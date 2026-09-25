@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getCurrentStudent } from "@/lib/auth";
 import LoginForm from "./LoginForm";
@@ -8,7 +9,7 @@ export default async function LoginPage() {
   return (
     <main className="login-shell">
       <section className="login-brand">
-        <div className="brand-mark">MICA</div>
+        <Image src="/mica-logo.svg" alt="MICA – The School of Ideas" width={107} height={110} className="login-logo" priority />
         <p className="kicker">Business Analytics &amp; AI · 2026–27</p>
         <h1>Learning Portal</h1>
         <p className="lede">

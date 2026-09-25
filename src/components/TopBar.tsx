@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { logout } from "@/app/actions";
 import type { Student } from "@/data/students";
@@ -14,7 +15,8 @@ export default function TopBar({ student }: { student: Student }) {
     <header className="topbar">
       <div className="topbar-inner">
         <Link href="/dashboard" className="topbar-brand">
-          <span className="brand-mark sm">MICA</span>
+          <Image src="/mica-logo.svg" alt="MICA – The School of Ideas" width={107} height={110} className="topbar-logo" priority />
+          <span className="topbar-divider" aria-hidden="true" />
           <span>Learning Portal</span>
         </Link>
         <div className="topbar-user">
