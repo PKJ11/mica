@@ -1,4 +1,4 @@
-# MICA Learning Portal
+# MICA Portal
 
 Next.js (App Router, TypeScript) portal for the Business Analytics & AI class.
 
@@ -15,9 +15,10 @@ Set `AUTH_SECRET` (any long random string) in the environment for production.
 
 ## Login
 
-- Username: roll number
+- Username: pick your roll number from the searchable dropdown (search by name or roll no.)
 - Password: first 2 letters of first name + first 2 letters of last name + last 4 digits of roll no.
   (e.g. Aakansha Johari, 20250132001 -> `AaJo2001`; letters are case-insensitive)
+- Anyone not on the list picks **Others** and uses the password `KaVy2026`.
 - The full list is in `credentials.md`. Students are defined in `src/data/students.ts`.
 
 ## Structure

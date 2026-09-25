@@ -17,13 +17,13 @@ export default function TopBar({ student }: { student: Student }) {
         <Link href="/dashboard" className="topbar-brand">
           <Image src="/mica-logo.svg" alt="MICA – The School of Ideas" width={107} height={110} className="topbar-logo" priority />
           <span className="topbar-divider" aria-hidden="true" />
-          <span>Learning Portal</span>
+          <span>Portal</span>
         </Link>
         <div className="topbar-user">
           <span className="avatar">{initials}</span>
           <span className="user-meta">
             <strong>{student.name}</strong>
-            <span className="mono">{student.roll}</span>
+            {student.roll !== "others" && <span className="mono">{student.roll}</span>}
           </span>
           <form action={logout}>
             <button className="btn-ghost" type="submit">

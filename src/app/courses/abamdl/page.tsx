@@ -27,17 +27,17 @@ export default async function AbamdlCourse() {
             </div>
           </div>
           <div className="grid two">
-            <Link href={`/activity/${s1.slug}`} className="activity-card feature">
-              <span className="tag">Session 1 Activity</span>
-              <h3>{s1.title}</h3>
-              <p>{s1.subtitle}</p>
-              <span className="arrow">Start activity →</span>
-            </Link>
             <Link href={`/activity/${zillow.slug}`} className="activity-card feature">
               <span className="tag">{zillow.tag}</span>
               <h3>{zillow.title}</h3>
               <p>{zillow.subtitle}</p>
               <span className="arrow">Read PDF →</span>
+            </Link>
+            <Link href={`/activity/${s1.slug}`} className="activity-card feature">
+              <span className="tag">Session 1 Activity</span>
+              <h3>{s1.title}</h3>
+              <p>{s1.subtitle}</p>
+              <span className="arrow">Start activity →</span>
             </Link>
           </div>
         </section>
@@ -56,8 +56,7 @@ export default async function AbamdlCourse() {
               <span className="tag light">Session 2 Activity</span>
               <h3>CRISP-DM Phase Mapping Activity</h3>
               <p>
-                Map each real Indian business case to the six CRISP-DM phases: business understanding,
-                data understanding, data preparation, modeling, evaluation and deployment.
+                Map each real Indian business case to the six CRISP-DM phases.
               </p>
             </div>
           </div>
@@ -66,7 +65,7 @@ export default async function AbamdlCourse() {
             {CRISP_DM_CASES.map((a, i) => (
               <Link key={a.slug} href={`/activity/${a.slug}`} className="activity-card">
                 <div className="card-row">
-                  <span className="case-no">Index {i + 1}</span>
+                  {/* <span className="case-no">Index {i + 1}</span> */}
                   <span className="tag">{a.tag}</span>
                 </div>
                 <h3>{a.title}</h3>

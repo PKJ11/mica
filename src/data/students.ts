@@ -53,12 +53,19 @@ export const STUDENTS: Student[] = [
  * The last word of the name is treated as the last name.
  */
 export function passwordFor(s: Student): string {
+  if (s.roll === OTHERS.roll) return OTHERS_PASSWORD;
   const parts = s.name.trim().split(/\s+/);
   const first = parts[0];
   const last = parts[parts.length - 1];
   return first.slice(0, 2) + last.slice(0, 2) + s.roll.slice(-4);
 }
 
+/** Shared login for anyone not on the class list. */
+export const OTHERS: Student = { roll: "others", name: "Others" };
+const OTHERS_PASSWORD = "KaVy2026";
+
 export function findStudent(roll: string): Student | undefined {
-  return STUDENTS.find((s) => s.roll === roll.trim());
+  const r = roll.trim();
+  if (r === OTHERS.roll) return OTHERS;
+  return STUDENTS.find((s) => s.roll === r);
 }

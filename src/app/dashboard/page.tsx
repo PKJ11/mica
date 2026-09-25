@@ -4,14 +4,14 @@ import { requireStudent } from "@/lib/auth";
 
 export default async function Dashboard() {
   const student = await requireStudent();
-  const firstName = student.name.split(/\s+/)[0];
+  const greeting = student.roll === "others" ? "Welcome" : `Welcome, ${student.name.split(/\s+/)[0]}`;
 
   return (
     <>
       <TopBar student={student} />
       <main className="page">
         <p className="kicker dark">Dashboard</p>
-        <h1 className="page-title">Welcome, {firstName}</h1>
+        <h1 className="page-title">{greeting}</h1>
         <p className="muted">Pick a course to continue.</p>
 
         <div className="grid two">

@@ -2,17 +2,18 @@
 
 import { useActionState, useState } from "react";
 import { login, type LoginState } from "../actions";
+import RollSelect, { type RollOption } from "./RollSelect";
 
-export default function LoginForm() {
+export default function LoginForm({ options }: { options: RollOption[] }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});
   const [show, setShow] = useState(false);
 
   return (
     <form action={action} className="login-form">
-      <label>
+      <div className="field">
         <span>Roll number</span>
-        <input name="roll" defaultValue={state.roll} key={state.roll} inputMode="numeric" autoComplete="username" placeholder="2025XXXXXXX" required />
-      </label>
+        <RollSelect name="roll" options={options} defaultValue={state.roll} key={state.roll} />
+      </div>
       <label>
         <span>Password</span>
         <div className="pw-row">

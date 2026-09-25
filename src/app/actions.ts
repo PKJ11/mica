@@ -11,7 +11,8 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   const roll = String(formData.get("roll") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
 
-  if (!roll || !password) return { error: "Please enter your roll number and password.", roll };
+  if (!roll) return { error: "Please select your roll number." };
+  if (!password) return { error: "Please enter your password.", roll };
 
   const student = findStudent(roll);
   // Letters are compared case-insensitively so "aajo2001" and "AaJo2001" both work.
