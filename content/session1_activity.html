@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice: the analytics continuum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#B61D22; --teal-dark:#8E161A; --teal-soft:#F7E2E2; --paper:#F5F0EE; --saffron:#D98A05; --saffron-soft:#FBEBCD;
+  --ok:#B61D22; --ok-soft:#FBECEC; --stop:#B45309; --stop-soft:#FDEBD3; --blue:#3C6E8F; --blue-soft:#E1ECF3;
+  --ink:#2A1F1F; --muted:#6B5B5A; --line:#DCCFCC; --white:#FFFFFF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:70px}
+body{font-family:var(--sans);color:var(--ink);background-color:var(--paper);
+  background-image:linear-gradient(rgba(182,29,34,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(182,29,34,.06) 1px,transparent 1px);
+  background-size:24px 24px;line-height:1.6;font-size:16px;min-height:100vh}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+
+header.top{background:var(--teal);color:var(--white);padding:28px 20px 24px}
+.wrap{max-width:1080px;margin:0 auto}
+.kicker{font-size:14px;opacity:.85}
+header.top h1{font-size:clamp(24px,4vw,34px);font-weight:600;line-height:1.2;margin:6px 0 8px}
+header.top p{max-width:700px;opacity:.92}
+
+nav.rail{position:sticky;top:0;z-index:20;background:var(--white);border-bottom:1px solid var(--line)}
+nav.rail .wrap{display:flex;gap:4px;padding:0 12px;overflow-x:auto}
+.tab{background:none;border:none;border-bottom:3px solid transparent;padding:14px 14px 11px;font-size:15px;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab .n{font-family:var(--mono);font-size:13px;width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;background:var(--paper);color:var(--teal)}
+.tab[aria-selected="true"]{color:var(--teal);border-bottom-color:var(--saffron);font-weight:600}
+.tab[aria-selected="true"] .n{background:var(--teal);color:var(--white)}
+
+main{padding:28px 20px 60px}
+section.panel{display:none}
+section.panel.on{display:block}
+.sheet{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:26px 28px;margin-bottom:20px}
+.sheet h2{font-size:22px;font-weight:600;color:var(--teal);margin-bottom:10px}
+.sheet h3{font-size:17px;font-weight:600;margin:18px 0 6px}
+.sheet p{max-width:72ch;margin-bottom:10px}
+.sheet ul{margin:6px 0 12px 20px;max-width:70ch}
+.sheet li{margin-bottom:5px}
+.newword{background:var(--blue-soft);border:1.5px solid var(--blue);border-radius:6px;padding:12px 16px;margin:14px 0;max-width:72ch}
+.newword b{color:var(--blue)}
+
+.ladder{display:grid;gap:8px;margin:14px 0}
+.rung{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;border:1.5px solid var(--line);border-radius:6px;padding:12px 14px}
+.rung .pnum{font-family:var(--mono);font-size:14px;width:28px;height:28px;border-radius:50%;background:var(--teal);color:var(--white);display:grid;place-items:center}
+.rung b{display:block}
+.rung span{font-size:14px;color:var(--muted)}
+
+.btn{border:none;border-radius:6px;padding:11px 18px;font-size:15px;font-weight:500;cursor:pointer}
+.btn.primary{background:var(--teal);color:var(--white)}
+.btn.primary:hover{background:var(--teal-dark)}
+.btn.ghost{background:var(--white);color:var(--teal);border:1.5px solid var(--teal)}
+.btn.small{padding:6px 10px;font-size:14px}
+
+.qcount{font-size:14px;color:var(--muted);margin-bottom:14px}
+.q{background:var(--white);border:1.5px solid var(--line);border-radius:6px;padding:22px 24px;margin-bottom:18px}
+.q .qhead{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
+.q .qn{font-family:var(--mono);font-size:14px;flex:0 0 28px;height:28px;border-radius:50%;background:var(--teal);color:var(--white);display:grid;place-items:center}
+.q h3{font-size:17px;font-weight:600;line-height:1.35}
+.q .kind{font-size:14px;color:var(--muted);margin:0 0 12px 40px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;background:var(--white)}
+.opt input{margin-top:5px;accent-color:var(--teal);width:17px;height:17px;flex:0 0 auto}
+.opt .otxt{font-size:15px}
+.opt.picked{border-color:var(--teal);background:var(--teal-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.missed{border-color:var(--ok);border-style:dashed;background:var(--white)}
+.opt.wrongpick{border-color:var(--stop);background:var(--stop-soft)}
+.opt .mark{margin-left:auto;font-size:13px;font-weight:600;white-space:nowrap}
+.opt.right .mark,.opt.missed .mark{color:var(--ok)}
+.opt.wrongpick .mark{color:var(--stop)}
+
+.sortlist{display:grid;gap:8px;counter-reset:s}
+.sortitem{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;background:var(--white);touch-action:none;user-select:none}
+.sortitem .pos{font-family:var(--mono);font-size:13px;width:26px;height:26px;border-radius:50%;background:var(--paper);color:var(--teal);display:grid;place-items:center;flex:0 0 auto}
+.sortitem .stxt{font-size:15px;flex:1}
+.sortitem .grip{cursor:grab;color:var(--muted);font-size:18px;line-height:1;padding:0 4px}
+.sortitem .arrows{display:flex;flex-direction:column;gap:2px}
+.sortitem .arrows button{border:1px solid var(--line);background:var(--white);border-radius:3px;width:26px;height:18px;line-height:1;cursor:pointer;color:var(--teal);font-size:11px}
+.sortitem.right{border-color:var(--ok);background:var(--ok-soft)}
+.sortitem.wrongpick{border-color:var(--stop);background:var(--stop-soft)}
+.sortitem.dragging{opacity:.35}
+.sortghost{position:fixed;pointer-events:none;z-index:100;width:min(520px,80vw);box-shadow:0 10px 24px rgba(182,29,34,.25);transform:translate(-50%,-50%)}
+
+.qfoot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.verdict{font-size:15px}
+.verdict.good{color:var(--ok);font-weight:500}
+.verdict.bad{color:var(--stop)}
+.why{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px;font-size:15px}
+.why.on{display:block}
+.why p{margin-bottom:8px}
+
+.closing{display:none;background:var(--teal);color:var(--white);border-radius:6px;padding:20px 22px;margin-top:4px}
+.closing.on{display:block}
+.closing h3{font-size:18px;margin-bottom:4px}
+.closing .btn{margin-top:10px;background:var(--white);color:var(--teal)}
+
+@media (max-width:560px){.sheet,.q{padding:20px 18px}.q .kind{margin-left:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">Practice activity, the analytics continuum</div>
+    <h1>Gut feel, research, analysis, machine learning</h1>
+    <p>Practice activity to hone your knowledge of the Analytics Continuum from pure intuition or gut feel to ML Algorithms.</p>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Activity sections">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="idea"><span class="n">1</span>The idea</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="practice"><span class="n">2</span>Five questions</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="take"><span class="n">3</span>What to take away</button>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<section class="panel on" id="idea">
+  <div class="sheet">
+    <h2>Four ways to decide</h2>
+    <p>A manager deciding how many milk pouches to send, or which districts to launch a cooler in, can lean on four kinds of support. They are not rivals. Each one costs more time and data than the one before it, and each one is stronger where the one before it is weak.</p>
+
+    <div class="newword"><b>Terminology Alert: analytics continuum.</b> A way of describing how much evidence a decision rests on, from personal judgement at one end to models learned from large amounts of data at the other. Most real decisions use more than one point on it.</div>
+
+    <div class="ladder">
+      <div class="rung"><span class="pnum">1</span><p><b>Intuition</b><span>What an experienced person believes, built from years of seeing the business. Fast and free, works when there is no data, but it is easily fooled by memory and recent events.</span></p></div>
+      <div class="rung"><span class="pnum">2</span><p><b>Research</b><span>Evidence somebody else has already gathered: census figures, industry reports, published studies, what competitors did. Cheap, broad, but not about your own customers.</span></p></div>
+      <div class="rung"><span class="pnum">3</span><p><b>Analysis</b><span>Studying your own past data to see what actually happened: sales by district, orders by hour, late payments by customer type. Specific to your business, but it looks backwards.</span></p></div>
+      <div class="rung"><span class="pnum">4</span><p><b>Machine learning</b><span>A model that learns patterns from that data and makes a prediction for each new case, at a scale no person could handle. Powerful, but only for questions it was built and tested on.</span></p></div>
+    </div>
+
+    <h3>Real world examples of how decisions are made across the analytics continuum</h3>
+    <ul>
+      <li>Intuition set the direction at Zillow: two founders believed home prices should be public, long before any data proved it.</li>
+      <li>Research told Godrej how many households live in each district and how hot the summers are, which no internal sales report can say.</li>
+      <li>Analysis showed Swiggy that late deliveries cluster between 7 pm and 10 pm and on rainy days.</li>
+      <li>Machine learning then gave every single order its own delivery estimate, which no team of people could do by hand.</li>
+    </ul>
+    <p>The lesson of the cases is not that machine learning wins. It is that a decision should rest on the highest point of the continuum the question can actually support, and that human judgement stays in the loop at every point.</p>
+    <div class="qfoot"><button class="btn primary" data-go="practice">Start the questions</button></div>
+  </div>
+</section>
+
+<section class="panel" id="practice">
+  <p class="qcount" id="qcount">Five questions. Answer each one and press Check.</p>
+  <div id="qs"></div>
+  <div class="closing" id="closing">
+    <h3>All five checked.</h3>
+    <p>Read the reasons once more if any surprised you, then move to the last tab.</p>
+    <button class="btn" data-go="take">What to take away</button>
+  </div>
+</section>
+
+<section class="panel" id="take">
+  <div class="sheet">
+    <h2>What to take away</h2>
+    <h3>1. Data usually beats gut feel, but not always</h3>
+    <p>Across the cases, moving from judgement to data improved decisions: Swiggy's delivery promise, Amul's dispatch quantity, IDFC FIRST Bank's collection calls, Godrej's launch districts. The gains came where the same kind of decision is made again and again, and where the result is recorded so the model can learn from it.</p>
+    <h3>2. Intuition holds its ground in three places</h3>
+    <ul>
+      <li>When there is no relevant past data: a brand new product, a new market, an event nobody has seen before.</li>
+      <li>When the situation has just changed in a way the data cannot know: a competitor collapses, a flood shuts a highway, a rule changes overnight.</li>
+      <li>When the question is about values rather than prediction: whether flagging a customer is fair, whether a price is decent, whether a launch is worth the risk.</li>
+    </ul>
+    <h3>3. A model is only as good as the question it was tested on</h3>
+    <p>Zillow's estimate was accurate enough to attract millions of visitors and far too rough to buy houses with the company's own money. Same model, different question, opposite outcome.</p>
+    <h3>4. Keep people in the loop</h3>
+    <p>Zillow's pricing experts used to adjust the algorithm's offers. When they were told to stop, errors went straight into purchases. The strongest arrangement is not people or models, but people with models.</p>
+    <div class="qfoot"><button class="btn ghost" id="restart">Try the questions again</button></div>
+  </div>
+</section>
+
+</div>
+</main>
+
+<script>
+(function(){
+  const QS = [
+    {
+      id:'q1', type:'order',
+      q:'Put these four ways of deciding in order, from the one that rests most on personal judgement to the one that rests most on data.',
+      kind:'Ordering question. Drag the rows, or use the arrows, then press Check.',
+      items:[
+        {id:'i1', t:'Intuition: an experienced manager\u2019s feel for the business'},
+        {id:'i2', t:'Research: census figures, industry reports and published studies'},
+        {id:'i3', t:'Analysis: studying the company\u2019s own past records'},
+        {id:'i4', t:'Machine learning: a model that predicts each new case'}
+      ],
+      answer:['i1','i2','i3','i4'],
+      why:'<p>Each step adds evidence and cost. Intuition needs nothing but experience. Research borrows evidence somebody else collected. Analysis uses the company\u2019s own history. Machine learning learns patterns from that history and applies them case by case.</p><p>The order is not a ranking of worth. A decision may stop at step 2 because no useful data exists, and that is a sound choice.</p>'
+    },
+    {
+      id:'q2', type:'multi',
+      q:'Zillow\u2019s Zestimate was wrong by about 14% on average when it launched in 2006, yet it made Zillow the most visited property site in America. Choose all the reasons this worked.',
+      kind:'Choose all that are correct.',
+      opts:[
+        {id:'a', t:'It covered almost every home in the country, including homes that were not for sale.', ok:true},
+        {id:'b', t:'Buyers and sellers used it as a starting point for a conversation, not as a final price.', ok:true},
+        {id:'c', t:'Before it, an ordinary buyer had no independent way at all to check a price.', ok:true},
+        {id:'d', t:'It was accurate enough for Zillow to buy houses with its own money.', ok:false},
+        {id:'e', t:'Every estimate was checked by a professional valuer before it appeared.', ok:false}
+      ],
+      why:'<p>A rough number beat no number. The Zestimate\u2019s value came from its coverage and from being free and public, at a time when prices sat inside brokers\u2019 databases.</p><p>Option D is the mistake Zillow itself made later. Option E never happened: the estimates were produced by a model, with no human valuation behind them.</p>'
+    },
+    {
+      id:'q3', type:'multi',
+      q:'In which of these situations would you rely more on experienced judgement than on a model built from past data?',
+      kind:'Choose all that are correct.',
+      opts:[
+        {id:'a', t:'Godrej is entering a product category it has never sold before, so there are no past sales to learn from.', ok:true},
+        {id:'b', t:'A highway is shut by floods this morning, something that has never happened in the two years of delivery records.', ok:true},
+        {id:'c', t:'The bank must decide whether flagging customers by area is fair to them.', ok:true},
+        {id:'d', t:'Amul must decide how many pouches to send to a route it has supplied daily for two years.', ok:false},
+        {id:'e', t:'Swiggy must show a delivery estimate for each of two lakh orders tonight.', ok:false}
+      ],
+      why:'<p>Judgement is strongest where data is absent, where the world has just changed in a way the records cannot know, and where the question is about values rather than prediction.</p><p>D and E are the opposite case: the same decision repeats constantly, the outcome is recorded every time, and the volume is far beyond what people can handle one by one. That is where a model earns its place.</p>'
+    },
+    {
+      id:'q4', type:'order',
+      q:'Godrej is choosing fifty districts for a cooler launch. Put the team\u2019s steps in the order that spends the least effort first and adds evidence as it goes.',
+      kind:'Ordering question. Drag the rows, or use the arrows, then press Check.',
+      items:[
+        {id:'j1', t:'Regional managers name the districts they believe will sell'},
+        {id:'j2', t:'The team checks census households and summer temperatures for those districts'},
+        {id:'j3', t:'The team studies three years of its own cooler sales, district by district'},
+        {id:'j4', t:'A model ranks every district by predicted sales per 1,000 households'}
+      ],
+      answer:['j1','j2','j3','j4'],
+      why:'<p>Good teams do not skip to the model. The managers\u2019 list is free and gives the project a starting shape. Public data tests that list cheaply. The company\u2019s own sales history tests it more sharply. Only then is a model worth building, and its job is to rank hundreds of districts nobody had time to think about.</p><p>Notice that the earlier steps do not disappear. The managers\u2019 knowledge of which districts have dealers and service centres decided the final list in the case.</p>'
+    },
+    {
+      id:'q5', type:'multi',
+      q:'Zillow had the best home-price data in America, and still lost 421 million dollars buying houses. Choose all the statements that help explain the loss.',
+      kind:'Choose all that are correct.',
+      opts:[
+        {id:'a', t:'A model built to estimate a home\u2019s value today was used to decide what to pay for a future resale.', ok:true},
+        {id:'b', t:'Pricing experts were told to stop adjusting the algorithm\u2019s offers.', ok:true},
+        {id:'c', t:'A revenue target set the buying pace, so mistakes were repeated at speed.', ok:true},
+        {id:'d', t:'House prices across America were falling through 2021.', ok:false},
+        {id:'e', t:'Zillow had no data on the homes it was buying.', ok:false}
+      ],
+      why:'<p>The model, the people and the strategy all played a part. The question changed from "what is this worth today" to "what will it fetch months from now, after repairs", and nobody tested the model on the new question.</p><p>D is what makes the case memorable: prices were rising, and Zillow still lost money. E is the opposite of the truth. Its data was its greatest asset, which is exactly why the failure is worth studying.</p>'
+    }
+  ];
+
+  const state = {checked:{}};
+
+  // tabs
+  const tabs=document.querySelectorAll('.tab');
+  function showTab(id){
+    tabs.forEach(t=>t.setAttribute('aria-selected', t.dataset.tab===id?'true':'false'));
+    document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('on', s.id===id));
+    window.scrollTo({top:0});
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+  document.addEventListener('click',e=>{const g=e.target.closest('[data-go]'); if(g) showTab(g.dataset.go);});
+
+  function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+  const host=document.getElementById('qs');
+
+  QS.forEach((q,idx)=>{
+    const box=document.createElement('section');
+    box.className='q'; box.id=q.id;
+    box.innerHTML='<div class="qhead"><span class="qn">'+(idx+1)+'</span><h3></h3></div><p class="kind"></p><div class="body"></div>'+
+      '<div class="qfoot"><button class="btn primary small" data-act="check">Check</button><button class="btn ghost small" data-act="retry" hidden>Try again</button><span class="verdict" role="status" aria-live="polite"></span></div>'+
+      '<div class="why"></div>';
+    box.querySelector('h3').textContent=q.q;
+    box.querySelector('.kind').textContent=q.kind;
+    box.querySelector('.why').innerHTML=q.why;
+    host.appendChild(box);
+    if(q.type==='multi') buildMulti(q,box); else buildOrder(q,box);
+    box.querySelector('[data-act="check"]').addEventListener('click',()=>check(q,box));
+    box.querySelector('[data-act="retry"]').addEventListener('click',()=>reset(q,box));
+  });
+
+  function buildMulti(q,box){
+    const wrapEl=document.createElement('div'); wrapEl.className='opts';
+    q.order=shuffle(q.opts.map(o=>o.id));
+    q.order.forEach(oid=>{
+      const o=q.opts.find(x=>x.id===oid);
+      const lab=document.createElement('label'); lab.className='opt'; lab.dataset.opt=o.id;
+      lab.innerHTML='<input type="checkbox"><span class="otxt"></span><span class="mark"></span>';
+      lab.querySelector('.otxt').textContent=o.t;
+      lab.querySelector('input').addEventListener('change',e=>lab.classList.toggle('picked',e.target.checked));
+      wrapEl.appendChild(lab);
+    });
+    box.querySelector('.body').appendChild(wrapEl);
+  }
+
+  function buildOrder(q,box){
+    const list=document.createElement('div'); list.className='sortlist'; list.dataset.list=q.id;
+    let start=shuffle(q.items.map(i=>i.id));
+    if(start.join()===q.answer.join()) start=start.reverse();
+    start.forEach(iid=>{
+      const it=q.items.find(x=>x.id===iid);
+      const row=document.createElement('div'); row.className='sortitem'; row.dataset.item=it.id;
+      row.innerHTML='<span class="pos"></span><span class="grip" aria-hidden="true">\u2261</span><span class="stxt"></span>'+
+        '<span class="arrows"><button type="button" data-mv="up" aria-label="Move up">\u25B2</button><button type="button" data-mv="down" aria-label="Move down">\u25BC</button></span>';
+      row.querySelector('.stxt').textContent=it.t;
+      row.querySelector('[data-mv="up"]').addEventListener('click',()=>{const p=row.previousElementSibling; if(p) list.insertBefore(row,p); renumber(list);});
+      row.querySelector('[data-mv="down"]').addEventListener('click',()=>{const n=row.nextElementSibling; if(n) list.insertBefore(n,row); renumber(list);});
+      row.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; startDrag(e,row,list); });
+      list.appendChild(row);
+    });
+    box.querySelector('.body').appendChild(list);
+    renumber(list);
+  }
+
+  function renumber(list){ [...list.children].forEach((r,i)=>{ r.querySelector('.pos').textContent=i+1; }); }
+
+  // drag to reorder
+  let drag=null;
+  function startDrag(e,row,list){
+    if(row.classList.contains('locked')) return;
+    drag={row,list,ghost:null,moved:false,x0:e.clientX,y0:e.clientY};
+    window.addEventListener('pointermove',onMove);
+    window.addEventListener('pointerup',onUp,{once:true});
+    window.addEventListener('pointercancel',onUp,{once:true});
+  }
+  function onMove(e){
+    if(!drag) return;
+    if(!drag.moved){
+      if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<6) return;
+      drag.moved=true;
+      const g=drag.row.cloneNode(true); g.classList.add('sortghost'); drag.ghost=g; document.body.appendChild(g);
+      drag.row.classList.add('dragging'); document.body.style.userSelect='none';
+    }
+    drag.ghost.style.left=e.clientX+'px'; drag.ghost.style.top=e.clientY+'px';
+    const rows=[...drag.list.children].filter(r=>r!==drag.row);
+    let placed=false;
+    for(const r of rows){
+      const b=r.getBoundingClientRect();
+      if(e.clientY < b.top + b.height/2){ drag.list.insertBefore(drag.row,r); placed=true; break; }
+    }
+    if(!placed) drag.list.appendChild(drag.row);
+    renumber(drag.list);
+  }
+  function onUp(){
+    window.removeEventListener('pointermove',onMove);
+    if(!drag) return;
+    if(drag.ghost) drag.ghost.remove();
+    drag.row.classList.remove('dragging');
+    document.body.style.userSelect='';
+    renumber(drag.list);
+    drag=null;
+  }
+
+  // check
+  function check(q,box){
+    const v=box.querySelector('.verdict');
+    if(q.type==='multi'){
+      const picks=[...box.querySelectorAll('.opt')].filter(l=>l.querySelector('input').checked);
+      if(picks.length===0){ v.textContent='Choose at least one option before checking.'; v.className='verdict bad'; return; }
+      let wrong=0, missed=0;
+      box.querySelectorAll('.opt').forEach(lab=>{
+        const o=q.opts.find(x=>x.id===lab.dataset.opt);
+        const picked=lab.querySelector('input').checked;
+        lab.querySelector('input').disabled=true;
+        lab.classList.remove('picked');
+        if(o.ok && picked){ lab.classList.add('right'); lab.querySelector('.mark').textContent='\u2713 Correct'; }
+        else if(o.ok && !picked){ lab.classList.add('missed'); lab.querySelector('.mark').textContent='Also correct'; missed++; }
+        else if(!o.ok && picked){ lab.classList.add('wrongpick'); lab.querySelector('.mark').textContent='\u2717 Not this one'; wrong++; }
+      });
+      if(wrong===0 && missed===0){ v.textContent='All correct.'; v.className='verdict good'; }
+      else { v.textContent = (wrong? wrong+(wrong===1?' option should not be ticked. ':' options should not be ticked. '):'') + (missed? missed+(missed===1?' correct option was left out.':' correct options were left out.'):''); v.className='verdict bad'; }
+    } else {
+      const list=box.querySelector('.sortlist');
+      const now=[...list.children].map(r=>r.dataset.item);
+      let wrong=0;
+      [...list.children].forEach((r,i)=>{
+        r.classList.add('locked');
+        r.querySelectorAll('button').forEach(b=>b.disabled=true);
+        if(now[i]===q.answer[i]) r.classList.add('right'); else { r.classList.add('wrongpick'); wrong++; }
+      });
+      if(wrong===0){ v.textContent='Correct order.'; v.className='verdict good'; }
+      else { v.textContent=wrong+(wrong===1?' row is':' rows are')+' out of place. The reason below gives the order.'; v.className='verdict bad'; }
+    }
+    box.querySelector('.why').classList.add('on');
+    box.querySelector('[data-act="check"]').hidden=true;
+    box.querySelector('[data-act="retry"]').hidden=false;
+    state.checked[q.id]=true;
+    if(Object.keys(state.checked).length===QS.length) document.getElementById('closing').classList.add('on');
+  }
+
+  function reset(q,box){
+    box.querySelector('.why').classList.remove('on');
+    box.querySelector('.verdict').textContent=''; box.querySelector('.verdict').className='verdict';
+    box.querySelector('[data-act="check"]').hidden=false;
+    box.querySelector('[data-act="retry"]').hidden=true;
+    if(q.type==='multi'){
+      box.querySelectorAll('.opt').forEach(lab=>{
+        lab.className='opt';
+        const inp=lab.querySelector('input'); inp.disabled=false; inp.checked=false;
+        lab.querySelector('.mark').textContent='';
+      });
+    } else {
+      box.querySelectorAll('.sortitem').forEach(r=>{
+        r.classList.remove('right','wrongpick','locked');
+        r.querySelectorAll('button').forEach(b=>b.disabled=false);
+      });
+    }
+  }
+
+  document.getElementById('restart').addEventListener('click',()=>{
+    QS.forEach(q=>reset(q,document.getElementById(q.id)));
+    state.checked={};
+    document.getElementById('closing').classList.remove('on');
+    showTab('practice');
+  });
+})();
+</script>
+</body>
+</html>

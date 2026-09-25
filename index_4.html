@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRISP-DM Mapping, Case 4: Godrej appliance launch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#B61D22; --teal-dark:#8E161A; --teal-soft:#F7E2E2; --paper:#F5F0EE; --saffron:#D98A05; --saffron-soft:#FBEBCD;
+  --ok:#B61D22; --ok-soft:#FBECEC; --stop:#B45309; --stop-soft:#FDEBD3; --blue:#3C6E8F; --blue-soft:#E1ECF3;
+  --ink:#2A1F1F; --muted:#6B5B5A; --line:#DCCFCC; --white:#FFFFFF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:70px}
+body{font-family:var(--sans);color:var(--ink);background-color:var(--paper);
+  background-image:linear-gradient(rgba(182,29,34,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(182,29,34,.06) 1px,transparent 1px);
+  background-size:24px 24px;line-height:1.6;font-size:16px;min-height:100vh}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+
+header.top{background:var(--teal);color:var(--white);padding:28px 20px 24px}
+.wrap{max-width:1080px;margin:0 auto}
+.kicker{font-size:14px;opacity:.85}
+header.top h1{font-size:clamp(24px,4vw,34px);font-weight:600;line-height:1.2;margin:6px 0 8px}
+header.top p{max-width:680px;opacity:.92}
+
+nav.rail{position:sticky;top:0;z-index:20;background:var(--white);border-bottom:1px solid var(--line)}
+nav.rail .wrap{display:flex;gap:4px;padding:0 12px;overflow-x:auto}
+.tab{background:none;border:none;border-bottom:3px solid transparent;padding:14px 14px 11px;font-size:15px;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab .n{font-family:var(--mono);font-size:13px;width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;background:var(--paper);color:var(--teal)}
+.tab[aria-selected="true"]{color:var(--teal);border-bottom-color:var(--saffron);font-weight:600}
+.tab[aria-selected="true"] .n{background:var(--teal);color:var(--white)}
+.tab:disabled{cursor:not-allowed;opacity:.5}
+
+main{padding:28px 20px 60px}
+section.panel{display:none}
+section.panel.on{display:block}
+.sheet{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:26px 28px;margin-bottom:20px}
+.sheet h2{font-size:22px;font-weight:600;color:var(--teal);margin-bottom:10px}
+.sheet h3{font-size:17px;font-weight:600;margin:18px 0 6px}
+.sheet p{max-width:72ch;margin-bottom:10px}
+.sheet ul{margin:6px 0 12px 20px;max-width:70ch}
+.sheet li{margin-bottom:4px}
+
+.newword{background:var(--blue-soft);border:1.5px solid var(--blue);border-radius:6px;padding:12px 16px;margin:14px 0;max-width:72ch}
+.newword b{color:var(--blue)}
+.later{background:var(--saffron-soft);border:1.5px solid var(--saffron);border-radius:6px;padding:12px 16px;margin:14px 0;max-width:72ch}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.fact{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--paper)}
+.fact .v{font-family:var(--mono);font-size:22px;color:var(--teal)}
+.fact .l{font-size:14px;color:var(--muted)}
+
+.phaselist{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-top:10px}
+.phaselist div{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:6px}
+.pnum{font-family:var(--mono);font-size:14px;flex:0 0 28px;height:28px;border-radius:50%;background:var(--teal);color:var(--white);display:grid;place-items:center}
+.phaselist b{display:block}
+.phaselist p span{font-size:14px;color:var(--muted)}
+.phaselist .pnum{font-size:14px;color:var(--white)}
+
+.btn{border:none;border-radius:6px;padding:11px 18px;font-size:15px;font-weight:500;cursor:pointer}
+.btn.primary{background:var(--teal);color:var(--white)}
+.btn.primary:hover{background:var(--teal-dark)}
+.btn.ghost{background:var(--white);color:var(--teal);border:1px solid var(--teal)}
+.btn.warn{background:var(--saffron);color:var(--white)}
+
+/* activity */
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-bottom:14px}
+.bar .how{flex:1 1 380px;font-size:15px;color:var(--muted)}
+.score{display:flex;gap:16px;font-size:14px}
+.score b{font-family:var(--mono);font-size:17px;color:var(--teal)}
+.tray{background:var(--white);border:2px dashed var(--line);border-radius:6px;padding:14px;min-height:96px;margin-bottom:18px}
+.tray-h{font-size:14px;color:var(--muted);margin-bottom:10px}
+.tray .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tray.empty .tray-h::after{content:": all cards placed. Press Check my mapping."}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.zone{background:var(--white);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;min-height:230px;transition:box-shadow .12s,border-color .12s}
+.zone-h{display:flex;gap:10px;align-items:flex-start;padding:12px 12px 10px;border-bottom:1px solid var(--line);background:var(--teal-soft);border-radius:6px 6px 0 0;cursor:pointer}
+.zone-h b{display:block;font-size:15px;line-height:1.3}
+.zone-h div span{font-size:13px;color:var(--muted);line-height:1.35;display:block}
+.zone-h .pnum{flex:0 0 28px}
+.zone-body{flex:1;padding:10px;display:flex;flex-direction:column;gap:8px}
+.zone.hot{border-color:var(--saffron);box-shadow:0 0 0 3px var(--saffron-soft)}
+.zone.target{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.zone-count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--teal);white-space:nowrap;padding-top:4px}
+
+.card{background:var(--white);border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;font-size:14px;line-height:1.45;cursor:grab;touch-action:none;user-select:none;position:relative}
+.card:hover{border-color:var(--teal)}
+.card.sel{outline:3px solid var(--saffron);outline-offset:1px}
+.card.dragging{opacity:.35}
+.card.right{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+.card.wrong{border-color:var(--stop);background:var(--stop-soft)}
+.card .why{display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.1);font-size:13px;color:var(--ink)}
+.card.right .why,.card.wrong .why{display:block}
+.card .tag{display:none;font-size:12px;font-weight:600;margin-bottom:4px}
+.card.right .tag{display:block;color:var(--ok)}
+.card.wrong .tag{display:block;color:var(--stop)}
+.ghostcard{position:fixed;pointer-events:none;z-index:100;width:240px;transform:translate(-50%,-60%) rotate(-2deg);box-shadow:0 10px 24px rgba(182,29,34,.25);opacity:.95}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.msg{font-size:15px;min-height:24px}
+.msg.err{color:var(--stop)}
+.msg.good{color:var(--ok);font-weight:500}
+.banner{display:none;background:var(--teal);color:var(--white);border-radius:6px;padding:18px 20px;margin-top:18px}
+.banner.on{display:block}
+.banner h3{font-size:18px;margin-bottom:4px}
+.banner .btn{margin-top:10px;background:var(--white);color:var(--teal)}
+
+/* debrief */
+.flow{display:grid;gap:10px;margin-top:12px}
+.step{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:6px}
+.step .pnum{align-self:start}
+.step h4{font-size:15px;margin-bottom:4px}
+.step ul{margin:0 0 0 18px;font-size:14px}
+.loop{margin-top:14px}
+.locked{padding:30px;text-align:center;color:var(--muted)}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:200}
+
+@media (max-width:860px){.zones{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.zones{grid-template-columns:1fr}.sheet{padding:20px 18px}.zone{min-height:150px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">CRISP-DM mapping activity, case 4 of 4</div>
+    <h1>Godrej: where should the new cooler launch first?</h1>
+    <p>An appliance maker has limited stock and advertising money for a launch. Sort the work of the analytics team into the six phases of CRISP-DM.</p>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Activity sections">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="case"><span class="n">1</span>The case</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="map"><span class="n">2</span>Map the phases</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="debrief" id="tabDebrief" disabled><span class="n">3</span>How it fits together</button>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<!-- ========== TAB 1: CASE ========== -->
+<section class="panel on" id="case">
+  <div class="sheet">
+    <h2>The business problem</h2>
+    <p>Godrej Appliances is ready to launch a new air cooler built for very hot, dry summers. It cannot launch everywhere at once. There is enough stock and advertising money for about fifty districts in the first season.</p>
+    <p>Until now such decisions were made from experience. The sales team would pick the districts where the company already sells well, or where a regional manager pushes hardest.</p>
+    <p>Imagine the marketing team wants to choose those fifty districts from data instead: where are households most likely to buy this cooler, and where can dealers actually deliver and service it?</p>
+
+    <div class="newword"><b>Terminology Alert: market potential.</b> An estimate of how much of a product could be sold in a place, based on how many households live there, what they already own and what they can spend. It is an estimate of what is possible, not a record of past sales.</div>
+
+    <div class="facts" aria-label="Case figures (illustrative)">
+      <div class="fact"><div class="v">50</div><div class="l">Districts the first season can cover</div></div>
+      <div class="fact"><div class="v">3 years</div><div class="l">Past sales of similar coolers by district</div></div>
+      <div class="fact"><div class="v">60%</div><div class="l">Share of first-year sales the chosen districts should deliver</div></div>
+    </div>
+    <p style="font-size:14px;color:var(--muted)">The situation and figures in this case are illustrative, created for teaching. They are not Godrej’s actual data.</p>
+  </div>
+  <div class="sheet">
+    <h2>The six phases of CRISP-DM</h2>
+    <div class="newword"><b>Terminology Alert: CRISP-DM.</b> Short for Cross-Industry Standard Process for Data Mining. It is a widely used plan that breaks an analytics project into six phases, so a team moves from a business question to a working solution in an orderly way.</div>
+    <div class="phaselist">
+      <div><span class="pnum">1</span><p><b>Business understanding</b><span>What is the business goal, and how will we know we have succeeded?</span></p></div>
+      <div><span class="pnum">2</span><p><b>Data understanding</b><span>What data do we have, and what does it look like? Is it complete and correct?</span></p></div>
+      <div><span class="pnum">3</span><p><b>Data preparation</b><span>Clean the data, fix errors and create the columns the model will need.</span></p></div>
+      <div><span class="pnum">4</span><p><b>Modelling</b><span>Build one or more models that make predictions from the prepared data.</span></p></div>
+      <div><span class="pnum">5</span><p><b>Evaluation</b><span>Test the model on new data. Does it meet the business goal from phase 1?</span></p></div>
+      <div><span class="pnum">6</span><p><b>Deployment</b><span>Put the model to work in the real business and keep checking it.</span></p></div>
+    </div>
+    <div class="later">Coming later: real projects rarely move in a straight line from phase 1 to phase 6. Teams often go back to an earlier phase. You will see an example of this after you finish the mapping.</div>
+    <div class="actions"><button class="btn primary" data-go="map">Start the mapping</button></div>
+  </div>
+</section>
+
+<!-- ========== TAB 2: MAP ========== -->
+<section class="panel" id="map">
+  <div class="bar">
+    <p class="how">Drag each card from the tray below into the phase where that piece of work belongs. You can also tap a card and then tap a phase. Each phase takes two cards.</p>
+    <div class="score"><span>Placed <b id="placed">0</b>/12</span><span>Correct <b id="correct">0</b></span><span>Mistakes <b id="mistakes">0</b></span></div>
+  </div>
+
+
+  <div class="zones" id="zones"></div>
+
+  <div class="tray" style="margin:18px 0 0" id="tray" aria-label="Cards to place">
+    <div class="tray-h">Cards to place</div>
+    <div class="cards" id="trayCards"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="check">Check my mapping</button>
+    <button class="btn ghost" id="reset">Start again</button>
+    <span class="msg" id="msg" role="status" aria-live="polite"></span>
+  </div>
+
+  <div class="banner" id="banner" role="status">
+    <h3>All 12 cards are in the right phase.</h3>
+    <p id="bannerText"></p>
+    <button class="btn" data-go="debrief">See how it fits together</button>
+  </div>
+</section>
+
+<!-- ========== TAB 3: DEBRIEF ========== -->
+<section class="panel" id="debrief">
+  <div class="sheet">
+    <h2>The Godrej launch project, phase by phase</h2>
+    <p>Here is the full project in order. Read the reason under each card. Notice how every phase depends on the one before it.</p>
+    <div class="flow" id="flow"></div>
+  </div>
+  <div class="sheet">
+    <h2>Going back a step</h2>
+    <p>In phase 5 the team compared its ranking with last season’s real sales. Suppose the model ranked several hot districts near the top, but sales there had been poor because the nearest service centre was four hours away and dealers refused to stock the cooler.</p>
+    <p>The team would not send the list to the launch team as it stands. It would go back to phase 3 and add a column for how far each district is from a service centre. Then it would build the model again in phase 4 and test it again in phase 5.</p>
+    <p>This is why CRISP-DM is usually drawn as a cycle. Evaluation can send you back to data preparation, and what the launch teaches the company can start the cycle again at phase 1.</p>
+    <div class="actions"><button class="btn ghost" id="again">Try the mapping again</button></div>
+  </div>
+</section>
+
+</div>
+</main>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+  const PHASES = [
+    {id:1, name:'Business understanding', hint:'Goal and success measure'},
+    {id:2, name:'Data understanding',     hint:'What data exists and what it looks like'},
+    {id:3, name:'Data preparation',       hint:'Clean it and create useful columns'},
+    {id:4, name:'Modelling',              hint:'Build models that predict'},
+    {id:5, name:'Evaluation',             hint:'Does it meet the business goal?'},
+    {id:6, name:'Deployment',             hint:'Use it for real and keep watching'}
+  ];
+
+  const CARDS = [
+    {id:'a', p:1, t:'Meet the marketing and sales heads and agree that the goal is to choose the fifty districts for the first season, so stock and advertising go where the cooler will actually sell.',
+      why:'The decision the project must support is settled before any data work begins. This is business understanding.'},
+    {id:'b', p:1, t:'Agree on a target: the chosen fifty districts should together bring in at least 60% of the cooler\u2019s first-year sales.',
+      why:'A clear success measure is fixed at the start, so the team can later judge whether the choice was a good one.'},
+    {id:'c', p:2, t:'Collect three years of district-level sales of similar coolers, along with dealer lists, service centre locations, summer temperatures and household numbers from the census.',
+      why:'Gathering the data that exists and seeing what it contains is the first step of data understanding.'},
+    {id:'d', p:2, t:'Study the data and notice that a few districts were split into two in recent years, and that some dealers appear twice because they have two showrooms.',
+      why:'Spotting boundary changes and double counting is part of understanding the data. Fixing them comes next.'},
+    {id:'e', p:3, t:'Combine the split districts so three years can be compared, remove the repeated dealers, and convert sales into units sold per 1,000 households so small and large districts can be compared fairly.',
+      why:'Fixing boundaries, duplicates and units that are not comparable is data preparation.'},
+    {id:'f', p:3, t:'Create new columns for each district: average summer temperature, share of households that already own a cooler, dealers per 1,000 households, and last year\u2019s growth in cooler sales.',
+      why:'Building the extra columns a model will use is also data preparation.'},
+    {id:'g', p:4, t:'Build a linear regression model that predicts cooler sales per 1,000 households in a district from temperature, ownership, dealer reach and past growth.',
+      why:'Choosing a method and fitting it to the prepared data is modelling.'},
+    {id:'h', p:4, t:'Build a KNN model that finds the districts most similar to the ten where last year\u2019s cooler sold best, so the team has a second way of ranking districts.',
+      why:'Trying more than one method is a normal part of modelling. Choosing between them happens in evaluation.'},
+    {id:'i', p:5, t:'Hold back last season\u2019s real launch districts, predict them as if they were unknown, and check how close the predicted ranking is to what actually sold.',
+      why:'Testing on data the model has not seen shows how the ranking will behave in real life. This is evaluation.'},
+    {id:'j', p:5, t:'Take the top districts to the sales team and check whether each one has enough dealers and service centres to support a launch.',
+      why:'Evaluation weighs the business goal from phase 1 and whether the plan can actually be carried out, not accuracy alone.'},
+    {id:'k', p:6, t:'Hand the ranked district list to the launch team, send stock and advertising to the chosen fifty, and keep ten nearby districts aside for comparison.',
+      why:'Putting the ranking to work in the real launch plan is deployment.'},
+    {id:'l', p:6, t:'Compare monthly sales in each district against what the model predicted, and update the ranking before the next summer season.',
+      why:'A deployed model must be watched, because markets and competitors keep changing.'}
+  ];
+
+  // ---------- state ----------
+  const state = {where:{}, mistakes:0, locked:{}, done:false};
+  let order = [];
+  let selected = null;
+
+  function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+  // ---------- tabs ----------
+  const tabs = document.querySelectorAll('.tab');
+  function showTab(id){
+    tabs.forEach(t=>t.setAttribute('aria-selected', t.dataset.tab===id ? 'true':'false'));
+    document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('on', s.id===id));
+    window.scrollTo({top:0});
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>{ if(!t.disabled) showTab(t.dataset.tab); }));
+  document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g) showTab(g.dataset.go); });
+
+  // ---------- build zones ----------
+  const zonesEl = document.getElementById('zones');
+  PHASES.forEach(ph=>{
+    const z = document.createElement('div');
+    z.className='zone'; z.dataset.zone=ph.id;
+    z.innerHTML = '<div class="zone-h" role="button" tabindex="0" aria-label="Place selected card in '+ph.name+'"><span class="pnum">'+ph.id+'</span><div><b>'+ph.name+'</b><span>'+ph.hint+'</span></div><span class="zone-count" data-count></span></div><div class="zone-body" data-body></div>';
+    zonesEl.appendChild(z);
+    const head = z.querySelector('.zone-h');
+    const place = ()=>{ if(selected){ moveCard(selected, ph.id); clearSel(); } };
+    z.addEventListener('click', e=>{ if(!e.target.closest('.card')) place(); });
+    head.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); place(); } });
+  });
+  const trayEl = document.getElementById('tray');
+  trayEl.addEventListener('click', e=>{ if(selected && !e.target.closest('.card')){ moveCard(selected, 0); clearSel(); } });
+
+  // ---------- cards ----------
+  const cardEls = {};
+  function makeCard(c){
+    const el = document.createElement('div');
+    el.className='card'; el.tabIndex=0; el.dataset.id=c.id;
+    el.setAttribute('role','button');
+    el.innerHTML='<div class="tag"></div><div class="txt"></div><div class="why"></div>';
+    el.querySelector('.txt').textContent=c.t;
+    el.querySelector('.why').textContent=c.why;
+    el.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleSel(c.id); }
+    });
+    el.addEventListener('pointerdown', e=>startDrag(e,c.id));
+    cardEls[c.id]=el;
+    return el;
+  }
+  CARDS.forEach(makeCard);
+
+  function toggleSel(id){
+    if(state.locked[id]) return;
+    if(selected===id){ clearSel(); return; }
+    clearSel(); selected=id; cardEls[id].classList.add('sel');
+    setMsg('Card selected. Now tap or press Enter on a phase.', '');
+  }
+  function clearSel(){ if(selected && cardEls[selected]) cardEls[selected].classList.remove('sel'); selected=null; }
+
+  function moveCard(id, zone){
+    if(state.locked[id]) return;
+    const el = cardEls[id];
+    el.classList.remove('wrong');
+    el.querySelector('.tag').textContent='';
+    state.where[id]=zone;
+    render();
+    setMsg('', '');
+  }
+
+  function render(){
+    const trayCards = document.getElementById('trayCards');
+    order.forEach(id=>{ if(!state.where[id]) trayCards.appendChild(cardEls[id]); });
+    PHASES.forEach(ph=>{
+      const body = zonesEl.querySelector('[data-zone="'+ph.id+'"] [data-body]');
+      order.forEach(id=>{ if(state.where[id]===ph.id) body.appendChild(cardEls[id]); });
+      const n = order.filter(id=>state.where[id]===ph.id).length;
+      zonesEl.querySelector('[data-zone="'+ph.id+'"] [data-count]').textContent = n+'/2';
+    });
+    const placed = order.filter(id=>state.where[id]).length;
+    document.getElementById('placed').textContent=placed;
+    document.getElementById('correct').textContent=Object.keys(state.locked).length;
+    document.getElementById('mistakes').textContent=state.mistakes;
+    trayEl.classList.toggle('empty', placed===CARDS.length);
+  }
+
+  // ---------- drag (pointer events: mouse, pen, touch) ----------
+  let drag=null;
+  function startDrag(e,id){
+    if(state.locked[id]) return;
+    if(e.button!==undefined && e.button!==0) return;
+    drag={id, x0:e.clientX, y0:e.clientY, moved:false, ghost:null, over:null};
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp, {once:true});
+    window.addEventListener('pointercancel', cancelDrag, {once:true});
+  }
+  function onMove(e){
+    if(!drag) return;
+    if(!drag.moved){
+      if(Math.hypot(e.clientX-drag.x0, e.clientY-drag.y0) < 6) return;
+      drag.moved=true;
+      const g = cardEls[drag.id].cloneNode(true);
+      g.classList.remove('sel'); g.classList.add('ghostcard'); g.removeAttribute('tabindex');
+      document.body.appendChild(g); drag.ghost=g;
+      cardEls[drag.id].classList.add('dragging');
+      document.body.style.userSelect='none';
+      clearSel();
+    }
+    drag.ghost.style.left=e.clientX+'px'; drag.ghost.style.top=e.clientY+'px';
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const z = under && under.closest('.zone');
+    const t = under && under.closest('.tray');
+    const target = z ? z : (t ? t : null);
+    if(target!==drag.over){
+      if(drag.over) drag.over.classList.remove('hot');
+      drag.over=target; if(target) target.classList.add('hot');
+    }
+    autoScroll(e.clientY);
+  }
+  function autoScroll(y){
+    const edge=60;
+    if(y<edge+50) window.scrollBy(0,-12);
+    else if(y>window.innerHeight-edge) window.scrollBy(0,12);
+  }
+  function onUp(){
+    window.removeEventListener('pointermove', onMove);
+    if(!drag) return;
+    const d=drag; drag=null;
+    if(!d.moved){ toggleSel(d.id); return; }
+    if(d.over){
+      d.over.classList.remove('hot');
+      const zid = d.over.classList.contains('zone') ? Number(d.over.dataset.zone) : 0;
+      moveCard(d.id, zid);
+    }
+    endGhost(d);
+  }
+  function cancelDrag(){ window.removeEventListener('pointermove', onMove); if(drag){ if(drag.over) drag.over.classList.remove('hot'); endGhost(drag); } drag=null; }
+  function endGhost(d){ if(d.ghost) d.ghost.remove(); cardEls[d.id].classList.remove('dragging'); document.body.style.userSelect=''; }
+
+  // ---------- check ----------
+  const msgEl=document.getElementById('msg');
+  function setMsg(t,cls){ msgEl.textContent=t; msgEl.className='msg'+(cls?' '+cls:''); }
+
+  document.getElementById('check').addEventListener('click',()=>{
+    const left = CARDS.filter(c=>!state.where[c.id]).length;
+    if(left>0){ setMsg('Place all 12 cards before checking. '+left+(left===1?' card is':' cards are')+' still in the tray.', 'err'); return; }
+    let wrong=0;
+    CARDS.forEach(c=>{
+      const el=cardEls[c.id];
+      if(state.locked[c.id]) return;
+      if(state.where[c.id]===c.p){
+        state.locked[c.id]=true; el.classList.remove('wrong'); el.classList.add('right');
+        el.querySelector('.tag').textContent='\u2713 Correct'; el.tabIndex=-1;
+      } else {
+        wrong++; el.classList.add('wrong');
+        el.querySelector('.tag').textContent='\u2717 Not this phase. Move it and check again.';
+        el.querySelector('.why').textContent = hintFor(c);
+      }
+    });
+    state.mistakes += wrong;
+    render();
+    if(wrong===0){ finish(); }
+    else setMsg(wrong+(wrong===1?' card is':' cards are')+' in the wrong phase. The orange cards show a hint.', 'err');
+  });
+
+  function hintFor(c){
+    const hints={
+      1:'Hint: this is about agreeing what the business wants before any data work starts.',
+      2:'Hint: this is about seeing what data exists and spotting its problems, not fixing them yet.',
+      3:'Hint: this changes the data itself, by cleaning it or adding columns.',
+      4:'Hint: this is about building a prediction method from the data.',
+      5:'Hint: this is about testing results, on new data and against the business goal.',
+      6:'Hint: this happens once the model is used by real customers.'
+    };
+    return hints[c.p];
+  }
+
+  function finish(){
+    state.done=true;
+    CARDS.forEach(c=>{ cardEls[c.id].querySelector('.why').textContent=c.why; });
+    const m=state.mistakes;
+    document.getElementById('bannerText').textContent = m===0 ? 'You mapped every card correctly on the first try.' : 'You finished with '+m+(m===1?' mistake':' mistakes')+' along the way. Read the green notes on each card to see why it belongs where it does.';
+    document.getElementById('banner').classList.add('on');
+    setMsg('Mapping complete.', 'good');
+    document.getElementById('tabDebrief').disabled=false;
+    buildDebrief();
+    confetti();
+  }
+
+  function buildDebrief(){
+    const flow=document.getElementById('flow'); flow.innerHTML='';
+    PHASES.forEach(ph=>{
+      const d=document.createElement('div'); d.className='step';
+      const items = CARDS.filter(c=>c.p===ph.id).map(c=>'<li>'+esc(c.t)+'<br><span style="color:var(--muted)">'+esc(c.why)+'</span></li>').join('');
+      d.innerHTML='<span class="pnum">'+ph.id+'</span><div><h4>'+ph.name+'</h4><ul>'+items+'</ul></div>';
+      flow.appendChild(d);
+    });
+  }
+  function esc(s){ return s.replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+
+  // ---------- reset ----------
+  function reset(){
+    state.where={}; state.mistakes=0; state.locked={}; state.done=false; clearSel();
+    order = shuffle(CARDS.map(c=>c.id));
+    CARDS.forEach(c=>{ const el=cardEls[c.id]; el.className='card'; el.tabIndex=0; el.querySelector('.tag').textContent=''; el.querySelector('.why').textContent=c.why; });
+    document.getElementById('banner').classList.remove('on');
+    setMsg('', '');
+    render();
+  }
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('again').addEventListener('click', ()=>{ reset(); showTab('map'); });
+
+  // ---------- confetti (skipped when reduced motion is requested) ----------
+  function confetti(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv=document.getElementById('confetti'), ctx=cv.getContext('2d');
+    cv.width=innerWidth; cv.height=innerHeight;
+    const cols=['#B61D22','#D98A05','#8E161A','#F2C14E','#E8B4B6'];
+    const ps=Array.from({length:120},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*0.4,w:6+Math.random()*6,h:8+Math.random()*8,vy:2+Math.random()*3,vx:-1.5+Math.random()*3,r:Math.random()*6,vr:-0.2+Math.random()*0.4,c:cols[Math.floor(Math.random()*cols.length)]}));
+    let t=0;
+    (function tick(){
+      ctx.clearRect(0,0,cv.width,cv.height);
+      ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
+      if(++t<200) requestAnimationFrame(tick); else ctx.clearRect(0,0,cv.width,cv.height);
+    })();
+  }
+
+  reset();
+})();
+</script>
+</body>
+</html>
