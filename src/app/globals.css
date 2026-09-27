@@ -92,6 +92,8 @@ button, input { font-family: inherit; font-size: inherit; }
   box-shadow: var(--shadow);
 }
 .login-card h2 { font-size: 26px; font-weight: 600; }
+.back-link { display: inline-block; font-size: 13px; font-weight: 500; color: var(--red); margin-bottom: 14px; }
+.back-link:hover { text-decoration: underline; }
 .login-form { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
 .login-form label { display: flex; flex-direction: column; gap: 6px; }
 .login-form label > span { font-size: 14px; font-weight: 500; }

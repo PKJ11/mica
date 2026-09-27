@@ -34,5 +34,5 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 export async function logout() {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
-  redirect("/login");
+  redirect("/home");
 }

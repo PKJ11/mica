@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentStudent } from "@/lib/auth";
 import { OTHERS, STUDENTS } from "@/data/students";
@@ -30,6 +31,9 @@ export default async function LoginPage() {
       </section>
       <section className="login-card-wrap">
         <div className="login-card">
+          <Link href="/home" className="back-link">
+            ← Back to home
+          </Link>
           <h2>Student sign in</h2>
           <p className="muted">Select your roll number and enter your portal password.</p>
           <LoginForm options={options} />

@@ -23,7 +23,8 @@ Set `AUTH_SECRET` (any long random string) in the environment for production.
 
 ## Structure
 
-- `/login` – sign in
+- `/home` – public welcome page (`/` redirects here). MICA → login; VNIT and JIT show “available on 1st October 2026”. Rebuilt from the design export `content/welcomepage.html`; images are in `public/home/`.
+- `/login` – sign in (log out returns to `/home`)
 - `/dashboard` – course cards: ABAMDL and GENAILLM
 - `/courses/abamdl` – Session 1 activity card; Session 2 CRISP-DM Phase Mapping with Index 1–4 cases
 - `/courses/genaillm` – Session 1 (deck + Software Application Design PDF), Session 2 (Anatomy deck), Session 3 locked. Other files in `content/Genaiml/` are registered with `hidden: true` in `src/lib/activities.ts` — remove that flag and add them to a session to publish.
