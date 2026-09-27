@@ -62,7 +62,7 @@ export default async function AbamdlCourse() {
           </div>
 
           <div className="grid four">
-            {CRISP_DM_CASES.map((a, i) => (
+            {CRISP_DM_CASES.map((a) => (
               <Link key={a.slug} href={`/activity/${a.slug}`} className="activity-card">
                 <div className="card-row">
                   {/* <span className="case-no">Index {i + 1}</span> */}

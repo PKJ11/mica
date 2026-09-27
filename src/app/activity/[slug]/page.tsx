@@ -7,14 +7,15 @@ export default async function ActivityPage({ params }: { params: Promise<{ slug:
   await requireStudent();
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
-  if (!activity) notFound();
+  if (!activity || activity.hidden) notFound();
 
   const src = `/api/activity/${activity.slug}`;
+  const course = activity.course ?? "abamdl";
 
   return (
     <div className="viewer">
       <div className="viewer-bar">
-        <Link href="/courses/abamdl" className="btn-ghost">
+        <Link href={`/courses/${course}`} className="btn-ghost">
           ← Back
         </Link>
         <div className="viewer-title">

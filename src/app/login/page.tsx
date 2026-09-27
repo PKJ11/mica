@@ -13,10 +13,14 @@ export default async function LoginPage() {
     <main className="login-shell">
       <section className="login-brand">
         <Image src="/mica-logo.svg" alt="MICA – The School of Ideas" width={107} height={110} className="login-logo" priority />
-        <p className="kicker">Business Analytics &amp; AI · 2026–27</p>
+        <p className="kicker">
+          Gen AI &amp; LLM Applications &amp;
+          <br />
+          Application of Business Analytics Managerial Statistics and Data Literacy
+        </p>
         <h1>Portal</h1>
         <p className="lede">
-          Sign in to access your course sessions, in-class activities and case practice.
+          Sign in to access your course sessions, in-class activities and practice activities.
         </p>
         <ul className="brand-points">
           <li>Session activities</li>

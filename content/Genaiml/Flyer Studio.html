@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flyer Studio</title>
+<meta name="theme-color" content="#B61D22">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F8F4F3; --surface:#FFFFFF; --sunk:#F1EAE8; --text:#2A1C1D; --muted:#6E5A5B; --line:#E0CFCD;
+  --heading:#8A1519; --red:#B61D22; --red-soft:#FBE8E8; --on-red:#FFFFFF; --bad:#8F161A;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#160E0F; --surface:#221617; --sunk:#1B1112; --text:#F2E7E7; --muted:#B9A3A4; --line:#4A2F31;
+    --heading:#F4B9BB; --red:#D9434A; --red-soft:#3D1B1D; --bad:#F4B9BB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#160E0F; --surface:#221617; --sunk:#1B1112; --text:#F2E7E7; --muted:#B9A3A4; --line:#4A2F31;
+  --heading:#F4B9BB; --red:#D9434A; --red-soft:#3D1B1D; --bad:#F4B9BB;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--display);color:var(--heading);font-stretch:112%;margin:0}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+img{max-width:100%}
+
+.top{border-bottom:1.5px solid var(--red);background:var(--surface)}
+.top .in{max-width:1320px;margin:0 auto;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+.top h1{font-size:1.9rem;font-weight:900;letter-spacing:-.01em}
+.top p{color:var(--muted)}
+.notice{max-width:1320px;margin:12px auto 0;padding:0 20px}
+.notice div{border:1.5px solid var(--red);background:var(--surface);padding:10px 14px;font-size:.92rem}
+
+.layout{max-width:1320px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--surface);border:1.5px solid var(--line);padding:18px}
+.panel + .panel{margin-top:16px}
+.step-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.step-h .n{font-family:var(--display);font-weight:900;font-stretch:125%;font-size:1.5rem;color:var(--red);line-height:1}
+.step-h h2{font-size:1.2rem;font-weight:800}
+.hint{font-size:.86rem;color:var(--muted)}
+
+label.f{display:block;font-weight:600;font-size:.88rem;margin:12px 0 4px}
+label.f .opt{font-weight:400;color:var(--muted)}
+input[type=text],select,textarea{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:0;padding:9px 10px;font-size:.93rem}
+textarea{resize:vertical;min-height:70px;line-height:1.45}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--red);outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 18px;border:1.5px solid var(--red);background:var(--red);color:var(--on-red);border-radius:0;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--heading);border-color:var(--line)}
+.btn.ghost:hover:not(:disabled){border-color:var(--red)}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:.86rem}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1.5px solid var(--line)}
+.seg button{min-height:40px;border:0;border-right:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--red);color:var(--on-red)}
+
+/* Template library */
+.lib{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tcard{display:flex;flex-direction:column;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;padding:0}
+.tcard[aria-pressed="true"]{border-color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+.tcard .th{aspect-ratio:3/4;background:var(--sunk);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tcard .th img{width:100%;height:100%;object-fit:cover}
+.tcard .tm{padding:6px 8px;font-size:.78rem;line-height:1.3;min-height:48px}
+.tcard .tm b{display:block;font-size:.84rem;color:var(--heading);overflow-wrap:anywhere}
+.tcard.add{align-items:center;justify-content:center;border-style:dashed;color:var(--heading);font-weight:700;min-height:120px;gap:4px}
+.tcard.add span{font-family:var(--display);font-size:2rem;line-height:1;font-weight:900}
+.upload{margin-top:12px;border:1.5px dashed var(--line);padding:12px;display:none}
+.upload.open{display:block}
+.drop{border:1.5px dashed var(--line);background:var(--sunk);padding:16px;text-align:center;cursor:pointer;font-size:.9rem}
+.drop.over{border-color:var(--red);background:var(--red-soft)}
+.drop img{max-height:160px;margin:0 auto 8px;display:block}
+.selected-t{margin-top:14px;border-top:1.5px solid var(--line);padding-top:12px}
+.selected-t h3{font-size:1rem;font-weight:800}
+
+details.side{border:1.5px solid var(--line);margin-top:10px;background:var(--surface)}
+details.side summary{cursor:pointer;padding:10px 12px;font-weight:700;color:var(--heading);list-style:none}
+details.side summary::-webkit-details-marker{display:none}
+details.side summary::after{content:"+";float:right;font-family:var(--display);font-weight:900}
+details.side[open] summary::after{content:"–"}
+details.side .inner{padding:0 12px 12px}
+
+.status{font-size:.9rem;font-weight:600;margin-top:10px;min-height:1.2em}
+.status.err{color:var(--bad)}
+.critique{margin-top:12px;border:1.5px solid var(--red);padding:12px;white-space:pre-wrap;font-size:.9rem;display:none}
+.critique.show{display:block}
+
+/* Results */
+.results-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:14px}
+.results-h h2{font-size:1.6rem;font-weight:900}
+.empty{border:1.5px dashed var(--line);padding:40px 24px;text-align:center;color:var(--muted);background:var(--surface)}
+.empty b{display:block;font-family:var(--display);font-size:1.3rem;color:var(--heading);margin-bottom:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.ocard{background:var(--surface);border:1.5px solid var(--line);display:flex;flex-direction:column}
+.ocard.chosen{border-color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+.ocard .pv{background:var(--sunk);padding:14px;display:flex;align-items:center;justify-content:center;border-bottom:1.5px solid var(--line)}
+.ocard .pv img{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line)}
+.ocard .pv .wait{aspect-ratio:var(--ar,3/4);width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:.9rem;text-align:center;padding:12px;border:1.5px dashed var(--line);background:var(--surface)}
+.ocard .pv .wait b{font-family:var(--display);color:var(--heading);font-size:1rem}
+.ocard .body{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ocard .on{display:flex;align-items:baseline;gap:8px}
+.ocard .on .k{font-family:var(--display);font-weight:900;font-stretch:125%;color:var(--red);font-size:1.3rem;line-height:1}
+.ocard .on h3{font-size:1.05rem;font-weight:800}
+.ocard .concept{font-size:.9rem}
+.issues{font-size:.84rem;border-top:1px solid var(--line);padding-top:8px}
+.issues b{color:var(--heading)}
+.issues ul{margin:4px 0 0;padding-left:18px}
+.ocard .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto;padding-top:6px}
+.ocard .acts .btn{width:100%}
+.refine{display:none;border-top:1px solid var(--line);padding-top:8px}
+.refine.open{display:block}
+.report{display:none;border-top:1px solid var(--line);padding-top:8px;font-size:.84rem}
+.report.open{display:block}
+.report table{width:100%;border-collapse:collapse}
+.report td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.report td.r{white-space:nowrap;font-weight:700}
+.report td.r.p{color:var(--red)}
+.report td.r.f{color:var(--bad)}
+.tag{display:inline-block;border:1.5px solid var(--red);color:var(--heading);font-size:.75rem;font-weight:700;padding:1px 6px}
+
+.hist{margin-top:24px}
+.hist h3{font-size:1.1rem;font-weight:800;margin-bottom:8px}
+.hlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.hitem{border:1.5px solid var(--line);background:var(--surface);padding:0;text-align:left;cursor:pointer;display:flex;flex-direction:column}
+.hitem .th{background:var(--sunk);padding:8px;display:flex;justify-content:center}
+.hitem .th img{max-height:130px;width:auto;background:#fff}
+.hitem .tm{padding:6px 8px;font-size:.78rem;line-height:1.3}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .lib{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .row2{grid-template-columns:1fr}
+  .top h1{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="in">
+  <h1>Flyer Studio</h1>
+  <p>Upload a template, describe the flyer, and choose from 3 to 5 options.</p>
+</div></header>
+<div class="notice" id="notice" hidden><div id="noticeText"></div></div>
+
+<div class="layout">
+  <aside>
+    <section class="panel" aria-labelledby="h1">
+      <div class="step-h"><span class="n">1</span><h2 id="h1">Pick or upload a template</h2></div>
+      <p class="hint">Templates are shared with everyone who uses this studio. Upload a PNG, JPG or WebP. For a PDF, export the page as an image first.</p>
+      <div class="lib" id="lib" style="margin-top:12px"></div>
+
+      <div class="upload" id="upload">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a template image">
+          <div id="dropInner">Drop an image here, or tap to choose one</div>
+        </div>
+        <input type="file" id="file" accept="image/png,image/jpeg,image/webp" class="sr">
+        <label class="f" for="tName">Template name</label>
+        <input type="text" id="tName" placeholder="For example: School event flyer, A4">
+        <label class="f" for="tFormat">Made for</label>
+        <select id="tFormat"></select>
+        <div class="btns">
+          <button class="btn" id="saveTemplate" disabled>Upload and read template</button>
+          <button class="btn ghost" id="cancelUpload">Cancel</button>
+        </div>
+        <div class="status" id="upStatus"></div>
+      </div>
+
+      <div class="selected-t" id="selT" hidden>
+        <h3 id="selName"></h3>
+        <p class="hint" id="selMeta"></p>
+        <label class="f" for="analysis">How Claude reads this template <span class="opt">(check and correct it)</span></label>
+        <textarea id="analysis" rows="9" placeholder="Claude hasn't read this template yet."></textarea>
+        <div class="btns">
+          <button class="btn sm" id="saveAnalysis">Save corrections</button>
+          <button class="btn ghost sm" id="reread">Read it again</button>
+          <button class="btn ghost sm" id="delTemplate" hidden>Delete template</button>
+        </div>
+        <div class="status" id="anStatus"></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="h2">
+      <div class="step-h"><span class="n">2</span><h2 id="h2">Describe this flyer</h2></div>
+      <p class="hint">This is the flyer's brief. Claude uses only the details you give here and never invents dates, venues or prizes.</p>
+      <div class="btns" style="margin-top:8px"><button class="btn ghost sm" id="example">Fill in the Prime Time Tournament example</button></div>
+
+      <label class="f" for="purpose">What is the flyer for?</label>
+      <textarea id="purpose" rows="2" placeholder="For example: get schools to register teams for the Prime Time Tournament"></textarea>
+      <label class="f" for="audience">Who will read it?</label>
+      <input type="text" id="audience" placeholder="For example: principals and maths coordinators; students in Class 3 to 8">
+      <label class="f" for="headline">Headline idea <span class="opt">(optional)</span></label>
+      <input type="text" id="headline" placeholder="Leave blank and Claude will suggest one per option">
+      <label class="f" for="details">Key details, most important first</label>
+      <textarea id="details" rows="5" placeholder="Dates, venue, who can take part, how to take part, prizes. Write [TBC] for anything not yet confirmed."></textarea>
+      <label class="f" for="cta">Call to action</label>
+      <input type="text" id="cta" placeholder="For example: Register your school">
+      <label class="f" for="contact">Contact, website or registration link</label>
+      <input type="text" id="contact" placeholder="For example: logicology.in, [registration link]">
+      <label class="f" for="extra">Must include or avoid <span class="opt">(optional)</span></label>
+      <textarea id="extra" rows="2" placeholder="For example: mention the consent letter; no prices"></textarea>
+
+      <div class="row2">
+        <div>
+          <label class="f" for="format">Format</label>
+          <select id="format"></select>
+        </div>
+        <div>
+          <span class="f" style="display:block;font-weight:600;font-size:.88rem;margin:12px 0 4px">Options</span>
+          <div class="seg" id="countSeg" role="group" aria-label="Number of options"></div>
+        </div>
+      </div>
+      <span class="f" style="display:block;font-weight:600;font-size:.88rem;margin:12px 0 4px">How closely to follow the template</span>
+      <div class="seg" id="freeSeg" role="group" aria-label="Layout freedom"></div>
+      <p class="hint" id="freeHint" style="margin-top:6px"></p>
+
+      <details class="side" id="brandBox">
+        <summary>Brand rules (BRAND.md)</summary>
+        <div class="inner">
+          <p class="hint">Shared by everyone. Exact values work better than adjectives.</p>
+          <textarea id="brand" rows="10"></textarea>
+          <div class="btns"><button class="btn sm" id="saveBrand">Save brand rules</button></div>
+          <div class="status" id="brandStatus"></div>
+        </div>
+      </details>
+      <details class="side" id="checksBox">
+        <summary>Checks every flyer must pass (CHECKS.md)</summary>
+        <div class="inner">
+          <p class="hint">Shared by everyone. Write each check as a yes-or-no question.</p>
+          <textarea id="checks" rows="10"></textarea>
+          <div class="btns"><button class="btn sm" id="saveChecks">Save checks</button></div>
+          <div class="status" id="checksStatus"></div>
+        </div>
+      </details>
+
+      <div class="btns">
+        <button class="btn ghost" id="critique">Check my brief first</button>
+      </div>
+      <div class="critique" id="critiqueOut" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h3">
+      <div class="step-h"><span class="n">3</span><h2 id="h3">Generate options</h2></div>
+      <p class="hint">Claude plans distinct directions first, then draws each one. This usually takes one to two minutes.</p>
+      <div class="btns">
+        <button class="btn" id="generate">Generate options</button>
+        <button class="btn ghost" id="stop" hidden>Stop</button>
+      </div>
+      <div class="status" id="genStatus" aria-live="polite"></div>
+    </section>
+  </aside>
+
+  <main>
+    <div class="results-h">
+      <h2>Options</h2>
+      <span class="hint" id="resMeta"></span>
+    </div>
+    <div id="results">
+      <div class="empty"><b>No options yet</b>Pick a template, describe the flyer, then generate options.</div>
+    </div>
+    <div class="hist" id="hist" hidden>
+      <h3>Earlier runs with this template</h3>
+      <div class="hlist" id="hlist"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Constants ---------- */
+var FORMATS = {
+  a4:     {label:"A4 portrait, for print",       w:595,  h:842,  scale:3, margin:28, minText:9},
+  social: {label:"Social 4:5 (1080 × 1350)",     w:1080, h:1350, scale:1, margin:60, minText:26},
+  square: {label:"Square (1080 × 1080)",         w:1080, h:1080, scale:1, margin:60, minText:26}
+};
+var FREEDOM = {
+  strict:   {label:"Strictly", hint:"Keeps the template’s zones and positions. Options differ in headline angle, emphasis and colour accents."},
+  flexible: {label:"Loosely",  hint:"Keeps the template’s style and brand, but options may rearrange the zones."}
+};
+var EXAMPLE = {
+  purpose: "Get schools to register official teams for Logicology’s first Prime Time Tournament, and get students excited enough to ask their teachers about it.",
+  audience: "Principals and maths coordinators deciding whether to take part; students in Class 3 to 8 and their parents seeing it on a notice board or in a WhatsApp group.",
+  headline: "",
+  details: "1. The first Prime Time Tournament, for students in Class 3 to 8\n2. Builds number sense, strategy and reasoning, through play\n3. How to take part: register the school, send the consent letter, hold optional practice rounds in school\n4. Dates: [TBC]\n5. Format and venue: [TBC]\n6. Prizes: [TBC]",
+  cta: "Register your school",
+  contact: "logicology.in, [registration link], [contact number]",
+  extra: "Mention the consent letter. No product prices on this flyer."
+};
+var LOCAL_KEY = "flyer-studio-brief-v1";
+var CHUNK = 180000;
+
+/* ---------- State ---------- */
+var db = null, sample = null, user = null, downloads = null, meId = null, canEditAll = false;
+var templates = [], selectedId = null, pendingFile = null;
+var count = 4, freedom = "strict";
+var run = null;          // {id, templateId, format, options:[...], chosen}
+var genCtl = null;
+var unsubRuns = null;
+var localTemplates = {}; // fallback when db is absent
+
+/* ---------- Helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function setStatus(el, text, err){ el.textContent = text || ""; el.className = "status" + (err ? " err" : ""); }
+function notice(text){ $("notice").hidden = !text; $("noticeText").textContent = text || ""; }
+function errCopy(e){
+  var c = e && e.code;
+  if (c === "not_granted" || c === "sampling_disabled" || c === "capability_disabled" || c === "not_declared") return "Claude isn’t available here. Allow this page to use Claude when asked, then try again.";
+  if (c === "rate_limited") return "You’ve reached a usage limit for now. Wait a little, then try again.";
+  if (c === "session_expired") return "Your session has expired. Reload the page and sign in again.";
+  if (c === "image_rejected") return "Claude couldn’t read that image. Try a PNG or JPG under 20 MB.";
+  if (c === "images_unavailable") return "This view can’t send images to Claude, so templates can’t be read here.";
+  if (c === "prompt_too_large") return "The brief is too long. Shorten the details or the brand rules.";
+  if (c === "refused") return "Claude declined this request. Change the brief and try again.";
+  if (c === "invalid_json" || c === "empty_completion") return "Claude’s reply couldn’t be used. Try again.";
+  if (c === "cancelled") return "Stopped.";
+  return "Something went wrong reaching Claude. Try again.";
+}
+function fmtDate(iso){ try { return new Date(iso).toLocaleDateString(undefined, {day:"numeric", month:"short", year:"numeric"}); } catch(e){ return ""; } }
+function dataUrlToBlob(u){
+  var parts = u.split(","), mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/jpeg";
+  var bin = atob(parts[1]), arr = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
+}
+function loadImage(src){ return new Promise(function(res, rej){ var im = new Image(); im.onload = function(){ res(im); }; im.onerror = rej; im.src = src; }); }
+function resizeToDataUrl(img, maxSide, quality){
+  var s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+  var c = document.createElement("canvas");
+  c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+  var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", quality);
+}
+function cleanSvg(s){
+  s = String(s || "");
+  var i = s.indexOf("<svg"), j = s.lastIndexOf("</svg>");
+  if (i < 0 || j < 0) return null;
+  s = s.slice(i, j + 6)
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, "")
+    .replace(/<image\b[^>]*>/gi, "")
+    .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*')/gi, "");
+  if (!/xmlns=/.test(s.slice(0, 200))) s = s.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+  try {
+    var doc = new DOMParser().parseFromString(s, "image/svg+xml");
+    if (doc.getElementsByTagName("parsererror").length) return null;
+  } catch(e){ return null; }
+  return s;
+}
+function svgUrl(svg){ return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
+function svgToPngBlob(svg, fmt){
+  var f = FORMATS[fmt] || FORMATS.a4;
+  return loadImage(svgUrl(svg)).then(function(img){
+    var c = document.createElement("canvas");
+    c.width = f.w * f.scale; c.height = f.h * f.scale;
+    var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise(function(res, rej){ c.toBlob(function(b){ b ? res(b) : rej(new Error("png")); }, "image/png"); });
+  });
+}
+function brief(){
+  return {
+    purpose: $("purpose").value.trim(), audience: $("audience").value.trim(), headline: $("headline").value.trim(),
+    details: $("details").value.trim(), cta: $("cta").value.trim(), contact: $("contact").value.trim(), extra: $("extra").value.trim(),
+    format: $("format").value
+  };
+}
+function specText(b){
+  return "# SPEC.md\n\n## Purpose\n" + (b.purpose || "[not given]") +
+    "\n\n## Audience\n" + (b.audience || "[not given]") +
+    "\n\n## Headline idea\n" + (b.headline || "[none: suggest one]") +
+    "\n\n## Key details (most important first)\n" + (b.details || "[not given]") +
+    "\n\n## Call to action\n" + (b.cta || "[not given]") +
+    "\n\n## Contact, website or link\n" + (b.contact || "[not given]") +
+    "\n\n## Must include or avoid\n" + (b.extra || "[nothing extra]") +
+    "\n\n## Format\n" + FORMATS[b.format].label + " (" + FORMATS[b.format].w + " × " + FORMATS[b.format].h + " units)";
+}
+function saveBriefLocal(){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(brief())); } catch(e){} }
+function loadBriefLocal(){
+  try { var v = JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); if (!v) return;
+    ["purpose","audience","headline","details","cta","contact","extra"].forEach(function(k){ if (v[k]) $(k).value = v[k]; });
+    if (v.format && FORMATS[v.format]) $("format").value = v.format;
+  } catch(e){}
+}
+
+/* ---------- Segmented controls and selects ---------- */
+function buildControls(){
+  [$("format"), $("tFormat")].forEach(function(sel){
+    sel.innerHTML = Object.keys(FORMATS).map(function(k){ return '<option value="'+k+'">'+esc(FORMATS[k].label)+"</option>"; }).join("");
+  });
+  $("countSeg").innerHTML = [3,4,5].map(function(n){ return '<button type="button" data-count="'+n+'" aria-pressed="'+(n===count)+'">'+n+"</button>"; }).join("");
+  $("freeSeg").innerHTML = Object.keys(FREEDOM).map(function(k){ return '<button type="button" data-free="'+k+'" aria-pressed="'+(k===freedom)+'">'+esc(FREEDOM[k].label)+"</button>"; }).join("");
+  $("freeHint").textContent = FREEDOM[freedom].hint;
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-count]");
+  if (t){ count = +t.getAttribute("data-count"); $("countSeg").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed", String(b === t)); }); return; }
+  t = e.target.closest("[data-free]");
+  if (t){ freedom = t.getAttribute("data-free"); $("freeSeg").querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed", String(b === t)); }); $("freeHint").textContent = FREEDOM[freedom].hint; }
+});
+
+/* ---------- Template library ---------- */
+function renderLib(){
+  var h = templates.map(function(t){
+    return '<button type="button" class="tcard" data-tid="'+esc(t.id)+'" aria-pressed="'+(t.id===selectedId)+'">'
+      + '<span class="th">'+(t.thumb ? '<img alt="" src="'+esc(t.thumb)+'">' : "")+"</span>"
+      + '<span class="tm"><b>'+esc(t.name || "Untitled")+'</b><span data-uploader="'+esc(t.by || "")+'"></span></span></button>';
+  }).join("");
+  h += '<button type="button" class="tcard add" id="addTemplate"><span>+</span>Upload a template</button>';
+  $("lib").innerHTML = h;
+  resolveUploaders();
+}
+function resolveUploaders(){
+  if (!user) return;
+  var ids = templates.map(function(t){ return t.by; }).filter(Boolean);
+  user.profiles(ids).then(function(ps){
+    document.querySelectorAll("[data-uploader]").forEach(function(el){
+      var id = el.getAttribute("data-uploader"), p = ps[id];
+      el.textContent = id ? ("by " + ((p && p.isMe) ? "you" : ((p && p.name) || "a colleague"))) : "";
+    });
+  }).catch(function(){});
+}
+function selectTemplate(id){
+  selectedId = id;
+  renderLib();
+  var t = templates.find(function(x){ return x.id === id; });
+  $("selT").hidden = !t;
+  if (!t) return;
+  $("selName").textContent = t.name || "Untitled";
+  $("selMeta").textContent = FORMATS[t.format] ? ("Made for " + FORMATS[t.format].label + (t.createdAt ? ". Added " + fmtDate(t.createdAt) + "." : "")) : "";
+  $("analysis").value = t.analysis || "";
+  if (t.format && FORMATS[t.format]) $("format").value = t.format;
+  $("delTemplate").hidden = !(canEditAll || (meId && t.by === meId));
+  setStatus($("anStatus"), t.analysis ? "" : "Claude hasn’t read this template yet. Choose “Read it again”.");
+  subscribeRuns(id);
+}
+$("lib").addEventListener("click", function(e){
+  var add = e.target.closest("#addTemplate");
+  if (add){ $("upload").classList.add("open"); $("tName").focus(); return; }
+  var t = e.target.closest("[data-tid]");
+  if (t) selectTemplate(t.getAttribute("data-tid"));
+});
+
+/* ---------- Upload ---------- */
+function pickFile(f){
+  if (!f) return;
+  if (!/^image\/(png|jpeg|webp)$/.test(f.type)){ setStatus($("upStatus"), "Use a PNG, JPG or WebP image. For a PDF, export the page as an image first.", true); return; }
+  pendingFile = f;
+  var u = URL.createObjectURL(f);
+  $("dropInner").innerHTML = '<img alt="Template preview" src="'+u+'">' + esc(f.name);
+  if (!$("tName").value) $("tName").value = f.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+  $("saveTemplate").disabled = false;
+  setStatus($("upStatus"), "");
+}
+$("drop").addEventListener("click", function(){ $("file").click(); });
+$("drop").addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("file").click(); } });
+$("file").addEventListener("change", function(){ pickFile(this.files[0]); });
+["dragover","dragenter"].forEach(function(ev){ $("drop").addEventListener(ev, function(e){ e.preventDefault(); $("drop").classList.add("over"); }); });
+["dragleave","drop"].forEach(function(ev){ $("drop").addEventListener(ev, function(){ $("drop").classList.remove("over"); }); });
+$("drop").addEventListener("drop", function(e){ e.preventDefault(); pickFile(e.dataTransfer.files[0]); });
+$("cancelUpload").addEventListener("click", resetUpload);
+function resetUpload(){
+  pendingFile = null; $("file").value = ""; $("tName").value = "";
+  $("dropInner").textContent = "Drop an image here, or tap to choose one";
+  $("saveTemplate").disabled = true; $("upload").classList.remove("open"); setStatus($("upStatus"), "");
+}
+
+$("saveTemplate").addEventListener("click", function(){
+  if (!pendingFile) return;
+  var btn = this; btn.disabled = true;
+  setStatus($("upStatus"), "Preparing the image…");
+  var url = URL.createObjectURL(pendingFile);
+  loadImage(url).then(function(img){
+    var full = resizeToDataUrl(img, 1600, 0.85);
+    var thumb = resizeToDataUrl(img, 320, 0.7);
+    var rec = {name: $("tName").value.trim() || "Untitled template", format: $("tFormat").value, by: meId || "", createdAt: new Date().toISOString(), thumb: thumb, analysis: "", chunks: 0};
+    return storeTemplate(rec, full);
+  }).then(function(id){
+    setStatus($("upStatus"), "");
+    resetUpload();
+    selectTemplate(id);
+    readTemplate(id);
+  }).catch(function(e){
+    btn.disabled = false;
+    setStatus($("upStatus"), e && e.code === "quota_exceeded" ? "The template library is full. Delete an old template, then try again." : "The template couldn’t be saved. Try again.", true);
+  });
+});
+
+function storeTemplate(rec, full){
+  var parts = [];
+  for (var i = 0; i < full.length; i += CHUNK) parts.push(full.slice(i, i + CHUNK));
+  rec.chunks = parts.length;
+  if (!db){
+    var id = "local-" + Date.now();
+    rec.id = id; localTemplates[id] = full; templates.unshift(rec); renderLib();
+    return Promise.resolve(id);
+  }
+  var ref = db.collection("templates").doc();
+  var p = Promise.resolve();
+  parts.forEach(function(part, i){ p = p.then(function(){ return ref.collection("img").doc(String(i)).set({d: part}); }); });
+  return p.then(function(){ return ref.set(rec); }).then(function(){ return ref.id; });
+}
+function templateBlob(id){
+  if (localTemplates[id]) return Promise.resolve(dataUrlToBlob(localTemplates[id]));
+  var t = templates.find(function(x){ return x.id === id; });
+  if (!db || !t) return Promise.reject({code:"no_template"});
+  var reads = [];
+  for (var i = 0; i < (t.chunks || 0); i++) reads.push(db.doc("templates/" + id + "/img/" + i).get());
+  return Promise.all(reads).then(function(snaps){
+    var s = snaps.map(function(x){ return x.exists ? x.data().d : ""; }).join("");
+    if (!s) throw {code:"no_template"};
+    localTemplates[id] = s;
+    return dataUrlToBlob(s);
+  });
+}
+
+/* ---------- Claude reads the template ---------- */
+function readTemplate(id){
+  if (!sample){ setStatus($("anStatus"), "Claude isn’t available in this view, so the template can’t be read. You can describe it yourself in the box above.", true); return; }
+  var t = templates.find(function(x){ return x.id === id; });
+  setStatus($("anStatus"), "Claude is reading the template…");
+  $("reread").disabled = true;
+  var prompt = "The attached image is a flyer template for Logicology, a company that makes screen-free thinking games and puzzle books for children.\n\n"
+    + "Write TEMPLATE.md: a short, exact description of this template that a designer could follow to make new flyers from it. Use these headings:\n"
+    + "## Layout zones: each zone from top to bottom (for example header, hero image, headline, body, key details, call to action, footer), with its position, approximate share of the page height, alignment, and what kind of content goes there.\n"
+    + "## Colours: every colour you can see, as hex codes, and where each is used.\n"
+    + "## Type: the style of each type level (headline, subheading, body), described as weight, size relative to the page, case and alignment. Name the likely typeface only if you’re confident.\n"
+    + "## Graphic elements: shapes, borders, illustrations, photo treatment, logo position.\n"
+    + "## Margins and grid.\n\n"
+    + "Mark any guessed value with (estimated). Keep it under 350 words. Reply with the markdown only.";
+  templateBlob(id).then(function(blob){
+    $("analysis").value = "";
+    return sample(prompt, {images: [blob], cache: false, onText: function(u){ if (selectedId === id) $("analysis").value = u.text; }});
+  }).then(function(r){
+    var text = r.text.trim();
+    if (selectedId === id) $("analysis").value = text;
+    t.analysis = text;
+    if (db && id.indexOf("local-") !== 0) return db.doc("templates/" + id).update({analysis: text});
+  }).then(function(){
+    setStatus($("anStatus"), "Read. Check the description against your template and correct anything wrong.");
+  }).catch(function(e){
+    setStatus($("anStatus"), e && e.code === "no_template" ? "The template image couldn’t be loaded. Upload it again." : errCopy(e), true);
+  }).then(function(){ $("reread").disabled = false; });
+}
+$("reread").addEventListener("click", function(){ if (selectedId) readTemplate(selectedId); });
+$("saveAnalysis").addEventListener("click", function(){
+  if (!selectedId) return;
+  var text = $("analysis").value.trim(), t = templates.find(function(x){ return x.id === selectedId; });
+  if (t) t.analysis = text;
+  if (!db || selectedId.indexOf("local-") === 0){ setStatus($("anStatus"), "Saved for this visit."); return; }
+  db.doc("templates/" + selectedId).update({analysis: text}).then(function(){ setStatus($("anStatus"), "Corrections saved for everyone."); })
+    .catch(function(){ setStatus($("anStatus"), "Couldn’t save. You may only have view access to this studio.", true); });
+});
+$("delTemplate").addEventListener("click", function(){
+  var t = templates.find(function(x){ return x.id === selectedId; });
+  if (!t || !confirm("Delete the template “" + (t.name || "Untitled") + "” for everyone? Earlier runs with it will stay.")) return;
+  var id = t.id;
+  var p = Promise.resolve();
+  if (db && id.indexOf("local-") !== 0){
+    for (var i = 0; i < (t.chunks || 0); i++) (function(i){ p = p.then(function(){ return db.doc("templates/" + id + "/img/" + i).delete(); }); })(i);
+    p = p.then(function(){ return db.doc("templates/" + id).delete(); });
+  } else { templates = templates.filter(function(x){ return x.id !== id; }); delete localTemplates[id]; }
+  p.then(function(){ selectedId = null; $("selT").hidden = true; renderLib(); })
+   .catch(function(){ setStatus($("anStatus"), "Couldn’t delete this template.", true); });
+});
+
+/* ---------- Shared brand rules and checks ---------- */
+function saveShared(docId, text, statusEl, label){
+  if (!db){ setStatus(statusEl, "Saved for this visit."); return; }
+  db.doc("config/" + docId).set({text: text, updatedAt: new Date().toISOString(), by: meId || ""})
+    .then(function(){ setStatus(statusEl, label + " saved for everyone."); })
+    .catch(function(){ setStatus(statusEl, "Couldn’t save. You may only have view access to this studio.", true); });
+}
+$("saveBrand").addEventListener("click", function(){ saveShared("brand", $("brand").value, $("brandStatus"), "Brand rules"); });
+$("saveChecks").addEventListener("click", function(){ saveShared("checks", $("checks").value, $("checksStatus"), "Checks"); });
+
+/* ---------- Brief ---------- */
+$("example").addEventListener("click", function(){
+  Object.keys(EXAMPLE).forEach(function(k){ $(k).value = EXAMPLE[k]; });
+  saveBriefLocal();
+});
+["purpose","audience","headline","details","cta","contact","extra","format"].forEach(function(k){ $(k).addEventListener("change", saveBriefLocal); });
+
+function contextBlock(){
+  var t = templates.find(function(x){ return x.id === selectedId; }) || {};
+  return "<template_md>\n" + ($("analysis").value.trim() || t.analysis || "[No description yet: work from the attached image.]") + "\n</template_md>\n\n"
+    + "<brand_md>\n" + ($("brand").value.trim() || "[No brand rules given. Follow the template’s own colours and style.]") + "\n</brand_md>\n\n"
+    + "<spec_md>\n" + specText(brief()) + "\n</spec_md>\n\n"
+    + "<checks_md>\n" + ($("checks").value.trim() || "[No checks given.]") + "\n</checks_md>\n\n";
+}
+
+$("critique").addEventListener("click", function(){
+  var out = $("critiqueOut"), btn = this;
+  if (!sample){ out.classList.add("show"); out.textContent = "Claude isn’t available in this view."; return; }
+  btn.disabled = true; out.classList.add("show"); out.textContent = "Claude is reading your brief…";
+  var prompt = "You are reviewing a flyer brief before any design is made. Don’t design anything.\n\n" + contextBlock()
+    + "1. List anything in SPEC.md that’s unclear, missing, or in conflict with the template or brand rules.\n"
+    + "2. Point out any content that’s unlikely to fit the template’s zones.\n"
+    + "3. Ask your questions, numbered, so the team can answer them in one reply.\n"
+    + "Be brief: at most 150 words. Plain text, no markdown headings.";
+  sample(prompt, {modelTier: "quick", cache: false, onText: function(u){ out.textContent = u.text; }})
+    .then(function(r){ out.textContent = r.text; })
+    .catch(function(e){ out.textContent = e.text || errCopy(e); })
+    .then(function(){ btn.disabled = false; });
+});
+
+/* ---------- Generate ---------- */
+function svgRules(fmt){
+  var f = FORMATS[fmt];
+  return "SVG rules:\n"
+    + "- One complete <svg> element with xmlns='http://www.w3.org/2000/svg', viewBox='0 0 " + f.w + " " + f.h + "', width='" + f.w + "' and height='" + f.h + "'. Start with a full-size background rect.\n"
+    + "- Use single quotes for every attribute value.\n"
+    + "- Draw only with rect, circle, ellipse, line, polyline, polygon, path, g, text and tspan. No image, foreignObject, script, style, filter, external references or web fonts.\n"
+    + "- font-family must be 'Arial, Helvetica, sans-serif' or 'Georgia, serif'. Set font-size, font-weight and fill on each text element.\n"
+    + "- Break long text into lines yourself with <tspan x='…' dy='…'>. Estimate each line’s width as about 0.55 × font-size × characters, and keep every line at least " + f.margin + " units from the page edge. No text smaller than " + f.minText + " units.\n"
+    + "- Where a photo belongs, draw a softly tinted rectangle with a short centred label saying what photo goes there.\n"
+    + "- Where a QR code belongs, draw a square outline labelled 'QR code'.\n"
+    + "- Write the Logicology name as text where the logo goes.\n"
+    + "- Keep the SVG under about 7,000 characters.\n";
+}
+function makeCard(i, opt, fmt){
+  var f = FORMATS[fmt] || FORMATS.a4, ar = f.w + "/" + f.h;
+  var pv;
+  if (opt.state === "done" && opt.svg) pv = '<img alt="Flyer option ' + (i+1) + ': ' + esc(opt.name) + '" src="' + svgUrl(opt.svg) + '">';
+  else if (opt.state === "error") pv = '<div class="wait" style="--ar:' + ar + '"><b>This option couldn’t be drawn</b>' + esc(opt.error || "") + '<button class="btn ghost sm" data-act="redraw" data-i="' + i + '">Draw it again</button></div>';
+  else pv = '<div class="wait" style="--ar:' + ar + '"><b>' + (opt.state === "planning" ? "Planning…" : "Drawing…") + '</b>' + esc(opt.progress || "") + "</div>";
+  var issues = "";
+  if (opt.state === "done"){
+    issues = opt.issues && opt.issues.length
+      ? '<div class="issues"><b>Claude’s own check flagged:</b><ul>' + opt.issues.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>"
+      : '<div class="issues"><b>Claude’s own check:</b> no issues flagged. Run the independent check to confirm.</div>';
+  }
+  var chosen = run && run.chosen === i;
+  var acts = opt.state === "done"
+    ? '<div class="acts">'
+      + '<button class="btn sm" data-act="choose" data-i="' + i + '">' + (chosen ? "Chosen" : "Choose this one") + "</button>"
+      + '<button class="btn ghost sm" data-act="check" data-i="' + i + '">Check it</button>'
+      + '<button class="btn ghost sm" data-act="refine" data-i="' + i + '">Ask for changes</button>'
+      + '<button class="btn ghost sm" data-act="png" data-i="' + i + '">Download PNG</button>'
+      + "</div>"
+      + '<div class="refine' + (opt.refineOpen ? " open" : "") + '" id="ref-' + i + '"><label class="f" for="refText-' + i + '">What should change? <span class="opt">(everything else stays the same)</span></label>'
+      + '<textarea id="refText-' + i + '" rows="3" placeholder="For example: make the headline bigger and move the QR code to the bottom right"></textarea>'
+      + '<div class="btns"><button class="btn sm" data-act="applyRefine" data-i="' + i + '">Apply changes</button>'
+      + (opt.prevSvg ? '<button class="btn ghost sm" data-act="undo" data-i="' + i + '">Undo last change</button>' : "")
+      + '<button class="btn ghost sm" data-act="svg" data-i="' + i + '">Download SVG</button></div>'
+      + '<div class="status" id="refSt-' + i + '">' + esc(opt.refineMsg || "") + '</div></div>'
+      + '<div class="report' + (opt.report ? " open" : "") + '" id="rep-' + i + '">' + (opt.report || "") + '</div>'
+    : "";
+  return '<article class="ocard' + (chosen ? " chosen" : "") + '" id="card-' + i + '">'
+    + '<div class="pv">' + pv + "</div>"
+    + '<div class="body"><div class="on"><span class="k">' + (i+1) + '</span><h3>' + esc(opt.name || "Option " + (i+1)) + "</h3>" + (chosen ? ' <span class="tag">Chosen</span>' : "") + "</div>"
+    + (opt.concept ? '<p class="concept">' + esc(opt.concept) + "</p>" : "")
+    + issues + acts + "</div></article>";
+}
+function renderResults(){
+  if (!run){ $("results").innerHTML = '<div class="empty"><b>No options yet</b>Pick a template, describe the flyer, then generate options.</div>'; $("resMeta").textContent = ""; return; }
+  $("results").innerHTML = '<div class="opts">' + run.options.map(function(o, i){ return makeCard(i, o, run.format); }).join("") + "</div>";
+  var t = templates.find(function(x){ return x.id === run.templateId; });
+  $("resMeta").textContent = (t ? "Template: " + (t.name || "Untitled") + ". " : "") + FORMATS[run.format].label + ".";
+}
+function renderCard(i){
+  var el = $("card-" + i); if (!el || !run) return;
+  var wrap = document.createElement("div"); wrap.innerHTML = makeCard(i, run.options[i], run.format);
+  el.replaceWith(wrap.firstChild);
+}
+
+function drawOption(i, blob, signal){
+  var o = run.options[i], fmt = run.format;
+  o.state = "drawing"; o.progress = "Claude is laying out this option."; renderCard(i);
+  var prompt = "You are a senior graphic designer making one flyer option for Logicology, which makes screen-free thinking games and puzzle books for children.\n\n"
+    + "The attached image is the template the team uploaded.\n\n" + contextBlock()
+    + "Draw this option:\n<option>\nName: " + o.name + "\nDirection: " + o.concept + (o.headline ? "\nHeadline: " + o.headline : "") + "\n</option>\n\n"
+    + (freedom === "strict"
+        ? "Follow the template strictly: keep its zones, their order, positions and proportions, and its colours and graphic style. Change only the content, emphasis and colour accents.\n"
+        : "Keep the template’s colours, type style and graphic style, but you may rearrange its zones to suit this direction.\n")
+    + "Use only facts from SPEC.md. Never invent dates, venues, prizes, prices or claims; show anything marked [TBC] as [TBC].\n\n"
+    + svgRules(fmt)
+    + "\nThen check your flyer against every line of CHECKS.md and list only the checks it fails.\n\n"
+    + "Reply with only JSON: {\"svg\": \"<svg …>…</svg>\", \"issues\": [\"short description of each failed check\"]}";
+  return sample.json(prompt, {images: [blob], cache: false, signal: signal, onText: function(u){
+      var n = u.text.length; o.progress = n < 400 ? "Claude is laying out this option." : "Drawing: " + Math.min(99, Math.round(n / 70)) + "%";
+      var el = $("card-" + i); var w = el && el.querySelector(".wait"); if (w) w.lastChild.textContent = o.progress;
+    }})
+    .then(function(r){
+      var svg = cleanSvg(r && r.svg);
+      if (!svg) throw {code: "bad_svg"};
+      o.svg = svg; o.issues = Array.isArray(r.issues) ? r.issues.map(String).slice(0, 8) : []; o.state = "done";
+    })
+    .catch(function(e){
+      o.state = "error"; o.error = e && e.code === "bad_svg" ? "The drawing Claude returned wasn’t valid." : errCopy(e);
+      if (e && e.code === "cancelled") o.error = "Stopped.";
+    })
+    .then(function(){ renderCard(i); });
+}
+
+$("generate").addEventListener("click", function(){
+  var b = brief();
+  if (!selectedId){ setStatus($("genStatus"), "Pick or upload a template first.", true); return; }
+  if (!b.purpose || !b.details){ setStatus($("genStatus"), "Fill in what the flyer is for and the key details first.", true); return; }
+  if (!sample){ setStatus($("genStatus"), "Claude isn’t available in this view.", true); return; }
+  saveBriefLocal();
+  genCtl = new AbortController();
+  var signal = genCtl.signal, gen = this;
+  gen.disabled = true; $("stop").hidden = false;
+  run = {id: null, templateId: selectedId, format: b.format, spec: b, chosen: null, options: []};
+  for (var k = 0; k < count; k++) run.options.push({state: "planning", name: "Option " + (k+1), progress: ""});
+  renderResults();
+  setStatus($("genStatus"), "Planning " + count + " different directions…");
+  var blobP = templateBlob(selectedId);
+  var planPrompt = "You are the creative lead planning flyer options for Logicology, which makes screen-free thinking games and puzzle books for children.\n\n"
+    + "The attached image is the template the team uploaded.\n\n" + contextBlock()
+    + "Plan exactly " + count + " clearly different directions for this flyer. "
+    + (freedom === "strict" ? "They must all keep the template’s layout, so make them differ in headline angle, message emphasis and colour accents. " : "They may differ in layout as well as headline and emphasis. ")
+    + "Each must still follow BRAND.md and use only facts from SPEC.md.\n\n"
+    + "Reply with only JSON: {\"options\": [{\"name\": \"2 to 4 word name\", \"concept\": \"one sentence on what makes this direction different and who it will appeal to\", \"headline\": \"the headline this option uses, at most 8 words\"}]}";
+  blobP.then(function(blob){
+    return sample.json(planPrompt, {images: [blob], cache: false, signal: signal}).then(function(plan){
+      var list = (plan && Array.isArray(plan.options)) ? plan.options.slice(0, count) : [];
+      if (!list.length) throw {code: "invalid_json"};
+      run.options = list.map(function(p, i){ return {state: "drawing", name: String(p.name || "Option " + (i+1)), concept: String(p.concept || ""), headline: String(p.headline || ""), progress: ""}; });
+      renderResults();
+      setStatus($("genStatus"), "Drawing " + run.options.length + " options. They’ll appear as each one finishes.");
+      return Promise.all(run.options.map(function(_, i){ return drawOption(i, blob, signal); }));
+    });
+  }).then(function(){
+    var ok = run.options.filter(function(o){ return o.state === "done"; }).length;
+    setStatus($("genStatus"), ok ? ok + " option" + (ok === 1 ? "" : "s") + " ready. Choose one, check it, or ask for changes." : "No options could be drawn. Try again.", !ok);
+    if (ok) saveRun();
+  }).catch(function(e){
+    run.options.forEach(function(o){ if (o.state !== "done"){ o.state = "error"; o.error = e && e.code === "no_template" ? "The template image couldn’t be loaded." : errCopy(e); } });
+    renderResults();
+    setStatus($("genStatus"), e && e.code === "no_template" ? "The template image couldn’t be loaded. Upload it again." : errCopy(e), !(e && e.code === "cancelled"));
+  }).then(function(){ gen.disabled = false; $("stop").hidden = true; genCtl = null; });
+});
+$("stop").addEventListener("click", function(){ if (genCtl) genCtl.abort(); });
+
+function runDoc(){
+  return {templateId: run.templateId, by: meId || "", createdAt: run.createdAt || new Date().toISOString(), format: run.format, spec: run.spec || {}, chosen: run.chosen,
+    options: run.options.filter(function(o){ return o.state === "done"; }).map(function(o){ return {name: o.name, concept: o.concept || "", svg: o.svg, issues: o.issues || []}; })};
+}
+function saveRun(){
+  if (!db || !run) return Promise.resolve();
+  run.options = run.options.filter(function(o){ return o.state === "done"; });
+  renderResults();
+  var doc = runDoc();
+  if (!run.id){ var ref = db.collection("runs").doc(); run.id = ref.id; run.createdAt = doc.createdAt; return ref.set(doc).catch(function(){}); }
+  return db.doc("runs/" + run.id).set(doc).catch(function(){});
+}
+
+/* ---------- Option actions ---------- */
+$("results").addEventListener("click", function(e){
+  var t = e.target.closest("[data-act]"); if (!t || !run) return;
+  var i = +t.getAttribute("data-i"), act = t.getAttribute("data-act"), o = run.options[i];
+  if (act === "choose"){ run.chosen = i; renderResults(); saveRun(); return; }
+  if (act === "refine"){ o.refineOpen = !o.refineOpen; o.refineMsg = ""; renderCard(i); if (o.refineOpen) $("refText-" + i).focus(); return; }
+  if (act === "undo"){ if (o.prevSvg){ o.svg = o.prevSvg; o.prevSvg = null; o.report = ""; o.refineMsg = "Change undone."; renderCard(i); saveRun(); } return; }
+  if (act === "png"){ downloadOption(i, "png", t); return; }
+  if (act === "svg"){ downloadOption(i, "svg", t); return; }
+  if (act === "applyRefine"){ refineOption(i, t); return; }
+  if (act === "check"){ checkOption(i, t); return; }
+  if (act === "redraw"){
+    if (!sample) return;
+    templateBlob(run.templateId).then(function(blob){ return drawOption(i, blob, undefined); }).then(function(){ if (run.options[i].state === "done") saveRun(); })
+      .catch(function(){ o.state = "error"; o.error = "The template image couldn’t be loaded."; renderCard(i); });
+  }
+});
+
+function refineOption(i, btn){
+  var o = run.options[i], ask = $("refText-" + i).value.trim(), st = $("refSt-" + i);
+  if (!ask){ setStatus(st, "Say what should change.", true); return; }
+  if (!sample){ setStatus(st, "Claude isn’t available in this view.", true); return; }
+  btn.disabled = true; setStatus(st, "Claude is making the change…");
+  var prompt = "You are editing one flyer option for Logicology. Here is the current flyer as SVG:\n\n<current_svg>\n" + o.svg + "\n</current_svg>\n\n"
+    + contextBlock()
+    + "Requested change:\n<change>\n" + ask + "\n</change>\n\n"
+    + "Make only this change. Leave everything else exactly as it is. Keep following BRAND.md and use only facts from SPEC.md.\n\n"
+    + svgRules(run.format)
+    + "\nReply with only JSON: {\"svg\": \"<svg …>…</svg>\", \"issues\": [\"short description of each CHECKS.md check it now fails\"]}";
+  sample.json(prompt, {cache: false}).then(function(r){
+    var svg = cleanSvg(r && r.svg); if (!svg) throw {code: "bad_svg"};
+    o.prevSvg = o.svg; o.svg = svg; o.issues = Array.isArray(r.issues) ? r.issues.map(String).slice(0, 8) : [];
+    o.refineOpen = true; o.refineMsg = "Changed. Use “Undo last change” to go back."; o.report = "";
+    renderCard(i); saveRun();
+  }).catch(function(e){ btn.disabled = false; setStatus(st, e && e.code === "bad_svg" ? "The drawing Claude returned wasn’t valid. Try again." : errCopy(e), true); });
+}
+
+function checkOption(i, btn){
+  var o = run.options[i], box = $("rep-" + i);
+  if (!sample){ box.classList.add("open"); box.textContent = "Claude isn’t available in this view."; return; }
+  btn.disabled = true; box.classList.add("open"); box.textContent = "An independent checker is reviewing this flyer…";
+  svgToPngBlob(o.svg, run.format).then(function(png){
+    var prompt = "You are a strict flyer checker. You did not make this flyer, so assume nothing is correct until you’ve checked it. The attached image is the flyer.\n\n"
+      + "<spec_md>\n" + specText(run.spec || brief()) + "\n</spec_md>\n\n"
+      + "<brand_md>\n" + ($("brand").value.trim() || "[none]") + "\n</brand_md>\n\n"
+      + "<checks_md>\n" + ($("checks").value.trim() || "- The flyer is readable\n- Every detail matches SPEC.md\n- Nothing is invented") + "\n</checks_md>\n\n"
+      + "Check the flyer against every line of CHECKS.md. Also flag any fact on the flyer that isn’t in SPEC.md.\n"
+      + "Reply with only JSON: {\"results\": [{\"check\": \"the check, shortened\", \"pass\": true, \"evidence\": \"what you saw, under 20 words\"}]}";
+    return sample.json(prompt, {images: [png], cache: false});
+  }).then(function(r){
+    var rows = (r && Array.isArray(r.results)) ? r.results : [];
+    if (!rows.length) throw {code: "invalid_json"};
+    var fails = rows.filter(function(x){ return !x.pass; }).length;
+    o.report = "<p><b>" + (fails ? fails + " of " + rows.length + " checks failed." : "All " + rows.length + " checks passed.") + "</b></p><table>"
+      + rows.map(function(x){ return '<tr><td class="r ' + (x.pass ? "p" : "f") + '">' + (x.pass ? "✓ Pass" : "✗ Fail") + "</td><td>" + esc(x.check) + (x.evidence ? '<br><span class="hint">' + esc(x.evidence) + "</span>" : "") + "</td></tr>"; }).join("")
+      + "</table>" + (fails ? '<p class="hint" style="margin-top:6px">Copy the failures into “Ask for changes” to fix them.</p>' : "");
+    renderCard(i);
+  }).catch(function(e){ o.report = esc(errCopy(e)); renderCard(i); });
+}
+
+function downloadOption(i, kind, btn){
+  var o = run.options[i], t = templates.find(function(x){ return x.id === run.templateId; });
+  var base = ((t && t.name) || "flyer").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-option-" + (i+1);
+  if (!downloads){ alert("Downloads aren’t available in this view."); return; }
+  btn.disabled = true;
+  var dataP = kind === "svg" ? Promise.resolve(new Blob([o.svg], {type: "image/svg+xml"})) : svgToPngBlob(o.svg, run.format);
+  dataP.then(function(data){ return downloads.save({filename: base + "." + kind, data: data}); })
+    .catch(function(e){ if (e && e.code !== "declined") alert("The file couldn’t be saved."); })
+    .then(function(){ btn.disabled = false; });
+}
+
+/* ---------- History ---------- */
+function subscribeRuns(tid){
+  if (unsubRuns){ unsubRuns(); unsubRuns = null; }
+  $("hist").hidden = true;
+  if (!db || !tid || tid.indexOf("local-") === 0) return;
+  unsubRuns = db.collection("runs").where("templateId", "==", tid).orderBy("createdAt", "desc").limit(12).onSnapshot(function(snap){
+    var items = snap.docs.map(function(d){ var v = d.data(); v.id = d.id; return v; }).filter(function(v){ return v.options && v.options.length; });
+    $("hist").hidden = !items.length;
+    $("hlist").innerHTML = items.map(function(v){
+      var pick = v.options[(v.chosen != null && v.options[v.chosen]) ? v.chosen : 0];
+      return '<button type="button" class="hitem" data-run="' + esc(v.id) + '"><span class="th"><img alt="" src="' + svgUrl(pick.svg) + '"></span>'
+        + '<span class="tm"><b>' + esc(fmtDate(v.createdAt)) + "</b><br>" + v.options.length + " options" + (v.chosen != null ? ", one chosen" : "") + '<br><span data-runby="' + esc(v.by || "") + '"></span></span></button>';
+    }).join("");
+    if (user){
+      var ids = items.map(function(v){ return v.by; }).filter(Boolean);
+      user.profiles(ids).then(function(ps){ document.querySelectorAll("[data-runby]").forEach(function(el){ var p = ps[el.getAttribute("data-runby")]; el.textContent = p ? "by " + (p.isMe ? "you" : (p.name || "a colleague")) : ""; }); });
+    }
+    $("hlist")._runs = items;
+  }, function(){ $("hist").hidden = true; });
+}
+$("hlist").addEventListener("click", function(e){
+  var b = e.target.closest("[data-run]"); if (!b) return;
+  var v = ($("hlist")._runs || []).find(function(x){ return x.id === b.getAttribute("data-run"); }); if (!v) return;
+  run = {id: v.id, templateId: v.templateId, format: FORMATS[v.format] ? v.format : "a4", spec: v.spec || {}, chosen: v.chosen, createdAt: v.createdAt,
+    options: v.options.map(function(o){ return {state: "done", name: o.name, concept: o.concept, svg: cleanSvg(o.svg) || o.svg, issues: o.issues || []}; })};
+  renderResults();
+  $("results").scrollIntoView({behavior: "smooth", block: "start"});
+});
+
+/* ---------- Start ---------- */
+buildControls();
+loadBriefLocal();
+renderLib();
+
+var hasClaude = typeof window.claude !== "undefined" && window.claude && typeof window.claude.use === "function";
+function use(n){ return hasClaude ? window.claude.use(n).catch(function(){ return null; }) : Promise.resolve(null); }
+Promise.all([use("db"), use("sample"), use("user"), use("downloads")]).then(function(r){
+  db = r[0]; sample = r[1]; user = r[2]; downloads = r[3];
+  var msgs = [];
+  if (!sample) msgs.push("Claude can’t be reached from this view, so templates can’t be read and options can’t be generated. Open the studio in Claude to use it.");
+  if (!db) msgs.push("Shared storage isn’t available here, so templates and runs last only for this visit.");
+  notice(msgs.join(" "));
+  var p = user ? Promise.all([user.id(), user.canEdit()]).then(function(v){ meId = v[0]; canEditAll = !!v[1]; }) : Promise.resolve();
+  return p.then(function(){
+    if (!db) return;
+    db.collection("templates").orderBy("createdAt", "desc").limit(60).onSnapshot(function(snap){
+      templates = snap.docs.map(function(d){ var v = d.data(); v.id = d.id; return v; }).concat(templates.filter(function(t){ return t.id.indexOf("local-") === 0; }));
+      renderLib();
+      if (selectedId){
+        var t = templates.find(function(x){ return x.id === selectedId; });
+        if (!t){ selectedId = null; $("selT").hidden = true; }
+        else if (t.analysis && !$("analysis").value) $("analysis").value = t.analysis;
+      }
+    }, function(){ notice("The template library couldn’t be loaded. Reload the page to try again."); });
+    db.doc("config/brand").onSnapshot(function(s){ if (s.exists && document.activeElement !== $("brand")) $("brand").value = s.data().text || ""; });
+    db.doc("config/checks").onSnapshot(function(s){ if (s.exists && document.activeElement !== $("checks")) $("checks").value = s.data().text || ""; });
+  });
+});
+})();
+</script>
+</body>
+</html>

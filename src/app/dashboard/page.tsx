@@ -28,18 +28,18 @@ export default async function Dashboard() {
             </div>
           </Link>
 
-          <div className="course-card disabled" aria-disabled="true">
+          <Link href="/courses/genaillm" className="course-card">
             <div className="course-top">
               <span className="course-code">GENAILLM</span>
-              <span className="pill soon">Coming soon</span>
+              <span className="pill">Active</span>
             </div>
             <h2>Generative AI &amp; LLMs</h2>
-            <p>Content for this course will be published here soon. Stay tuned!</p>
+            <p>Gen AI &amp; LLMs for marketing, and the anatomy of applications and workflow design.</p>
             <div className="course-foot">
-              <span>Not yet available</span>
-              <span className="arrow">Coming soon</span>
+              <span>2 sessions · 3 activities</span>
+              <span className="arrow">Open →</span>
             </div>
-          </div>
+          </Link>
         </div>
       </main>
     </>

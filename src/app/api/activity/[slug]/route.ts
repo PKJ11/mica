@@ -13,7 +13,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
 
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
-  if (!activity) return new Response("Not found", { status: 404 });
+  if (!activity || activity.hidden) return new Response("Not found", { status: 404 });
 
   const data = await readFile(path.join(process.cwd(), "content", activity.file));
   const isPdf = activity.file.toLowerCase().endsWith(".pdf");
@@ -21,7 +21,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     headers: {
       "Content-Type": isPdf ? "application/pdf" : "text/html; charset=utf-8",
       ...(isPdf && {
-        "Content-Disposition": `inline; filename="${encodeURIComponent(activity.file)}"`,
+        "Content-Disposition": `inline; filename="${encodeURIComponent(path.basename(activity.file))}"`,
       }),
       "Cache-Control": "private, no-store",
     },

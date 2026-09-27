@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Claude Build Kit: Building Apps and AI Workflows with Claude</title>
+<meta name="theme-color" content="#B61D22">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F8F4F3; --surface:#FFFFFF; --text:#2A1C1D; --muted:#6E5A5B; --line:#E0CFCD;
+  --heading:#8A1519; --red:#B61D22; --red-deep:#8A1519; --red-soft:#FBE8E8; --on-red:#FFFFFF;
+  --ok:#B61D22; --ok-on:#FFFFFF; --bad:#8F161A;
+  --l1:#FBE8E8; --l2:#F4C7C8; --l3:#E48D90; --l4:#B61D22; --l5:#8F161A; --l6:#5E0E11;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#160E0F; --surface:#221617; --text:#F2E7E7; --muted:#B9A3A4; --line:#4A2F31;
+    --heading:#F4B9BB; --red:#D9434A; --red-deep:#F4B9BB; --red-soft:#3D1B1D; --on-red:#FFFFFF;
+    --ok:#D9434A; --ok-on:#FFFFFF; --bad:#F4B9BB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#160E0F; --surface:#221617; --text:#F2E7E7; --muted:#B9A3A4; --line:#4A2F31;
+  --heading:#F4B9BB; --red:#D9434A; --red-deep:#F4B9BB; --red-soft:#3D1B1D; --on-red:#FFFFFF;
+  --ok:#D9434A; --ok-on:#FFFFFF; --bad:#F4B9BB;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.55}
+img{max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);color:var(--heading);font-stretch:112%;margin:0}
+h1{font-size:clamp(2.3rem,6vw,4.2rem);font-weight:900;line-height:.98;letter-spacing:-.015em}
+h2{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:800;line-height:1.08;letter-spacing:-.01em}
+h3{font-size:1.2rem;font-weight:750;line-height:1.2}
+p{margin:0 0 .9em;max-width:70ch}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+
+/* Hero */
+header.hero{padding:44px 0 28px}
+.hero .kicker{font-family:var(--display);font-stretch:100%;font-weight:600;color:var(--muted);font-size:1rem;margin-bottom:14px}
+.hero .lede{font-size:1.12rem;color:var(--muted);margin-top:16px;max-width:62ch}
+.continuum{margin-top:30px;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1.5px solid var(--red)}
+.lvl{padding:14px 12px 16px;height:132px;display:flex;flex-direction:column;gap:6px}
+.lvl .n{font-family:var(--display);font-weight:900;font-size:1.9rem;line-height:1;font-stretch:125%}
+.lvl .nm{font-family:var(--display);font-weight:750;font-size:1rem;line-height:1.15}
+.lvl .ds{font-size:.82rem;line-height:1.35;opacity:.9}
+.lvl1{background:var(--l1);color:#5E0E11}.lvl2{background:var(--l2);color:#5E0E11}.lvl3{background:var(--l3);color:#3D0709}
+.lvl4{background:var(--l4);color:#fff}.lvl5{background:var(--l5);color:#fff}.lvl6{background:var(--l6);color:#fff}
+.who{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;margin-top:12px;font-weight:600;font-size:.92rem}
+.who .bar{height:6px;background:linear-gradient(90deg,var(--l1),var(--l6));border:1px solid var(--line)}
+.who .whoq{grid-column:1/-1;text-align:center;color:var(--muted);font-weight:500;margin-top:-2px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;color:var(--muted);font-size:.92rem}
+.meta b{color:var(--text)}
+
+/* Stepper */
+nav.steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-top:1.5px solid var(--red);border-bottom:1.5px solid var(--line)}
+.steps ol{list-style:none;margin:0 auto;padding:0 20px;max-width:1080px;display:flex;overflow-x:auto;gap:0}
+.steps li{flex:1 0 auto}
+.steps button{background:none;border:0;border-bottom:4px solid transparent;padding:12px 14px 10px;cursor:pointer;display:flex;align-items:baseline;gap:8px;white-space:nowrap;color:var(--muted);font-weight:600;width:100%}
+.steps button .sn{font-family:var(--display);font-weight:900;font-stretch:120%;font-size:1.05rem}
+.steps button[aria-current="step"]{color:var(--heading);border-bottom-color:var(--red)}
+.steps button.done .sn::after{content:"✓";margin-left:4px;color:var(--ok);font-size:.9rem}
+
+/* Round */
+main{padding:34px 0 60px}
+section.round{display:none}
+section.round.active{display:block}
+.round-head{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:22px}
+.round-head .rn{font-family:var(--display);font-weight:900;font-stretch:125%;color:var(--red);font-size:1rem}
+.idea{border:1.5px solid var(--red);background:var(--surface);padding:16px 20px;margin:0 0 22px;max-width:780px}
+.idea p:last-child{margin-bottom:0}
+.idea .it{font-family:var(--display);font-weight:750;color:var(--heading);margin-bottom:4px;font-stretch:105%}
+.task{font-weight:600;margin-bottom:16px}
+.part-title{margin:36px 0 10px}
+
+/* Sort */
+.tray{border:1.5px dashed var(--line);background:var(--surface);padding:16px;margin-top:16px;min-height:74px}
+.tray.over{border-color:var(--red);background:var(--red-soft)}
+.tray-label{font-size:.9rem;color:var(--muted);margin:0 0 12px}
+.tray-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(148px,auto);gap:12px}
+.buckets{--cols:3;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:16px}
+.buckets.c2{--cols:2}.buckets.c3{--cols:3}.buckets.c4{--cols:4}
+.bucket{border:1.5px solid var(--line);background:var(--surface);display:grid;grid-template-rows:auto 1fr;cursor:pointer}
+@supports (grid-template-rows:subgrid){.bucket{grid-row:span 2;grid-template-rows:subgrid;row-gap:0}}
+.bucket.over,.bucket.target{border-color:var(--red)}
+.bhead{min-height:96px;padding:14px 16px;border-bottom:1.5px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+.bhead .bnum{font-family:var(--display);font-weight:900;font-stretch:125%;font-size:2.1rem;line-height:1}
+.bhead .bt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bhead .bn{font-family:var(--display);font-weight:800;font-size:1.06rem;line-height:1.15;color:var(--heading)}
+.bhead .bh{font-size:.82rem;color:var(--muted);line-height:1.38}
+.bhead.shade{border-bottom:0}
+.bhead.shade .bn,.bhead.shade .bh{color:inherit}
+.bbody{padding:12px;display:flex;flex-direction:column;gap:12px;min-height:332px}
+.bbody .empty{font-size:.82rem;color:var(--muted);padding:4px 2px}
+.card{display:flex;flex-direction:column;gap:10px;width:100%;min-height:148px;margin:0;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:0;padding:14px 16px;font-size:.94rem;line-height:1.45;cursor:grab}
+.card.sel{border-color:var(--red);background:var(--red-soft)}
+.card.ok{border-color:var(--ok);background:var(--ok);color:var(--ok-on);cursor:default}
+.card.bad{border-style:dashed;border-color:var(--bad);background:var(--surface);cursor:default}
+.card .why{display:block;padding-top:10px;border-top:1px solid var(--line);font-size:.845rem;line-height:1.45}
+.card.ok .why{border-top-color:rgba(255,255,255,.45)}
+.card .why b{font-weight:700}
+.card.ok .why b{color:var(--ok-on)}.card.bad .why b{color:var(--bad)}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+.btn{border:1.5px solid var(--red);background:var(--red);color:var(--on-red);min-height:48px;padding:10px 22px;border-radius:0;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--heading);border-color:var(--line)}
+.status{font-weight:600}
+.status.good{color:var(--red)}.status.warn{color:var(--bad)}
+.next-row{margin-top:40px;padding-top:20px;border-top:1.5px solid var(--line);display:flex;justify-content:flex-end}
+
+/* Trace */
+.log{border:1.5px solid var(--red);background:var(--surface)}
+.logrow{display:grid;grid-template-columns:44px minmax(0,1fr) 190px;gap:12px;align-items:start;padding:12px 14px;border-bottom:1px solid var(--line)}
+.logrow:last-child{border-bottom:0}
+.logrow .ln{font-family:var(--display);font-weight:900;font-stretch:120%;color:var(--muted)}
+.logrow .lt{font-size:.94rem;line-height:1.5}
+.log.mono .lt{font-family:var(--mono);font-size:.88rem}
+.logrow select{width:100%;min-height:44px;padding:8px;font:inherit;font-size:.92rem;background:var(--surface);color:var(--text);border:1.5px solid var(--line);border-radius:0}
+.logrow.ok{background:var(--ok);color:var(--ok-on)}.logrow.ok .ln{color:var(--ok-on)}
+.logrow.bad{outline:1.5px dashed var(--bad);outline-offset:-1.5px}
+.logrow .why{grid-column:2/-1;font-size:.86rem}
+.logrow.ok .why b{color:var(--ok-on)}.logrow.bad .why b{color:var(--bad)}
+.legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 16px}
+.legend div{min-height:84px;background:var(--surface);border:1.5px solid var(--line);padding:12px 14px;font-size:.86rem;line-height:1.4}
+.legend b{font-family:var(--display);color:var(--heading)}
+
+/* MCQ */
+.mcq{display:grid;gap:16px}
+.q{background:var(--surface);border:1.5px solid var(--line);padding:16px}
+.q .qn{font-family:var(--display);font-weight:900;font-stretch:120%;color:var(--red);margin-right:6px}
+.q .qp{font-weight:600;margin-bottom:12px;max-width:72ch}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{min-height:52px;text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:0;padding:12px 14px;cursor:pointer;font-size:.94rem;line-height:1.35}
+.opt:hover:not(:disabled){border-color:var(--red)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok);color:var(--ok-on);font-weight:600}
+.opt.bad{border-style:dashed;border-color:var(--bad);background:var(--surface)}
+.fb{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:.92rem}
+.fb .v{font-weight:700}
+.fb.ok .v{color:var(--red)}.fb.bad .v{color:var(--bad)}
+.fb .fix{margin-top:6px}
+.fb .fix b{color:var(--heading)}
+
+/* Debrief */
+.scores{width:100%;border-collapse:collapse;background:var(--surface);border:1.5px solid var(--red);max-width:640px}
+.scores th,.scores td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+.scores td.num,.scores th.num{text-align:right;font-variant-numeric:tabular-nums}
+.scores tfoot td{font-weight:800;font-family:var(--display);font-size:1.1rem;border-bottom:0}
+.table-wrap{overflow-x:auto}
+.knows{counter-reset:k;list-style:none;padding:0;margin:18px 0 0;display:grid;gap:0;border-top:1.5px solid var(--line);max-width:820px}
+.knows li{counter-increment:k;display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;padding:14px 0;border-bottom:1.5px solid var(--line)}
+.knows li::before{content:counter(k);font-family:var(--display);font-weight:900;font-stretch:125%;font-size:1.5rem;color:var(--red);line-height:1}
+.knows b{color:var(--heading)}
+.discuss{background:var(--surface);border:1.5px solid var(--line);padding:16px 20px;margin-top:28px;max-width:820px}
+.discuss ul{margin:8px 0 0;padding-left:20px}
+.discuss li{margin-bottom:6px}
+footer{border-top:1.5px solid var(--line);padding:18px 0 30px;color:var(--muted);font-size:.85rem}
+
+@media (max-width:820px){
+  .continuum{grid-template-columns:repeat(3,1fr)}
+  .buckets.c3,.buckets.c4{--cols:2}
+  .tray-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .legend{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .continuum{grid-template-columns:repeat(2,1fr)}
+  .lvl{height:auto;min-height:104px}
+  .buckets.c2,.buckets.c3,.buckets.c4{--cols:1}
+  .bbody{min-height:0}
+  .card{min-height:120px}
+  .tray-cards{grid-auto-rows:minmax(120px,auto)}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .legend{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .logrow{grid-template-columns:30px minmax(0,1fr)}
+  .logrow select{grid-column:2/-1}
+  .tray-cards{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .card,.opt,.bucket{transition:background-color .15s,border-color .15s}
+}
+.card .ct{display:block}
+.movesel{width:100%;min-height:36px;padding:6px 8px;font:inherit;font-size:.85rem;background:var(--surface);color:var(--text);border:1.5px solid var(--line);border-radius:0}
+.sendto{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.sendto-l{font-size:.75rem;font-weight:600;color:var(--muted)}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px}
+.chips.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.chips.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.chip{box-sizing:border-box;min-height:34px;min-width:0;padding:5px 6px;display:flex;align-items:center;gap:4px;text-align:left;background:var(--surface);color:var(--heading);border:1.5px solid var(--line);border-radius:0;font-size:.78rem;font-weight:600;line-height:1.15;cursor:pointer}
+.chip span{min-width:0;overflow-wrap:anywhere}
+.chip b{font-family:var(--display);font-weight:900;font-stretch:120%}
+.chip.lvl1{background:var(--l1);color:#5E0E11;border-color:#D9A3A5}
+.chip.lvl2{background:var(--l2);color:#5E0E11;border-color:transparent}
+.chip.lvl3{background:var(--l3);color:#3D0709;border-color:transparent}
+.chip.lvl4{background:var(--l4);color:#fff;border-color:transparent}
+.chip.lvl5{background:var(--l5);color:#fff;border-color:transparent}
+.chip.lvl6{background:var(--l6);color:#fff;border-color:transparent}
+.chip:hover:not(:disabled){border-color:var(--text)}
+.chip.here,.chip.here[class*="lvl"]{background:var(--surface);color:var(--text);border-color:var(--red);cursor:default}
+.card{cursor:default}
+@media (hover:hover){.card[draggable="true"]{cursor:grab}.card[draggable="true"] .chip{cursor:pointer}}
+@media (max-width:560px){
+  .chip{min-height:40px}
+  .bhead{min-height:0;padding:10px 14px;align-items:center}
+  .bhead .bh{display:none}
+  .bhead .bnum{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Building apps and AI workflows with Claude: a class activity</div>
+    <h1>The Claude Build Kit</h1>
+    <p class="lede">Eight rounds on how to prompt, brief, brand, test and refine so that Claude builds what you actually want, without burning through your tokens. Every round checks itself.</p>
+
+    <div class="continuum" aria-label="The six pieces of the Claude build kit">
+      <div class="lvl lvl1"><span class="n">1</span><span class="nm">Prompt</span><span class="ds">One task, right now.</span></div>
+      <div class="lvl lvl2"><span class="n">2</span><span class="nm">SPEC.md</span><span class="ds">What this build is, and why.</span></div>
+      <div class="lvl lvl3"><span class="n">3</span><span class="nm">CLAUDE.md</span><span class="ds">Read at the start of every session.</span></div>
+      <div class="lvl lvl4"><span class="n">4</span><span class="nm">CHECKS.md</span><span class="ds">What every output must pass.</span></div>
+      <div class="lvl lvl5"><span class="n">5</span><span class="nm">BRAND.md</span><span class="ds">How everything looks and sounds.</span></div>
+      <div class="lvl lvl6"><span class="n">6</span><span class="nm">Skill</span><span class="ds">A repeatable task, in any project.</span></div>
+    </div>
+    <div class="who" aria-hidden="true">
+      <span>This task</span><span class="bar"></span><span>Every task</span>
+      <span class="whoq">Say it once in the right place, and it keeps working.</span>
+    </div>
+    <div class="meta"><span><b>Time:</b> about 75 minutes, or two sittings</span><span><b>Work in:</b> your project team</span><span><b>Before this:</b> The AI Spectrum</span></div>
+  </div>
+</header>
+
+<nav class="steps" aria-label="Rounds"><ol id="stepper"></ol></nav>
+
+<main class="wrap">
+
+<section class="round" data-round="r1">
+  <div class="round-head"><span class="rn">Round 1 of 8</span><h2>Building an app is a loop, not one prompt</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>You can build a working app with plain English, but not in one giant prompt. Good builders run a loop: <b>specify</b> what they want, ask Claude for a <b>plan</b>, <b>build</b> one small slice, <b>test</b> it, then <b>refine</b> it before moving to the next slice.</p>
+    <p>Small slices keep mistakes small. A bug found in one screen takes one message to fix. A bug buried in a whole app built in one go can take an hour.</p>
+  </div>
+  <p class="task">Your team is building a Market Research Intelligence app for Crunchwala, a made-up snack brand. Here is your chat with Claude. Label each line with the stage of the loop it shows.</p>
+  <div data-trace="t1"></div>
+  <div class="next-row"><button class="btn" data-go="1">Next: Strong prompts</button></div>
+</section>
+
+<section class="round" data-round="r2">
+  <div class="round-head"><span class="rn">Round 2 of 8</span><h2>Take a strong prompt apart</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>Write to Claude the way you’d brief a smart new colleague on their first day. They need the <b>context</b>, a clear <b>goal</b>, who it’s <b>for</b>, the must-have <b>requirements</b>, the <b>limits</b>, an <b>example</b> of good work, the <b>format</b> you want back, and how you’ll <b>judge</b> it.</p>
+    <p>Three habits make any prompt better. Say what to do, rather than what not to do. Give the reason behind a rule, because Claude uses the reason to handle cases you didn’t mention. And wrap long pasted material in tags, such as &lt;reviews&gt; … &lt;/reviews&gt;, so Claude can tell your instructions apart from your material.</p>
+  </div>
+  <p class="task">These 12 pieces come from one strong prompt for the Crunchwala app. Use the buttons on each card, or drag it, to sort each piece into the part of the prompt it is.</p>
+  <div data-sort="s2"></div>
+  <div class="next-row"><button class="btn" data-go="2">Next: CLAUDE.md</button></div>
+</section>
+
+<section class="round" data-round="r3">
+  <div class="round-head"><span class="rn">Round 3 of 8</span><h2>CLAUDE.md: your project’s standing brief</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>Every new Claude Code session starts with a blank memory. <b>CLAUDE.md</b> is a plain-text file in your project folder that Claude reads at the start of every session, so it always knows what the project is, how you work and which rules to follow.</p>
+    <p>You don’t have to write it from scratch. Run <b>/init</b> and Claude explores the project and drafts one for you to review. Because the file loads every session, every line costs tokens every time: aim for under 200 lines, and add a line when you catch yourself explaining the same thing twice. On claude.ai, the <b>instructions and files of a Project</b> play the same role.</p>
+  </div>
+  <p class="task">Seven questions. You get one try at each.</p>
+  <div data-mcq="m3"></div>
+  <div class="next-row"><button class="btn" data-go="3">Next: Skills</button></div>
+</section>
+
+<section class="round" data-round="r4">
+  <div class="round-head"><span class="rn">Round 4 of 8</span><h2>Skills: teach Claude a task once</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>A <b>Skill</b> is a folder that teaches Claude how to do one repeatable task well, such as writing a research summary in your format. At its heart is a file called <b>SKILL.md</b>: a name and a short description at the top, then the instructions. Examples, templates and small scripts can sit in the same folder.</p>
+    <p>Claude reads only the name and description of each Skill until a task matches. Then it opens the instructions, and opens the extra files only if it needs them. That’s why you can install dozens of Skills without slowing Claude down. Skills work on claude.ai, in Claude Code and through the API, and you can ask Claude to create one for you.</p>
+  </div>
+  <h3 class="part-title">Part A. Read a Skill folder</h3>
+  <p class="task">Label each line of this Skill with the part it is.</p>
+  <div data-trace="t4"></div>
+  <h3 class="part-title">Part B. How Skills behave</h3>
+  <div data-mcq="m4"></div>
+  <div class="next-row"><button class="btn" data-go="4">Next: Brand and design</button></div>
+</section>
+
+<section class="round" data-round="r5">
+  <div class="round-head"><span class="rn">Round 5 of 8</span><h2>Brand files and Claude Design</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>A <b>BRAND.md</b> file is your brand guide rewritten for Claude: exact values, not adjectives. “Warm and premium” means nothing to a machine. “Buttons in #B61D22, square corners, sentence case” does. To make one, give Claude your logo, brand guide and a few screenshots, ask it to draft a BRAND.md with exact values, then correct what it got wrong.</p>
+    <p>BRAND.md isn’t a name Claude looks for on its own, so point to it: from CLAUDE.md, from your Project files, or in your prompt.</p>
+  </div>
+  <h3 class="part-title">Part A. Could Claude follow this brand rule?</h3>
+  <p class="task">Sort the 10 lines from a first-draft BRAND.md. The explanations show how to rewrite the vague ones.</p>
+  <div data-sort="s5"></div>
+
+  <h3 class="part-title">Part B. Designing in Claude Design</h3>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p><b>Claude Design</b> is Anthropic’s visual workspace for designs, app screens, prototypes, slides and one-pagers. You can start it from claude.ai/design or from a conversation. Import your design system, from brand files, design files or a code repository, and Claude builds with it and checks its own output against it.</p>
+    <p>You refine by commenting on the exact element you want changed. When the design is right, you can export it or hand it to Claude Code to build. Designing first is cheap: changing a picture costs far less than changing a finished app.</p>
+  </div>
+  <div data-mcq="m5"></div>
+  <div class="next-row"><button class="btn" data-go="5">Next: Testing</button></div>
+</section>
+
+<section class="round" data-round="r6">
+  <div class="round-head"><span class="rn">Round 6 of 8</span><h2>CHECKS.md and a testing agent</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>A <b>CHECKS.md</b> file lists what every output must pass before you accept it, written as yes-or-no checks. You can ask Claude to run it on its own work: “Before you show me anything, check it against CHECKS.md and report pass or fail for each line.” A good check is specific, observable, and has only one right answer.</p>
+  </div>
+  <h3 class="part-title">Part A. Can this be checked?</h3>
+  <p class="task">Sort the 10 lines from a draft CHECKS.md.</p>
+  <div data-sort="s6"></div>
+
+  <h3 class="part-title">Part B. Build a testing agent</h3>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>A <b>testing agent</b> is a separate agent whose only job is to check work against CHECKS.md. This is the maker-and-checker pattern from The AI Spectrum: a reviewer that didn’t build the work doesn’t share the builder’s blind spots.</p>
+    <p>In Claude Code, you create one with the <b>/agents</b> command. It’s saved as a file in the project’s .claude/agents folder, with a name, a description of when to use it, the tools it may use, and its instructions. On claude.ai, the same idea is a separate chat or Project set up with checker instructions.</p>
+  </div>
+  <p class="task">Label each line of this tester agent file.</p>
+  <div data-trace="t6"></div>
+  <div data-mcq="m6" style="margin-top:22px"></div>
+  <div class="next-row"><button class="btn" data-go="6">Next: Saving tokens</button></div>
+</section>
+
+<section class="round" data-round="r7">
+  <div class="round-head"><span class="rn">Round 7 of 8</span><h2>Refine before you build, and save tokens</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p><b>Tokens</b> are the small chunks of text Claude reads and writes, and your usage is counted in them. Every message you send makes Claude re-read the conversation so far, plus the files and instructions it has loaded. So long chats, pasted documents and regenerated files add up quickly.</p>
+    <p>The biggest saving comes before any building. A plan is short; an app is long. Fixing a misunderstanding in a one-page <b>SPEC.md</b> costs a few hundred tokens. Fixing the same misunderstanding after the app is built can mean rewriting thousands. So write the spec, ask Claude to critique it and question you, correct it, and only then build.</p>
+  </div>
+  <h3 class="part-title">Part A. Saves or wastes?</h3>
+  <p class="task">Sort the 12 habits.</p>
+  <div data-sort="s7"></div>
+  <h3 class="part-title">Part B. Refining in practice</h3>
+  <div data-mcq="m7"></div>
+  <div class="next-row"><button class="btn" data-go="7">Next: Put it together</button></div>
+</section>
+
+<section class="round" data-round="r8">
+  <div class="round-head"><span class="rn">Round 8 of 8</span><h2>Put the kit together</h2></div>
+  <div class="idea">
+    <div class="it">The idea</div>
+    <p>Each instruction has a right home. Say it in the right place once, and you never have to repeat it. A prompt is for this task. SPEC.md is for this build. CLAUDE.md is for every session in the project. BRAND.md is for how things look and sound. CHECKS.md is for what every output must pass. A Skill is for a process you’ll repeat anywhere.</p>
+  </div>
+  <h3 class="part-title">Part A. Where does it live?</h3>
+  <p class="task">Sort the 12 instructions into their right home.</p>
+  <div data-sort="s8"></div>
+  <h3 class="part-title">Part B. Final design calls</h3>
+  <div data-mcq="m8"></div>
+  <div class="next-row"><button class="btn" data-go="8">See your debrief</button></div>
+</section>
+
+<section class="round" data-round="debrief">
+  <div class="round-head"><span class="rn">Debrief</span><h2>What you now know</h2></div>
+  <div id="scorebox"></div>
+  <ol class="knows">
+    <li><div><b>Building with prompts is a loop.</b> Specify, plan, build one slice, test, refine, then move to the next slice.</div></li>
+    <li><div><b>A strong prompt is a brief.</b> Context, goal, audience, requirements, constraints, an example, output format and success criteria. Say what to do, give reasons, and tag pasted material.</div></li>
+    <li><div><b>CLAUDE.md is the project’s standing brief.</b> Claude reads it every session. Draft it with /init, keep it under 200 lines, and add to it when you repeat yourself.</div></li>
+    <li><div><b>A Skill teaches Claude a repeatable task.</b> A SKILL.md with a clear name and description, instructions, and optional examples and scripts, loaded only when needed.</div></li>
+    <li><div><b>BRAND.md turns adjectives into values.</b> Exact colours, fonts, shapes and voice rules that Claude can follow and check.</div></li>
+    <li><div><b>Claude Design lets you get the look right before you build.</b> Import your design system, comment on exact elements, explore alternatives, then hand off to build.</div></li>
+    <li><div><b>CHECKS.md makes quality testable.</b> Specific yes-or-no checks that Claude can run on its own work.</div></li>
+    <li><div><b>A testing agent is your checker.</b> A separate agent with read-only tools that reports pass or fail with evidence, and never marks its own homework.</div></li>
+    <li><div><b>Refine the plan, not the product.</b> Fixing SPEC.md costs hundreds of tokens; fixing a built app costs thousands.</div></li>
+    <li><div><b>Save tokens by design.</b> Batch feedback, ask for targeted edits, start fresh chats for new tasks, keep standing files lean, and match the model to the job.</div></li>
+  </ol>
+  <div class="discuss">
+    <h3>Do this with your team next</h3>
+    <ul>
+      <li>Write a one-page SPEC.md for your Market Research Intelligence System, then ask Claude to critique it and question you before you build anything.</li>
+      <li>Draft BRAND.md and CHECKS.md for your project. Make every line specific enough to pass or fail.</li>
+      <li>Agree on one process your team will repeat, and ask Claude to turn it into a Skill.</li>
+    </ul>
+  </div>
+  <div class="controls"><button class="btn ghost" id="restart">Clear my answers and start over</button></div>
+</section>
+
+</main>
+
+<footer><div class="wrap">Crunchwala and all scenarios in this activity are fictional. CLAUDE.md and SKILL.md are file names Claude looks for; SPEC.md, BRAND.md and CHECKS.md are team conventions that you point Claude to. Your answers are saved in this browser only.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var SORTS = {
+  s2: { cls:"c4",
+    buckets:[
+      {id:"ctx", name:"Context", hint:"Background Claude needs to understand the situation."},
+      {id:"goal", name:"Goal", hint:"The one thing you want built or done."},
+      {id:"aud", name:"Audience", hint:"Who will use it, and what they’re like."},
+      {id:"req", short:"Requirements", name:"Requirements", hint:"Must-have features and behaviour."},
+      {id:"con", name:"Constraints", hint:"Limits: tools, budget, data, rules."},
+      {id:"ex", name:"Example", hint:"A sample of what good looks like."},
+      {id:"fmt", short:"Format", name:"Output format", hint:"What to hand back, and in what form."},
+      {id:"done", short:"Success", name:"Success criteria", hint:"How you’ll judge that it’s done."}
+    ],
+    cards:[
+      {id:"p1", a:"ctx", t:"Crunchwala is a Gujarat snack brand. Its marketing team gets about 2,000 online reviews a month and has no time to read them.", w:"Background that explains why the app matters. Without it, Claude guesses."},
+      {id:"p2", a:"ctx", t:"We tried a spreadsheet first, but the team found it too slow to use in meetings.", w:"What’s been tried and why it failed is context. It steers Claude away from the same answer."},
+      {id:"p3", a:"goal", t:"Build a web app that turns pasted reviews into the top five complaints and the top five praises.", w:"One clear outcome. Everything else in the prompt supports this line."},
+      {id:"p4", a:"aud", t:"Brand managers will use it on their phones between meetings. None of them code.", w:"Knowing the users changes the design: big buttons, plain words, phone first."},
+      {id:"p5", a:"req", t:"Users can paste up to 500 reviews at once.", w:"A must-have behaviour, stated precisely."},
+      {id:"p6", a:"req", t:"Each theme shows three example reviews as evidence.", w:"Another must-have feature. Requirements are what the app does."},
+      {id:"p7", a:"con", t:"Use only free tools, and don’t add a login screen.", w:"Limits on how Claude can build it."},
+      {id:"p8", a:"con", t:"Remove customer names before showing any review, because the brand has promised customers privacy.", w:"A rule framed as what to do, with the reason. The reason helps Claude handle names it didn’t expect, such as in email signatures."},
+      {id:"p9", a:"ex", t:"Here is a theme card we like: ‘Too salty (38 reviews)’, followed by three short quotes.", w:"One example is often clearer than a paragraph of description."},
+      {id:"p10", a:"fmt", t:"Give us a single HTML file we can open in a browser.", w:"Tells Claude exactly what to hand back."},
+      {id:"p11", a:"fmt", t:"Before the code, write a five-line summary of what you built and why.", w:"Also output format: what to include in the reply and in what order."},
+      {id:"p12", a:"done", t:"It’s done when a manager can paste reviews and see results on a phone in under 30 seconds.", w:"A finish line you can test. It also becomes a line in CHECKS.md."}
+    ]
+  },
+  s5: { cls:"c2",
+    buckets:[
+      {id:"ok", short:"Can follow", name:"Claude can follow this", hint:"Exact values or rules that you could check."},
+      {id:"vague", short:"Too vague", name:"Too vague: rewrite it", hint:"An adjective or feeling, with nothing to check."}
+    ],
+    cards:[
+      {id:"b1", a:"ok", t:"Primary colour #B61D22 for buttons and headings. Never for body text.", w:"An exact value and a clear rule about where it goes."},
+      {id:"b2", a:"ok", t:"Headings in Archivo Bold; body text in Public Sans at 16 px.", w:"Named fonts and a size. Claude can use and check these."},
+      {id:"b3", a:"ok", t:"Square corners on every box and button, with 1.5 px borders.", w:"Shape rules that are specific enough to measure."},
+      {id:"b4", a:"ok", t:"Write in sentence case. Say ‘you’, never ‘the user’.", w:"Voice rules that anyone could apply the same way."},
+      {id:"b5", a:"ok", t:"Show numbers in the Indian format: ₹1,20,000 and 12 lakh.", w:"A precise format with examples."},
+      {id:"b6", a:"vague", t:"Colours should feel warm and premium.", w:"Rewrite as: ‘Use only #B61D22, #8A1519 and #F8F4F3.’"},
+      {id:"b7", a:"vague", t:"Fonts should look modern.", w:"Rewrite as: ‘Headings in Archivo 800; body in Public Sans 400.’"},
+      {id:"b8", a:"vague", t:"Keep the layout clean.", w:"Rewrite as: ‘One column on phones, 16 px gaps between boxes, maximum width 1,080 px.’"},
+      {id:"b9", a:"vague", t:"Our tone is fun but professional.", w:"Rewrite as: ‘Short sentences, everyday words, no slang, at most one light joke per page.’"},
+      {id:"b10", a:"vague", t:"Make it look like our brand.", w:"This is the problem BRAND.md exists to solve. Replace it with the exact rules above."}
+    ]
+  },
+  s6: { cls:"c2",
+    buckets:[
+      {id:"ok", short:"Can check", name:"Claude can check this", hint:"Specific and observable, with a yes-or-no answer."},
+      {id:"vague", short:"Too vague", name:"Too vague to check", hint:"A matter of opinion. Rewrite it as a test."}
+    ],
+    cards:[
+      {id:"k1", a:"ok", t:"Every button is at least 44 px tall.", w:"Measurable. Pass or fail is obvious."},
+      {id:"k2", a:"ok", t:"The page works at 380 px wide with no sideways scrolling.", w:"A clear test on a phone-sized screen."},
+      {id:"k3", a:"ok", t:"All prices use the ₹ symbol and the Indian number format.", w:"Easy to scan for and confirm."},
+      {id:"k4", a:"ok", t:"Only colours listed in BRAND.md appear on the page.", w:"Checkable against another file. This is how your brand file and test file work together."},
+      {id:"k5", a:"ok", t:"No customer names appear anywhere in the results.", w:"A yes-or-no privacy check."},
+      {id:"k6", a:"vague", t:"The app looks good.", w:"Rewrite as: ‘Every heading uses Archivo, and body text is at least 16 px.’"},
+      {id:"k7", a:"vague", t:"It’s user-friendly.", w:"Rewrite as: ‘A first-time user can paste reviews and see results in three taps or fewer.’"},
+      {id:"k8", a:"vague", t:"The text reads well.", w:"Rewrite as: ‘No sentence is longer than 25 words, and no word from the banned-words list appears.’"},
+      {id:"k9", a:"vague", t:"It’s fast.", w:"Rewrite as: ‘Results appear in under 30 seconds for 500 reviews.’"},
+      {id:"k10", a:"vague", t:"There are no bugs.", w:"Rewrite as: ‘Each of the five listed user actions completes without an error message.’"}
+    ]
+  },
+  s7: { cls:"c2",
+    buckets:[
+      {id:"save", short:"Saves", name:"Saves tokens", hint:"Less re-reading, less regenerating, fewer wrong turns."},
+      {id:"waste", short:"Wastes", name:"Wastes tokens", hint:"Makes Claude re-read, redo or guess."}
+    ],
+    cards:[
+      {id:"w1", a:"save", t:"Asking Claude to question and critique your SPEC.md before any code is written.", w:"Catching a wrong idea in a page of text is far cheaper than rebuilding an app."},
+      {id:"w2", a:"save", t:"Collecting five fixes into one message.", w:"One message means one re-read of the conversation instead of five."},
+      {id:"w3", a:"save", t:"Saying ‘change only the header colour; leave everything else as it is’.", w:"A targeted edit means Claude doesn’t rewrite what already works."},
+      {id:"w4", a:"save", t:"Starting a fresh chat (or typing /clear in Claude Code) when you move to a new task.", w:"Claude stops carrying the old task’s history into every new message."},
+      {id:"w5", a:"save", t:"Keeping CLAUDE.md under 200 lines and moving detail into Skills or linked files.", w:"CLAUDE.md loads every session, so every extra line costs tokens every time."},
+      {id:"w6", a:"save", t:"Using a smaller, faster model for simple jobs like renaming or reformatting.", w:"Match the model to the job. Save the most capable model for the hard thinking."},
+      {id:"w7", a:"waste", t:"Running the whole term’s project in one giant chat.", w:"Every new message makes Claude re-read everything before it, and early decisions get lost in the noise."},
+      {id:"w8", a:"waste", t:"Saying ‘make it better’ and seeing what comes back.", w:"Claude has to guess, and you’ll likely spend several rounds getting to what you wanted."},
+      {id:"w9", a:"waste", t:"Asking Claude to regenerate the whole app to change one colour.", w:"Thousands of tokens rewritten for a one-line change."},
+      {id:"w10", a:"waste", t:"Pasting the same 40-page report into every new chat.", w:"Add it to a Project once, or keep it in a file Claude reads only when needed."},
+      {id:"w11", a:"waste", t:"Sending ten tiny messages, one fix at a time.", w:"Ten re-reads of the conversation instead of one."},
+      {id:"w12", a:"waste", t:"Asking Claude to ‘look at every file’ when the problem is in one screen.", w:"Point to the exact file or screen, so Claude reads only what matters."}
+    ]
+  },
+  s8: { cls:"c3", shaded:true,
+    buckets:[
+      {id:"prompt", name:"1. Prompt", hint:"This task, right now."},
+      {id:"spec", name:"2. SPEC.md", hint:"What this build is, what’s in and what’s out."},
+      {id:"claude", name:"3. CLAUDE.md", hint:"Standing rules for every session in the project."},
+      {id:"checks", name:"4. CHECKS.md", hint:"Yes-or-no checks every output must pass."},
+      {id:"brand", name:"5. BRAND.md", hint:"How everything should look and sound."},
+      {id:"skill", name:"6. Skill", hint:"A repeatable process, in any project."}
+    ],
+    cards:[
+      {id:"h1", a:"prompt", t:"Today: add an export-to-PDF button to the results screen.", w:"A one-off task. It belongs in this conversation only."},
+      {id:"h2", a:"prompt", t:"Make the chart title bigger on this screen.", w:"A single change, right now."},
+      {id:"h3", a:"spec", t:"The app has three screens: paste reviews, themes chart and export.", w:"What this build is. It stays true for the whole build."},
+      {id:"h4", a:"spec", t:"Out of scope for version 1: user logins and saved history.", w:"Scope decisions belong in the spec, so nobody, including Claude, adds them by accident."},
+      {id:"h5", a:"claude", t:"This is Crunchwala’s research app. Read SPEC.md before making any change.", w:"Orientation that every session needs, plus a pointer to the detail."},
+      {id:"h6", a:"claude", t:"Explain every change in plain English, because our team doesn’t code.", w:"A standing working rule, with its reason."},
+      {id:"h7", a:"checks", t:"Every screen works at 380 px wide.", w:"A yes-or-no test for every output."},
+      {id:"h8", a:"checks", t:"No customer names appear anywhere in the output.", w:"A privacy test that every output must pass."},
+      {id:"h9", a:"brand", t:"Buttons are #B61D22 with square corners and white text.", w:"Exact visual values."},
+      {id:"h10", a:"brand", t:"Voice: short sentences, say ‘you’, no slang.", w:"How the brand sounds."},
+      {id:"h11", a:"skill", t:"How to turn any set of interview notes into our one-page research summary, with a template and examples.", w:"A multi-step process you’ll repeat across projects. That’s a Skill."},
+      {id:"h12", a:"skill", t:"Our six-step process for building a competitor comparison table.", w:"Repeatable, multi-step and useful beyond this one app."}
+    ]
+  }
+};
+
+var TRACES = {
+  t1: {
+    legend:[["Specify","Saying what you want and who it’s for"],["Plan","Agreeing the steps before building"],["Build","Making one slice"],["Test","Checking what was built"],["Refine","Fixing or improving one thing"]],
+    lines:[
+      {a:"Specify", t:"We want a web app where Crunchwala’s marketing team pastes customer reviews and sees the top complaints and praises.", w:"The goal, in plain English."},
+      {a:"Specify", t:"The users are brand managers with no technical background. It must work on a phone.", w:"Who it’s for and a key constraint. Still specifying."},
+      {a:"Plan", t:"Before writing any code, list the screens you’ll build and the order you’ll build them in.", w:"Asking for a plan first costs a few lines. Skipping it can cost a rebuild."},
+      {a:"Plan", t:"Claude: Screen 1, paste reviews. Screen 2, themes chart. Screen 3, export. I’ll build them in that order.", w:"Claude’s plan. Now you can correct it before anything is built."},
+      {a:"Build", t:"Build Screen 1 only: a box to paste reviews and an Analyse button.", w:"One slice at a time."},
+      {a:"Test", t:"We pasted 50 real reviews. The Analyse button does nothing on a phone.", w:"Testing with real data finds real problems."},
+      {a:"Refine", t:"The Analyse button doesn’t respond on a phone. Fix only that, and don’t change anything else.", w:"A targeted fix. ‘Change nothing else’ protects what already works."},
+      {a:"Test", t:"We checked again on a phone and a laptop. Both work now.", w:"Always re-test after a fix."},
+      {a:"Build", t:"Now build Screen 2: a bar chart of the top five themes.", w:"The next slice starts only once the last one passed."},
+      {a:"Test", t:"Checking the chart against CHECKS.md: labels readable, brand colours used, works at 380 px.", w:"A written checklist makes testing consistent."},
+      {a:"Refine", t:"The chart is blue. Switch it to the colours in BRAND.md.", w:"Refining against a file, not a feeling."},
+      {a:"Plan", t:"Update the plan: Screens 1 and 2 are done; Screen 3 is next.", w:"Keeping the plan current means a fresh chat can pick up exactly where you left off."}
+    ]
+  },
+  t4: { mono:true,
+    legend:[["Name","The Skill’s short ID"],["Description","What it does and when to use it"],["Instructions","The steps Claude follows"],["Example or template","Material that shows what good looks like"],["Script","A small program Claude can run"]],
+    lines:[
+      {a:"Name", t:"name: research-summary", w:"A short, lowercase ID at the top of SKILL.md."},
+      {a:"Description", t:"description: Turns interview notes or survey results into a one-page research summary in Crunchwala’s format. Use when asked for a research summary, insight brief or findings page.", w:"The most important line. Claude always reads it and uses it to decide when to open the Skill."},
+      {a:"Instructions", t:"1. Read all the notes first. 2. Group the findings into at most five themes.", w:"The body of SKILL.md: steps Claude follows once the Skill is triggered."},
+      {a:"Instructions", t:"Every theme needs one direct customer quote as evidence.", w:"A rule inside the instructions."},
+      {a:"Instructions", t:"Write for brand managers: plain English, no statistics jargon.", w:"Audience guidance is part of the instructions too."},
+      {a:"Example or template", t:"examples/good-summary.md  (a summary the team loved)", w:"A worked example in the folder. Claude opens it only when it needs it."},
+      {a:"Example or template", t:"templates/summary-layout.md  (the headings every summary uses)", w:"A template keeps every output the same shape."},
+      {a:"Script", t:"scripts/count_mentions.py  (counts how often each theme is mentioned)", w:"A script does exact work, like counting, the same way every time."}
+    ]
+  },
+  t6: { mono:true,
+    legend:[["Name","The agent’s ID"],["Description","When it should be used"],["Tools","What it’s allowed to do"],["Instructions","How it should think and work"],["Report format","What it hands back"]],
+    lines:[
+      {a:"Name", t:"name: tester", w:"The agent’s short ID."},
+      {a:"Description", t:"description: Checks any new screen or feature against CHECKS.md. Use after every build step, before showing work to the user.", w:"Tells Claude when to call this agent."},
+      {a:"Tools", t:"tools: Read, Grep, Glob", w:"Read-only tools: it can look at files and search them, but it can’t edit anything."},
+      {a:"Instructions", t:"You are a strict tester. You didn’t build this, so assume nothing works until you’ve checked it.", w:"Sets the reviewer’s mindset."},
+      {a:"Instructions", t:"Check every line of CHECKS.md. Don’t skip any.", w:"Tells it exactly what to check against."},
+      {a:"Report format", t:"For each check, report PASS or FAIL with the evidence you found.", w:"Evidence makes the result trustworthy and easy to act on."},
+      {a:"Report format", t:"End with a list of failures, most serious first. Don’t fix anything yourself.", w:"A clear hand-back, so the builder knows what to fix first."}
+    ]
+  }
+};
+
+var MCQ = {
+  m3: [
+    {q:"What is CLAUDE.md?", o:[
+      "A code file Claude runs when you open the project, to set up its tools",
+      "A plain-text project brief that Claude reads at the start of each session",
+      "A running log Claude writes of every chat, so it can recall past sessions",
+      "An account settings file that decides which Claude model and plan you use"], a:1,
+     w:"You write it in plain English, it lives in the project folder, and every new session starts by reading it."},
+    {q:"What’s the fastest way to create a first CLAUDE.md for a project?", o:[
+      "Write every section yourself, so nothing Claude assumes ends up in it",
+      "Run /init, let Claude draft it, then review and edit it",
+      "Copy another team’s CLAUDE.md and swap in your own project’s name",
+      "Paste the whole project into a chat and ask Claude to memorise it all"], a:1,
+     w:"/init has Claude explore the project and propose a CLAUDE.md for you to review before it writes anything."},
+    {q:"Which line belongs in CLAUDE.md?", o:[
+      "Today, fix the chart colour on the results screen before the demo.",
+      "Always show money in the Indian format, for example ₹1,20,000.",
+      "Our API key is sk-12345, so Claude can connect to the data source.",
+      "The full 40-page research report, so Claude always has every detail."], a:1,
+     w:"A rule that should hold in every session. Today’s task goes in a prompt. Keys and passwords never go in a shared file. Long documents belong in their own files."},
+    {q:"Your CLAUDE.md has grown to 900 lines. What’s the problem?", o:[
+      "None. The more detail it holds, the better Claude understands the work.",
+      "It loads every session, costing tokens each time and diluting each rule.",
+      "Claude reads only the first 100 lines and quietly skips all the rest.",
+      "Files over 500 lines are rejected, so Claude starts with no brief at all."], a:1,
+     w:"Anthropic’s guidance is to aim for under 200 lines, and move detail into Skills or separate files."},
+    {q:"Claude has made the same mistake twice: it keeps using dollar signs. What should you do?", o:[
+      "Correct it in the chat each time it happens, so the fix stays fresh",
+      "Add a line to CLAUDE.md: ‘Show all prices in rupees (₹).’",
+      "Start a new project folder so Claude forgets the earlier mistake",
+      "Switch to a larger model, since a smarter one won’t repeat it"], a:1,
+     w:"A repeated mistake is the signal to add a standing rule."},
+    {q:"Your brand guide is six pages long. How should CLAUDE.md handle it?", o:[
+      "Paste all six pages into CLAUDE.md so the rules are always loaded",
+      "Keep it in BRAND.md and add a one-line pointer to it in CLAUDE.md",
+      "Leave it out and let Claude work the brand out from existing screens",
+      "Paste the whole guide into every prompt that involves visual work"], a:1,
+     w:"A short pointer keeps CLAUDE.md lean while making sure Claude finds the detail when it needs it."},
+    {q:"You only use claude.ai, not Claude Code. What plays the same role as CLAUDE.md?", o:[
+      "The instructions and files you add to a claude.ai Project",
+      "Pasting the same brief at the start of every new chat you open",
+      "Nothing; standing briefs only exist inside Claude Code projects",
+      "Your profile name and the style you pick in account settings"], a:0,
+     w:"Project instructions and files apply to every chat in that Project. Pasting the brief into each chat works, but wastes time and tokens."}
+  ],
+  m4: [
+    {q:"Which part of a Skill decides whether Claude uses it at all?", o:["The script inside it","The description line","The template file","The folder’s name"], a:1,
+     w:"Until a task matches, the name and description are all Claude reads. A vague description means the Skill never gets used."},
+    {q:"Which is the best description?", o:[
+      "Research summaries. Use this Skill for anything related to research, notes, surveys, data or insights.",
+      "A very important Skill that the whole team relies on. Always use it first, before any other Skill.",
+      "Turns interview notes into a one-page summary in our format. Use when asked for a research summary.",
+      "Summaries skill, version 2 (final). Made by the Crunchwala team in October for the research project."], a:2,
+     w:"It says what the Skill does and the exact situation that should trigger it. The first is so broad it would fire on almost anything."},
+    {q:"When should something become a Skill rather than a line in CLAUDE.md?", o:[
+      "When it’s a rule that should apply in every session of this project",
+      "When it’s a multi-step process you’ll reuse across projects",
+      "When it’s a one-off task that you only need to get done today",
+      "When the instruction runs longer than a few lines of plain text"], a:1,
+     w:"CLAUDE.md holds standing rules for one project. A Skill holds a process, with its steps, examples and scripts, that you can reuse anywhere."},
+    {q:"Why doesn’t installing 30 Skills slow Claude down much?", o:[
+      "Skills are compressed, so each one takes up very little space",
+      "Claude reads only each Skill’s name and description until needed",
+      "Claude keeps the ten most recent Skills and ignores the others",
+      "Skills run on separate servers, so they don’t use Claude’s context"], a:1,
+     w:"This is called progressive disclosure: the full instructions and files load only when they’re needed."},
+    {q:"What’s the easiest way to make your first Skill?", o:[
+      "Learn enough Python to write the scripts every Skill needs",
+      "Ask Claude to turn a process you just did together into a Skill",
+      "Download a ready-made Skill and rename it to match your project",
+      "Write the whole SKILL.md by hand, then ask Claude to proofread it"], a:1,
+     w:"Claude can draft the SKILL.md and folder for you. You then test it and tighten the description."}
+  ],
+  m5: [
+    {q:"You want every design to follow Crunchwala’s look. What should you do first in Claude Design?", o:[
+      "Describe the brand in a single word, such as ‘premium’ or ‘playful’",
+      "Import your design system: logo, colours, fonts and brand rules",
+      "Start designing freely, then fix the colours once the layout works",
+      "Pick the closest ready-made template and adjust it as you go"], a:1,
+     w:"With your design system imported, Claude builds with it and checks its own output against it."},
+    {q:"One button on the canvas is the wrong size. What’s the best way to fix it?", o:[
+      "Rewrite your whole prompt with the button size included this time",
+      "Comment on that button with the exact change you want",
+      "Start a new project so the next version gets the size right",
+      "Ask Claude to review the whole design and make it better"], a:1,
+     w:"A comment on the element tells Claude exactly what to change and leaves the rest alone."},
+    {q:"You like the current design but want to see a bold alternative. What do you ask for?", o:[
+      "Delete this version and start again with a bolder prompt",
+      "Save what we have, then try a completely different approach",
+      "Keep making small tweaks until the whole design feels bolder",
+      "Make the current design more creative and eye-catching"], a:1,
+     w:"You keep the good version and explore freely. Exploring is where Claude Design saves the most time."},
+    {q:"The design is approved. How does it become a working app?", o:[
+      "Take screenshots and paste them into a new chat to rebuild",
+      "Hand it off to Claude Code to build, or export it",
+      "Rebuild each screen by hand, using the design as a guide",
+      "Print it and describe each screen to Claude one at a time"], a:1,
+     w:"Claude Design can package the design for Claude Code, or export it as HTML, PDF, PowerPoint or to Canva."},
+    {q:"Why design first, then build?", o:[
+      "Designs look more polished in class presentations and reviews",
+      "Changing a design is far cheaper than changing a built app",
+      "Claude Code refuses to build anything without an approved design",
+      "The order doesn’t matter, as long as you test at the very end"], a:1,
+     w:"Settle the look while it’s still cheap to change. It’s the same idea as refining the spec before you build."}
+  ],
+  m6: [
+    {q:"Why use a separate testing agent instead of asking the builder to check its own work?", o:[
+      "It’s faster, because two agents can work at the same time",
+      "A fresh reviewer doesn’t share the builder’s blind spots",
+      "The builder agent isn’t allowed to read its own files",
+      "Claude Code needs a tester before anything can be saved"], a:1,
+     w:"This is maker and checker: nobody should mark their own homework."},
+    {q:"The tester reports four failures. What happens next?", o:[
+      "Ignore them if the app mostly works and the demo is soon",
+      "Send them to the builder, fix, re-test, and cap the rounds",
+      "Ask the tester to fix all four failures while it’s there",
+      "Delete the four checks that failed, since they’re too strict"], a:1,
+     w:"A loop with a limit, and a person steps in if it still fails. Without a limit, builder and tester can go back and forth for ever."},
+    {q:"Why give the tester read-only tools?", o:[
+      "Read-only agents cost less, so testing stays within budget",
+      "So it reports problems instead of quietly changing the work",
+      "Testers can’t write files in Claude Code, whatever you set",
+      "So it runs faster, because it never has to stop and save anything"], a:1,
+     w:"If the checker can edit, it can hide a failure by ‘fixing’ it without telling anyone."}
+  ],
+  m7: [
+    {q:"Your team has a one-page SPEC.md. What’s the best next prompt?", o:[
+      "Build it now, and we’ll tell you what to change once we see it.",
+      "First list what’s unclear or missing, and ask us questions.",
+      "Improve the spec on your own, then build the best version you can.",
+      "Build three different versions so we can pick the one we like best."], a:1,
+     w:"Let Claude find the gaps while they cost a few lines to fix."},
+    {q:"Claude built the app, but it’s the wrong idea entirely. Where should this have been caught?", o:[
+      "In testing, by adding more checks to CHECKS.md",
+      "In the spec, before anything was built",
+      "In the brand file, by describing the look more clearly",
+      "Nowhere; a wrong idea only shows up once it’s built"], a:1,
+     w:"A wrong idea is a spec problem. Testing catches bugs; a critiqued spec catches wrong ideas."},
+    {q:"What does plan mode do in Claude Code?", o:[
+      "Claude deletes unused files so it can plan a cleaner project",
+      "Claude proposes a plan and changes no files until you approve",
+      "Claude works faster by skipping its usual checks, tests and reviews",
+      "Claude switches to a cheaper model while it plans the work"], a:1,
+     w:"You get the plan first, and can correct it before anything is built."},
+    {q:"The chat is very long and Claude seems to be forgetting early decisions. What should you do?", o:[
+      "Keep going, and repeat the key decisions in every message",
+      "Save the decisions in SPEC.md and start a fresh chat from it",
+      "Switch to a larger model that can remember more of the chat",
+      "Upload all the project files again so Claude has the full picture"], a:1,
+     w:"A short written record beats a long chat history. In Claude Code, /compact summarises the conversation in a similar way."}
+  ],
+  m8: [
+    {q:"Which prompt will get the better first version?", o:[
+      "Build Crunchwala a market research app with charts, filters, exports, logins, alerts and a dashboard for every team.",
+      "For brand managers on phones: turn pasted reviews into top complaints and praises. One HTML file. Ask questions first.",
+      "You are the world’s best developer. Make an amazing, beautiful, modern market research app that will impress everyone.",
+      "Make a market research app like the ones big brands use. Make it look professional and fix any bugs that you find."], a:1,
+     w:"It gives the audience, the goal, the format and an invitation to ask questions. The others are long too, but they’re vague or pile on features."},
+    {q:"You’re pasting 300 reviews into a prompt. How should you lay it out?", o:[
+      "Mix the reviews into your instructions so the context stays close",
+      "Wrap the reviews in <reviews> tags and put your request after them",
+      "Paste only the first ten reviews to keep the prompt nice and short",
+      "Send the reviews one at a time and ask for a summary of each one"], a:1,
+     w:"Tags separate material from instructions. For long material, putting your request at the end tends to give better answers."},
+    {q:"Which instruction works better?", o:[
+      "Don’t use complicated words, jargon, long sentences or acronyms.",
+      "Write so a 15-year-old could follow it: short, everyday words.",
+      "Avoid sounding technical, academic, stiff or overly formal at all.",
+      "Never use difficult vocabulary under any circumstances."], a:1,
+     w:"Say what to do, not what to avoid. It gives Claude a target to aim for."},
+    {q:"Why add a reason, as in ‘Keep captions under 40 words, because they’re read on phones’?", o:[
+      "It makes the prompt longer, which gives Claude more to work with",
+      "Claude uses the reason to handle cases you didn’t mention",
+      "It’s good manners, and polite prompts get better answers",
+      "It doesn’t change the output, but it helps teammates read it"], a:1,
+     w:"With the reason, Claude also keeps headlines and buttons short without being told."},
+    {q:"What’s the best order for building a new app?", o:[
+      "Build first, then add the brand, then test what you ended up with",
+      "Refine the spec, design, build in slices, test, then refine",
+      "Test the idea with users first, then design and build it in one go",
+      "Design, build and test everything together in one detailed prompt"], a:1,
+     w:"The cheap decisions come first, so the expensive work is done once."}
+  ]
+};
+
+var ROUNDS = [
+  {id:"r1", label:"The build loop", parts:[["trace","t1"]]},
+  {id:"r2", label:"Strong prompts", parts:[["sort","s2"]]},
+  {id:"r3", label:"CLAUDE.md", parts:[["mcq","m3"]]},
+  {id:"r4", label:"Skills", parts:[["trace","t4"],["mcq","m4"]]},
+  {id:"r5", label:"Brand and design", parts:[["sort","s5"],["mcq","m5"]]},
+  {id:"r6", label:"Testing", parts:[["sort","s6"],["trace","t6"],["mcq","m6"]]},
+  {id:"r7", label:"Saving tokens", parts:[["sort","s7"],["mcq","m7"]]},
+  {id:"r8", label:"Put it together", parts:[["sort","s8"],["mcq","m8"]]},
+  {id:"debrief", label:"Debrief", parts:[]}
+];
+
+/* ---------- State ---------- */
+var KEY = "claude-build-kit-v2";
+var NROUNDS = ROUNDS.length - 1;
+function blank(){ return {view:0, place:{}, order:{}, checked:{}, score:{}, trace:{}, mcq:{}, oorder:{}}; }
+var S = blank();
+try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); for (var k in S) if (p && p[k] !== undefined) S[k] = p[k]; } } catch(e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+var sel = null;
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function scoreLine(sc, noun){ return "You got " + sc.got + " of " + sc.total + (sc.got === sc.total ? ". All correct." : ". Read the notes on the dashed " + noun + "."); }
+
+/* ---------- Sort ---------- */
+function shortName(b){ return b.short || b.name.replace(/^\d+\.\s*/, ""); }
+function renderSort(id){
+  var set = SORTS[id], root = document.querySelector('[data-sort="'+id+'"]'); if (!root) return;
+  var place = S.place[id] || (S.place[id] = {});
+  if (!S.order[id] || S.order[id].length !== set.cards.length) S.order[id] = shuffle(set.cards.map(function(c){return c.id;}));
+  var order = S.order[id], checked = !!S.checked[id];
+  var byId = {}; set.cards.forEach(function(c){ byId[c.id] = c; });
+  var bName = {}; set.buckets.forEach(function(b){ bName[b.id] = b.name; });
+  var cols = set.shaded ? 3 : (set.buckets.length <= 3 ? set.buckets.length : 0);
+  function chips(cid){
+    var at = place[cid];
+    if (at && set.buckets.length > 6) {
+      return '<div class="sendto"><div class="sendto-l">Move to</div><select class="movesel" data-set="'+id+'" data-card="'+cid+'" aria-label="Move this card">'
+        + set.buckets.map(function(b){ return '<option value="'+b.id+'"'+(b.id===at?" selected":"")+">"+esc(b.id===at ? "✓ " + b.name : b.name)+"</option>"; }).join("") + "</select></div>";
+    }
+    return '<div class="sendto"><div class="sendto-l">'+(at ? "Move to" : "Send to")+'</div><div class="chips'+(cols ? " cols"+cols : "")+'">'
+      + set.buckets.map(function(b, i){
+          var here = at === b.id;
+          return '<button type="button" class="chip'+(set.shaded ? " lvl"+(i+1) : "")+(here ? " here" : "")+'" data-set="'+id+'" data-card="'+cid+'" data-to="'+b.id+'"'+(here ? " disabled" : "")
+            + ' aria-label="'+(here ? "Already in " : "Send to ")+esc(b.name)+'">'
+            + (here ? "<b>✓</b><span>Here</span>" : (set.shaded ? "<b>"+(i+1)+"</b>" : "")+"<span>"+esc(shortName(b))+"</span>") + "</button>";
+        }).join("") + "</div></div>";
+  }
+  function card(cid){
+    var c = byId[cid], at = place[cid], cls = "card", extra = "";
+    if (checked && at){ var ok = at === c.a; cls += ok ? " ok" : " bad";
+      extra = '<span class="why"><b>' + (ok ? "✓ Correct." : "✗ Belongs in " + esc(bName[c.a]) + ".") + "</b> " + esc(c.w) + "</span>"; }
+    else if (!checked) extra = chips(cid);
+    return '<div class="'+cls+'" data-set="'+id+'" data-card="'+cid+'" draggable="'+(checked?"false":"true")+'"><span class="ct">'+esc(c.t)+"</span>"+extra+"</div>";
+  }
+  var h = '<div class="buckets '+(set.cls||"")+'">';
+  set.buckets.forEach(function(b, i){
+    var inB = order.filter(function(cid){ return place[cid] === b.id; });
+    h += '<div class="bucket" data-set="'+id+'" data-drop="'+b.id+'" aria-label="'+esc(b.name)+'">'
+       + '<div class="bhead'+(set.shaded ? " shade lvl"+(i+1) : "")+'">'+(set.shaded ? '<div class="bnum">'+(i+1)+"</div>" : "")
+       + '<div class="bt"><div class="bn">'+esc(set.shaded ? b.name.replace(/^\d+\.\s*/, "") : b.name)+'</div><div class="bh">'+esc(b.hint)+"</div></div></div>"
+       + '<div class="bbody">' + (inB.length ? inB.map(card).join("") : '<div class="empty">Empty</div>') + "</div></div>";
+  });
+  h += "</div>";
+  var tray = order.filter(function(cid){ return !place[cid]; });
+  h += '<div class="tray" data-set="'+id+'" data-drop="tray"><p class="tray-label">' + (tray.length ? "Cards to place: " + tray.length : "All cards placed.") + "</p>"
+     + '<div class="tray-cards">' + tray.map(card).join("") + "</div></div>";
+  var sc = S.score[id];
+  h += '<div class="controls">' + (checked ? '<button type="button" class="btn ghost" data-retry="'+id+'">Try the wrong ones again</button>' : '<button type="button" class="btn" data-check="'+id+'">Check answers</button>')
+     + '<span class="status'+(checked && sc && sc.got===sc.total ? " good" : "")+'" id="st-'+id+'">'
+     + (checked && sc ? "You got " + sc.got + " of " + sc.total + (sc.got === sc.total ? ". All correct." : ". Read the notes on the dashed cards.") : "") + "</span></div>";
+  root.innerHTML = h;
+}
+function placeCard(setId, cid, target){
+  if (S.checked[setId]) return;
+  if (target === "tray") delete S.place[setId][cid]; else S.place[setId][cid] = target;
+  sel = null; save(); renderSort(setId);
+}
+function checkSort(id){
+  var set = SORTS[id], place = S.place[id] || {};
+  var left = set.cards.filter(function(c){ return !place[c.id]; }).length;
+  if (left){ var st = document.getElementById("st-"+id); st.textContent = left + (left===1?" card is":" cards are") + " still in the tray. Place every card first."; st.className = "status warn"; return; }
+  S.checked[id] = true; S.score[id] = {got:set.cards.filter(function(c){ return place[c.id] === c.a; }).length, total:set.cards.length};
+  sel = null; save(); renderSort(id); renderStepper();
+}
+function retrySort(id){ var set = SORTS[id], place = S.place[id]; set.cards.forEach(function(c){ if (place[c.id] !== c.a) delete place[c.id]; }); S.checked[id] = false; save(); renderSort(id); renderStepper(); }
+
+/* ---------- Label (trace) ---------- */
+function renderTrace(id){
+  var T = TRACES[id], root = document.querySelector('[data-trace="'+id+'"]'); if (!root) return;
+  var vals = S.trace[id] || (S.trace[id] = {}), checked = !!S.checked[id];
+  var labels = T.legend.map(function(l){ return l[0]; });
+  var h = '<div class="legend">' + T.legend.map(function(l){ return "<div><b>"+esc(l[0])+"</b><br>"+esc(l[1])+"</div>"; }).join("") + "</div>";
+  h += '<div class="log'+(T.mono ? " mono" : "")+'">';
+  T.lines.forEach(function(r, i){
+    var v = vals[i] || "", cls = "logrow", why = "";
+    if (checked){ var ok = v === r.a; cls += ok ? " ok" : " bad"; why = '<div class="why"><b>' + (ok ? "✓ Correct." : "✗ This is " + esc(r.a) + ".") + "</b> " + esc(r.w) + "</div>"; }
+    h += '<div class="'+cls+'"><span class="ln">'+(i+1)+'</span><span class="lt">'+esc(r.t)+'</span>'
+       + '<select data-trace-id="'+id+'" data-trace-i="'+i+'" aria-label="Label for line '+(i+1)+'"'+(checked?" disabled":"")+'><option value="">Choose a label</option>'
+       + labels.map(function(l){ return '<option'+(v===l?" selected":"")+">"+esc(l)+"</option>"; }).join("") + "</select>" + why + "</div>";
+  });
+  h += "</div>";
+  var sc = S.score[id];
+  h += '<div class="controls">' + (checked ? '<button type="button" class="btn ghost" data-trace-retry="'+id+'">Try the wrong ones again</button>' : '<button type="button" class="btn" data-trace-check="'+id+'">Check answers</button>')
+     + '<span class="status'+(checked && sc && sc.got===sc.total ? " good" : "")+'" id="st-'+id+'">' + (checked && sc ? scoreLine(sc, "lines") : "") + "</span></div>";
+  root.innerHTML = h;
+}
+function checkTrace(id){
+  var T = TRACES[id], vals = S.trace[id] || {};
+  var left = T.lines.filter(function(r,i){ return !vals[i]; }).length;
+  if (left){ var st = document.getElementById("st-"+id); st.textContent = left + (left===1?" line needs":" lines need") + " a label first."; st.className = "status warn"; return; }
+  S.checked[id] = true; S.score[id] = {got:T.lines.filter(function(r,i){ return vals[i] === r.a; }).length, total:T.lines.length};
+  save(); renderTrace(id); renderStepper();
+}
+function retryTrace(id){ var T = TRACES[id], vals = S.trace[id]; T.lines.forEach(function(r,i){ if (vals[i] !== r.a) delete vals[i]; }); S.checked[id] = false; save(); renderTrace(id); renderStepper(); }
+
+/* ---------- Questions ---------- */
+function renderMCQ(id){
+  var root = document.querySelector('[data-mcq="'+id+'"]'); if (!root) return;
+  var ans = S.mcq[id] || (S.mcq[id] = {});
+  var oo = S.oorder[id] || (S.oorder[id] = {});
+  var h = '<div class="mcq">';
+  MCQ[id].forEach(function(q, qi){
+    var chosen = ans[qi], done = chosen !== undefined;
+    h += '<div class="q"><div class="qp"><span class="qn">'+(qi+1)+'</span>'+esc(q.q)+'</div><div class="opts">';
+    if (!oo[qi] || oo[qi].length !== q.o.length) oo[qi] = shuffle(q.o.map(function(x, n){ return n; }));
+    oo[qi].forEach(function(oi){
+      var o = q.o[oi], cls = "opt"; if (done){ if (oi === q.a) cls += " ok"; else if (oi === chosen) cls += " bad"; }
+      h += '<button type="button" class="'+cls+'" data-mcq="'+id+'" data-q="'+qi+'" data-o="'+oi+'"'+(done?" disabled":"")+">"+esc(o)+"</button>";
+    });
+    h += "</div>";
+    if (done){ var ok = chosen === q.a;
+      h += '<div class="fb '+(ok?"ok":"bad")+'"><span class="v">'+(ok ? "✓ Correct." : "✗ Not quite. The answer is: " + esc(q.o[q.a]))+"</span> "+esc(q.w)+"</div>"; }
+    h += "</div>";
+  });
+  h += "</div>";
+  var sc = mcqScore(id), answered = Object.keys(ans).length;
+  h += '<div class="controls"><span class="status'+(answered===MCQ[id].length && sc.got===sc.total ? " good" : "")+'">'
+     + (answered ? "Score so far: " + sc.got + " of " + answered + " answered (" + MCQ[id].length + " questions)." : "")
+     + "</span>" + (answered ? '<button type="button" class="btn ghost" data-mcq-reset="'+id+'">Retry these questions</button>' : "") + "</div>";
+  root.innerHTML = h;
+}
+function mcqScore(id){ var ans = S.mcq[id] || {}, got = 0; MCQ[id].forEach(function(q,i){ if (ans[i] === q.a) got++; }); return {got:got, total:MCQ[id].length}; }
+
+/* ---------- Rounds ---------- */
+function partDone(p){ return p[0] === "mcq" ? Object.keys(S.mcq[p[1]] || {}).length === MCQ[p[1]].length : !!S.checked[p[1]]; }
+function partScore(p){
+  if (p[0] === "mcq") return mcqScore(p[1]);
+  var total = p[0] === "trace" ? TRACES[p[1]].lines.length : SORTS[p[1]].cards.length, sc = S.score[p[1]];
+  return {got: sc ? sc.got : 0, total: total};
+}
+function roundDone(r){ return r.parts.length && r.parts.every(partDone); }
+function renderStepper(){
+  document.getElementById("stepper").innerHTML = ROUNDS.map(function(r, i){
+    return '<li><button type="button" data-go="'+i+'" class="'+(roundDone(r)?"done":"")+'"'+(S.view===i?' aria-current="step"':"")+'>'
+      + (i < NROUNDS ? '<span class="sn">'+(i+1)+"</span>" : "") + "<span>"+esc(r.label)+"</span></button></li>";
+  }).join("");
+}
+function renderDebrief(){
+  var tot = 0, max = 0;
+  var rows = ROUNDS.slice(0, NROUNDS).map(function(r, i){
+    var got = 0, total = 0; r.parts.forEach(function(p){ var s = partScore(p); got += s.got; total += s.total; });
+    tot += got; max += total;
+    return "<tr><td>"+(i+1)+". "+esc(r.label)+'</td><td class="num">'+(roundDone(r) ? got+" / "+total : "Not finished")+"</td></tr>";
+  }).join("");
+  document.getElementById("scorebox").innerHTML = '<div class="table-wrap"><table class="scores"><thead><tr><th>Round</th><th class="num">Score</th></tr></thead><tbody>'+rows
+    + '</tbody><tfoot><tr><td>Total</td><td class="num">'+tot+" / "+max+"</td></tr></tfoot></table></div>";
+}
+function show(i){
+  S.view = i; save();
+  document.querySelectorAll("section.round").forEach(function(s){ s.classList.toggle("active", s.getAttribute("data-round") === ROUNDS[i].id); });
+  renderStepper(); if (ROUNDS[i].id === "debrief") renderDebrief();
+}
+function go(i){ show(i); var nav = document.querySelector("nav.steps"); var y = nav.getBoundingClientRect().top + window.pageYOffset; if (window.pageYOffset > y) window.scrollTo(0, y); }
+
+/* ---------- Events ---------- */
+document.addEventListener("click", function(e){
+  var t;
+  if ((t = e.target.closest("[data-go]"))) { go(+t.getAttribute("data-go")); return; }
+  if ((t = e.target.closest(".chip[data-to]"))) {
+    var cs = t.getAttribute("data-set");
+    placeCard(cs, t.getAttribute("data-card"), t.getAttribute("data-to"));
+    var nx = document.querySelector('[data-sort="'+cs+'"] .tray .chip'); if (nx) nx.focus({preventScroll:true});
+    return;
+  }
+  if ((t = e.target.closest("[data-check]"))) { checkSort(t.getAttribute("data-check")); return; }
+  if ((t = e.target.closest("[data-retry]"))) { retrySort(t.getAttribute("data-retry")); return; }
+  if ((t = e.target.closest("[data-trace-check]"))) { checkTrace(t.getAttribute("data-trace-check")); return; }
+  if ((t = e.target.closest("[data-trace-retry]"))) { retryTrace(t.getAttribute("data-trace-retry")); return; }
+  if ((t = e.target.closest("button.opt[data-mcq]"))) {
+    var id = t.getAttribute("data-mcq"), qi = +t.getAttribute("data-q"), oi = +t.getAttribute("data-o");
+    if (S.mcq[id][qi] !== undefined) return;
+    S.mcq[id][qi] = oi; save(); renderMCQ(id); renderStepper();
+    var q = document.querySelectorAll('[data-mcq="'+id+'"] .q')[qi]; if (q) { var b = q.querySelector(".opt.ok"); if (b) b.focus({preventScroll:true}); }
+    return;
+  }
+  if ((t = e.target.closest("[data-mcq-reset]"))) { var rid = t.getAttribute("data-mcq-reset"); S.mcq[rid] = {}; save(); renderMCQ(rid); renderStepper(); return; }
+  if (e.target.id === "restart") { if (confirm("Clear all your answers and start again?")) { S = blank(); sel = null; save(); renderAll(); go(0); } }
+});
+document.addEventListener("keydown", function(e){
+  var t = e.target;
+  if ((e.key === "Enter" || e.key === " ") && t.matches && t.matches(".bucket[data-drop]")) { e.preventDefault(); var ds = t.getAttribute("data-set"); if (sel && sel.set === ds) placeCard(ds, sel.card, t.getAttribute("data-drop")); }
+  if (e.key === "Escape" && sel) { var s = sel.set; sel = null; renderSort(s); }
+});
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if (t.matches && t.matches("select.movesel")) { placeCard(t.getAttribute("data-set"), t.getAttribute("data-card"), t.value); return; }
+  if (t.matches && t.matches("select[data-trace-i]")) { var id = t.getAttribute("data-trace-id"), i = +t.getAttribute("data-trace-i"); S.trace[id] = S.trace[id] || {}; if (t.value) S.trace[id][i] = t.value; else delete S.trace[id][i]; save(); }
+});
+document.addEventListener("dragstart", function(e){
+  var t = e.target.closest && e.target.closest(".card[data-card]"); if (!t) return;
+  var s = t.getAttribute("data-set"); if (S.checked[s]) { e.preventDefault(); return; }
+  try { e.dataTransfer.setData("text/plain", s + "|" + t.getAttribute("data-card")); e.dataTransfer.effectAllowed = "move"; } catch(err) {}
+});
+document.addEventListener("dragover", function(e){ var z = e.target.closest && e.target.closest("[data-drop]"); if (!z) return; e.preventDefault(); z.classList.add("over"); });
+document.addEventListener("dragleave", function(e){ var z = e.target.closest && e.target.closest("[data-drop]"); if (z && !z.contains(e.relatedTarget)) z.classList.remove("over"); });
+document.addEventListener("drop", function(e){
+  var z = e.target.closest && e.target.closest("[data-drop]"); if (!z) return;
+  e.preventDefault(); z.classList.remove("over");
+  var d = ""; try { d = e.dataTransfer.getData("text/plain"); } catch(err) {}
+  var parts = d.split("|"); if (parts.length !== 2 || parts[0] !== z.getAttribute("data-set")) return;
+  placeCard(parts[0], parts[1], z.getAttribute("data-drop"));
+});
+
+function renderAll(){ Object.keys(SORTS).forEach(renderSort); Object.keys(TRACES).forEach(renderTrace); Object.keys(MCQ).forEach(renderMCQ); save(); }
+renderAll();
+show(Math.min(Math.max(+S.view || 0, 0), ROUNDS.length - 1));
+
+})();
+</script>
+</body>
+</html>

@@ -4,6 +4,10 @@ export type Activity = {
   title: string;
   subtitle: string;
   tag: string;
+  /** Course the activity belongs to; used for the viewer's Back link. Defaults to ABAMDL. */
+  course?: "abamdl" | "genaillm";
+  /** Not shown to students yet; its URL returns 404. */
+  hidden?: boolean;
 };
 
 export const ACTIVITIES: Record<string, Activity> = {
@@ -49,8 +53,73 @@ export const ACTIVITIES: Record<string, Activity> = {
     subtitle: "Where should the new cooler launch first?",
     tag: "Appliance launch",
   },
+
+  // ---------- GENAILLM (files live in content/Genaiml) ----------
+  "genai-session1": {
+    slug: "genai-session1",
+    file: "Genaiml/Session 1_ Gen AI & LLMs for Marketing.html",
+    title: "Gen AI & LLMs for Marketing",
+    subtitle: "The plan, and why Gen AI matters",
+    tag: "Session 1 Deck",
+    course: "genaillm",
+  },
+  "genai-session2": {
+    slug: "genai-session2",
+    file: "Genaiml/Session 2 Anatomy of Applications & Workflow Design.html",
+    title: "Anatomy of Applications & Workflow Design",
+    subtitle: "From a prompt to a working app",
+    tag: "Session 2 Deck",
+    course: "genaillm",
+  },
+  "genai-software-design": {
+    slug: "genai-software-design",
+    file: "Genaiml/Fundamentals_of_Software_Application_Design.pdf",
+    title: "Fundamentals of Software Application Design",
+    subtitle: "Concept note",
+    tag: "Reading · PDF",
+    course: "genaillm",
+  },
+  "genai-ai-spectrum": {
+    slug: "genai-ai-spectrum",
+    file: "Genaiml/The AI Spectrum_ Fundamentals of Agentic AI.html",
+    title: "The AI Spectrum",
+    subtitle: "Fundamentals of agentic AI: six rounds from “what is an agent?” to how much freedom to give one.",
+    tag: "Interactive",
+    course: "genaillm",
+    hidden: true,
+  },
+  "genai-claude-build-kit": {
+    slug: "genai-claude-build-kit",
+    file: "Genaiml/The Claude Build Kit_ Building Apps and AI Workflows with Claude.html",
+    title: "The Claude Build Kit",
+    subtitle: "Eight rounds on how to prompt, brief, brand, test and refine so Claude builds what you want.",
+    tag: "Interactive",
+    course: "genaillm",
+    hidden: true,
+  },
+  "genai-sipoc-workbench": {
+    slug: "genai-sipoc-workbench",
+    file: "Genaiml/SIPOC Workbench_ Multi-agent marketing.html",
+    title: "SIPOC Workbench",
+    subtitle: "Map a multi-agent marketing workflow before you build it, then download the worksheet as a PDF.",
+    tag: "Workbench",
+    course: "genaillm",
+    hidden: true,
+  },
+  "genai-flyer-studio": {
+    slug: "genai-flyer-studio",
+    file: "Genaiml/Flyer Studio.html",
+    title: "Flyer Studio",
+    subtitle: "Upload a template, describe the flyer, and choose from 3 to 5 options.",
+    tag: "Studio",
+    course: "genaillm",
+    hidden: true,
+  },
 };
 
 export const CRISP_DM_CASES = ["crisp-dm-1", "crisp-dm-2", "crisp-dm-3", "crisp-dm-4"].map(
   (s) => ACTIVITIES[s],
 );
+
+export const GENAI_SESSION_1 = ["genai-session1", "genai-software-design"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_2 = ["genai-session2"].map((s) => ACTIVITIES[s]);
