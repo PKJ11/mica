@@ -18,11 +18,25 @@ export const ACTIVITIES: Record<string, Activity> = {
     subtitle: "Gut feel, research, analysis, machine learning",
     tag: "Session 1",
   },
+  "abadl-session1-deck": {
+    slug: "abadl-session1-deck",
+    file: "ABADL_Session_1_Deck_Gut, Data & Machines.html",
+    title: "Gut, Data & Machines",
+    subtitle: "How better business decisions are made",
+    tag: "Session 1 Deck",
+  },
+  "abadl-session2-deck": {
+    slug: "abadl-session2-deck",
+    file: "ABADL_Session_2_Converting Business Problem to Analytical Solution.html",
+    title: "Converting Business Problem to an Analytical Solution",
+    subtitle: "A walk through the CRISP-DM model",
+    tag: "Session 2 Deck",
+  },
   "session1-zillow": {
     slug: "session1-zillow",
     file: "The Zillow Story.pdf",
     title: "The Zillow Story",
-    subtitle: "Session 1 case reading",
+    subtitle: "How Zillow put a price on every American home, and then paid for it",
     tag: "Reading · PDF",
   },
   "crisp-dm-1": {
@@ -93,9 +107,8 @@ export const ACTIVITIES: Record<string, Activity> = {
     file: "Genaiml/The Claude Build Kit_ Building Apps and AI Workflows with Claude.html",
     title: "The Claude Build Kit",
     subtitle: "Eight rounds on how to prompt, brief, brand, test and refine so Claude builds what you want.",
-    tag: "Interactive",
+    tag: "Session 2 Activity",
     course: "genaillm",
-    hidden: true,
   },
   "genai-sipoc-workbench": {
     slug: "genai-sipoc-workbench",
@@ -122,4 +135,4 @@ export const CRISP_DM_CASES = ["crisp-dm-1", "crisp-dm-2", "crisp-dm-3", "crisp-
 );
 
 export const GENAI_SESSION_1 = ["genai-session1", "genai-software-design"].map((s) => ACTIVITIES[s]);
-export const GENAI_SESSION_2 = ["genai-session2"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_2 = ["genai-session2", "genai-claude-build-kit"].map((s) => ACTIVITIES[s]);

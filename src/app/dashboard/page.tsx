@@ -23,7 +23,7 @@ export default async function Dashboard() {
             <h2>Applied Business Analytics &amp; ML</h2>
             <p>Session activities, the analytics continuum and CRISP-DM phase mapping cases.</p>
             <div className="course-foot">
-              <span>2 sessions · 6 activities</span>
+              <span>2 sessions · 8 activities</span>
               <span className="arrow">Open →</span>
             </div>
           </Link>
@@ -36,7 +36,7 @@ export default async function Dashboard() {
             <h2>Generative AI &amp; LLMs</h2>
             <p>Gen AI &amp; LLMs for marketing, and the anatomy of applications and workflow design.</p>
             <div className="course-foot">
-              <span>2 sessions · 3 activities</span>
+              <span>2 sessions · 4 activities</span>
               <span className="arrow">Open →</span>
             </div>
           </Link>

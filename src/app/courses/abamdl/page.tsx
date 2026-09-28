@@ -7,6 +7,8 @@ export default async function AbamdlCourse() {
   const student = await requireStudent();
   const s1 = ACTIVITIES["session1-activity"];
   const zillow = ACTIVITIES["session1-zillow"];
+  const deck1 = ACTIVITIES["abadl-session1-deck"];
+  const deck2 = ACTIVITIES["abadl-session2-deck"];
 
   return (
     <>
@@ -26,12 +28,18 @@ export default async function AbamdlCourse() {
               <p className="muted">The analytics continuum</p>
             </div>
           </div>
-          <div className="grid two">
+          <div className="grid three">
             <Link href={`/activity/${zillow.slug}`} className="activity-card feature">
               <span className="tag">{zillow.tag}</span>
               <h3>{zillow.title}</h3>
               <p>{zillow.subtitle}</p>
               <span className="arrow">Read PDF →</span>
+            </Link>
+            <Link href={`/activity/${deck1.slug}`} className="activity-card feature">
+              <span className="tag">{deck1.tag}</span>
+              <h3>{deck1.title}</h3>
+              <p>{deck1.subtitle}</p>
+              <span className="arrow">Open slides →</span>
             </Link>
             <Link href={`/activity/${s1.slug}`} className="activity-card feature">
               <span className="tag">Session 1 Activity</span>
@@ -49,6 +57,15 @@ export default async function AbamdlCourse() {
               <h2>Session 2</h2>
               <p className="muted">CRISP-DM in practice</p>
             </div>
+          </div>
+
+          <div className="grid two">
+            <Link href={`/activity/${deck2.slug}`} className="activity-card feature">
+              <span className="tag">{deck2.tag}</span>
+              <h3>{deck2.title}</h3>
+              <p>{deck2.subtitle}</p>
+              <span className="arrow">Open slides →</span>
+            </Link>
           </div>
 
           <div className="banner-card">

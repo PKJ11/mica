@@ -11,7 +11,8 @@ const SESSIONS: { no: string; title: string; blurb: string; items: Activity[] }[
 const LOCKED_SESSIONS = [3, 4, 5, 6];
 
 function cta(a: Activity) {
-  return a.file.toLowerCase().endsWith(".pdf") ? "Read PDF →" : "Open slides →";
+  if (a.file.toLowerCase().endsWith(".pdf")) return "Read PDF →";
+  return a.tag.includes("Deck") ? "Open slides →" : "Start activity →";
 }
 
 export default async function GenaillmCourse() {

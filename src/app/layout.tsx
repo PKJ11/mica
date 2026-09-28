@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -8,6 +8,12 @@ const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500"], variable: "--f
 export const metadata: Metadata = {
   title: "MICA Portal",
   description: "Business Analytics & AI — course activities",
+  // Icons come from app/favicon.ico, app/icon.svg and app/apple-icon.png (content/Favicon set).
+  manifest: "/site.webmanifest",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0E1828",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
