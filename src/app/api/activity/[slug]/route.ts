@@ -2,18 +2,20 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
-import { ACTIVITIES } from "@/lib/activities";
+import { ACTIVITIES, isPublicActivity } from "@/lib/activities";
 
-// Activity HTML lives outside /public so only signed-in students can load it.
+// Activity HTML lives outside /public so only signed-in students can load it (VNIT materials are open).
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const store = await cookies();
-  if (!verifySessionToken(store.get(SESSION_COOKIE)?.value)) {
-    return new Response("Unauthorized — please sign in.", { status: 401 });
-  }
-
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
   if (!activity || activity.hidden) return new Response("Not found", { status: 404 });
+
+  if (!isPublicActivity(activity)) {
+    const store = await cookies();
+    if (!verifySessionToken(store.get(SESSION_COOKIE)?.value)) {
+      return new Response("Unauthorized — please sign in.", { status: 401 });
+    }
+  }
 
   const data = await readFile(path.join(process.cwd(), "content", activity.file));
   const isPdf = activity.file.toLowerCase().endsWith(".pdf");

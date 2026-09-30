@@ -5,7 +5,7 @@ export type Activity = {
   subtitle: string;
   tag: string;
   /** Course the activity belongs to; used for the viewer's Back link. Defaults to ABAMDL. */
-  course?: "abamdl" | "genaillm";
+  course?: "abamdl" | "genaillm" | "vnit";
   /** Not shown to students yet; its URL returns 404. */
   hidden?: boolean;
 };
@@ -128,6 +128,48 @@ export const ACTIVITIES: Record<string, Activity> = {
     course: "genaillm",
     hidden: true,
   },
+
+  // ---------- VNIT (files live in content/vnit; open to everyone, no login) ----------
+  "vnit-data-visualisation": {
+    slug: "vnit-data-visualisation",
+    file: "vnit/Seeing Data Clearly_ Interactive Learning Module on Data Visualisation.html",
+    title: "Seeing Data Clearly",
+    subtitle: "Data visualisation: choosing and reading the right chart",
+    tag: "Interactive Module",
+    course: "vnit",
+  },
+  "vnit-data-engineering": {
+    slug: "vnit-data-engineering",
+    file: "vnit/Data Engineering _ Interactive Learning Module.html",
+    title: "Data Engineering",
+    subtitle: "How raw data becomes analysis-ready",
+    tag: "Interactive Module",
+    course: "vnit",
+  },
+  "vnit-market-basket": {
+    slug: "vnit-market-basket",
+    file: "vnit/Market Basket Analysis _ Interactive Learning Module.html",
+    title: "Market Basket Analysis",
+    subtitle: "Finding products that sell together",
+    tag: "Interactive Module",
+    course: "vnit",
+  },
+  "vnit-inventory-forecasting": {
+    slug: "vnit-inventory-forecasting",
+    file: "vnit/Inventory Forecasting _ Interactive Learning Module.html",
+    title: "Inventory Forecasting",
+    subtitle: "Forecasting demand and deciding when to reorder",
+    tag: "Interactive Module",
+    course: "vnit",
+  },
+  "vnit-eternal-dashboard": {
+    slug: "vnit-eternal-dashboard",
+    file: "vnit/eternal-ceo-revenue-dashboard.html",
+    title: "Eternal · CEO Revenue Console",
+    subtitle: "An interactive revenue dashboard across Zomato, Blinkit, District and Hyperpure",
+    tag: "Dashboard",
+    course: "vnit",
+  },
 };
 
 export const CRISP_DM_CASES = ["crisp-dm-1", "crisp-dm-2", "crisp-dm-3", "crisp-dm-4"].map(
@@ -136,3 +178,10 @@ export const CRISP_DM_CASES = ["crisp-dm-1", "crisp-dm-2", "crisp-dm-3", "crisp-
 
 export const GENAI_SESSION_1 = ["genai-session1", "genai-software-design"].map((s) => ACTIVITIES[s]);
 export const GENAI_SESSION_2 = ["genai-session2", "genai-claude-build-kit"].map((s) => ACTIVITIES[s]);
+
+export const VNIT_MODULES = Object.values(ACTIVITIES).filter((a) => a.course === "vnit" && !a.hidden);
+
+/** VNIT materials are open to everyone; everything else needs a signed-in student. */
+export function isPublicActivity(a: Activity): boolean {
+  return a.course === "vnit";
+}

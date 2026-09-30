@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eternal · CEO Revenue Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0F1317; --panel:#171D24; --panel2:#1D242D; --line:#28313C;
+    --txt:#E9EEF3; --sub:#93A0AE; --faint:#5C6875;
+    --zomato:#E23744; --blinkit:#F5C542; --district:#8B6CFF; --hyperpure:#38C98F;
+    --up:#38C98F; --down:#F06A6A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--txt);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.5;padding:0 0 60px}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{border-bottom:1px solid var(--line);padding:22px 0 0;margin-bottom:0}
+  .brandrow{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .brand{font-family:'Archivo',sans-serif;font-weight:900;font-stretch:110%;font-size:26px;letter-spacing:.5px}
+  .brand span{color:var(--faint);font-weight:400;font-stretch:80%;font-size:15px;letter-spacing:2px;margin-left:10px;text-transform:uppercase}
+  .stamp{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px}
+
+  /* ---------- dimension rail (signature) ---------- */
+  .rail{display:flex;align-items:stretch;gap:0;margin:18px 0 0;border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;overflow-x:auto;background:var(--panel)}
+  .dim{padding:12px 18px 14px;border-right:1px solid var(--line);min-width:170px;flex:1}
+  .dim:last-child{border-right:none}
+  .dim h4{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--faint);text-transform:uppercase;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:20px;color:var(--sub);cursor:pointer;background:transparent;transition:all .15s}
+  .chip:hover{border-color:var(--sub);color:var(--txt)}
+  .chip.on{color:var(--bg);font-weight:600}
+  .chip.on.c-all{background:var(--txt);border-color:var(--txt)}
+  .chip.on.c-zomato{background:var(--zomato);border-color:var(--zomato);color:#fff}
+  .chip.on.c-blinkit{background:var(--blinkit);border-color:var(--blinkit)}
+  .chip.on.c-district{background:var(--district);border-color:var(--district);color:#fff}
+  .chip.on.c-hyperpure{background:var(--hyperpure);border-color:var(--hyperpure)}
+  .chip.on.c-time{background:var(--txt);border-color:var(--txt)}
+  select.chip{appearance:none;-webkit-appearance:none;padding-right:22px;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M0 0l4 6 4-6z' fill='%2393A0AE'/%3E%3C/svg%3E") no-repeat right 8px center}
+  select.chip option{background:var(--panel);color:var(--txt)}
+  .railnote{font-size:11px;color:var(--faint);padding:6px 2px 14px;font-family:'IBM Plex Mono',monospace}
+  .railnote b{color:var(--sub);font-weight:500}
+
+  /* ---------- KPI strip ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:0 0 10px 10px;background:var(--panel);overflow:hidden}
+  .kpi{padding:16px 18px;border-right:1px solid var(--line)}
+  .kpi:last-child{border-right:none}
+  .kpi .lbl{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .kpi .val{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-.5px}
+  .kpi .dlt{font-family:'IBM Plex Mono',monospace;font-size:11.5px;margin-top:2px}
+  .dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.flat{color:var(--sub)}
+
+  /* ---------- insight strip ---------- */
+  .insight{margin:16px 0;padding:12px 16px;border:1px dashed var(--line);border-radius:8px;color:var(--sub);font-size:13px;background:linear-gradient(90deg,var(--panel),transparent)}
+  .insight b{color:var(--txt);font-weight:600}
+  .insight .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--faint);text-transform:uppercase;margin-right:10px}
+
+  /* ---------- grid ---------- */
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-bottom:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px 12px}
+  .card h3{font-family:'Archivo',sans-serif;font-weight:700;font-size:14px;letter-spacing:.3px;margin-bottom:2px}
+  .card .sub{font-size:11.5px;color:var(--faint);margin-bottom:12px}
+  .chartbox{position:relative;height:260px}
+  .chartbox.tall{height:300px}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+  th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
+  th:first-child{text-align:left}
+  th.sorted{color:var(--txt)}
+  td{padding:7px 10px;text-align:right;border-bottom:1px solid #1E2630;color:var(--sub)}
+  td:first-child{text-align:left;color:var(--txt);font-family:'IBM Plex Sans',sans-serif;font-weight:500}
+  tr:hover td{background:var(--panel2)}
+  td .bar{display:inline-block;height:6px;border-radius:3px;margin-right:8px;vertical-align:middle;background:var(--faint)}
+  .pos{color:var(--up)} .neg{color:var(--down)}
+
+  footer{margin-top:28px;font-size:11.5px;color:var(--faint);border-top:1px solid var(--line);padding-top:14px}
+  footer b{color:var(--sub)}
+
+  @media(max-width:900px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .kpi{border-bottom:1px solid var(--line)}
+    .grid,.grid2{grid-template-columns:1fr}
+    .rail{flex-direction:column}
+    .dim{border-right:none;border-bottom:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brandrow">
+    <div class="brand">ETERNAL<span>CEO Revenue Console</span></div>
+    <div class="stamp" id="stamp">FY26 · Teaching Build · Data: Simulated</div>
+  </div>
+
+  <!-- SIGNATURE: the dimension rail — every control is an OLAP slicer -->
+  <div class="rail" id="rail">
+    <div class="dim">
+      <h4>Time</h4>
+      <div class="chips" id="timeChips">
+        <button class="chip c-time on" data-t="FY">Full FY26</button>
+        <button class="chip c-time" data-t="Q1">Q1</button>
+        <button class="chip c-time" data-t="Q2">Q2</button>
+        <button class="chip c-time" data-t="Q3">Q3</button>
+        <button class="chip c-time" data-t="Q4">Q4</button>
+      </div>
+    </div>
+    <div class="dim">
+      <h4>Business</h4>
+      <div class="chips" id="bizChips">
+        <button class="chip c-all on" data-b="All">All</button>
+        <button class="chip c-zomato" data-b="Zomato">Zomato</button>
+        <button class="chip c-blinkit" data-b="Blinkit">Blinkit</button>
+        <button class="chip c-district" data-b="District">District</button>
+        <button class="chip c-hyperpure" data-b="Hyperpure">Hyperpure</button>
+      </div>
+    </div>
+    <div class="dim">
+      <h4>City</h4>
+      <div class="chips">
+        <select class="chip" id="citySel"><option value="All">All cities</option></select>
+      </div>
+    </div>
+    <div class="dim">
+      <h4>Grain</h4>
+      <div class="chips" id="grainChips">
+        <button class="chip c-time on" data-g="M">Monthly</button>
+        <button class="chip c-time" data-g="Q">Quarterly</button>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="railnote"><b>How to read this:</b> each control above slices one dimension of the same revenue cube — TIME × BUSINESS × CITY × PRODUCT. Every chart below recomputes from the sliced cube.</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="insight" id="insight"></div>
+
+<div class="grid">
+  <div class="card">
+    <h3>Revenue trend</h3>
+    <div class="sub" id="trendSub">Stacked by business · ₹ crore</div>
+    <div class="chartbox tall"><canvas id="trendChart"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Business mix</h3>
+    <div class="sub">Share of revenue in selected slice</div>
+    <div class="chartbox tall"><canvas id="mixChart"></canvas></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h3>Top cities</h3>
+    <div class="sub" id="citySub">Revenue in selected slice · ₹ crore</div>
+    <div class="chartbox"><canvas id="cityChart"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Product categories</h3>
+    <div class="sub" id="catSub">Top categories in selected slice · ₹ crore</div>
+    <div class="chartbox"><canvas id="catChart"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>City × business drill-down</h3>
+  <div class="sub">Click a column header to sort · Δ compares the selected period with the previous period of equal length</div>
+  <div style="overflow-x:auto"><table id="drillTable"></table></div>
+</div>
+
+<footer>
+  <b>Note for students:</b> All figures on this dashboard are simulated ("cooked") for teaching. Patterns are deliberate — Blinkit compounding month-on-month, District spiking in festive/IPL months, Zomato growing steadily — so you can practise reading a real executive console. For actual numbers, refer to Eternal Ltd's public quarterly disclosures.
+</footer>
+
+</div>
+
+<script>
+/* =========================================================
+   COOKED DATA — one revenue cube: month × business × city × category
+   Deterministic (seeded), with deliberate teaching patterns.
+   ========================================================= */
+const MONTHS=["Apr'25","May'25","Jun'25","Jul'25","Aug'25","Sep'25","Oct'25","Nov'25","Dec'25","Jan'26","Feb'26","Mar'26"];
+const QTRS={Q1:[0,1,2],Q2:[3,4,5],Q3:[6,7,8],Q4:[9,10,11],FY:[0,1,2,3,4,5,6,7,8,9,10,11]};
+const BIZ=["Zomato","Blinkit","District","Hyperpure"];
+const BIZCOLOR={Zomato:"#E23744",Blinkit:"#F5C542",District:"#8B6CFF",Hyperpure:"#38C98F"};
+const CITIES=["Delhi NCR","Mumbai","Bengaluru","Hyderabad","Pune","Chennai","Kolkata","Ahmedabad","Jaipur","Lucknow","Indore","Nagpur"];
+// city weight = relative market size; tail cities grow faster (tier-2 story)
+const CITYW={ "Delhi NCR":1.00,"Mumbai":0.92,"Bengaluru":0.88,"Hyderabad":0.62,"Pune":0.55,"Chennai":0.48,"Kolkata":0.45,"Ahmedabad":0.33,"Jaipur":0.24,"Lucknow":0.20,"Indore":0.16,"Nagpur":0.13 };
+const CITYGROW={ "Delhi NCR":1.010,"Mumbai":1.010,"Bengaluru":1.012,"Hyderabad":1.016,"Pune":1.016,"Chennai":1.014,"Kolkata":1.013,"Ahmedabad":1.022,"Jaipur":1.026,"Lucknow":1.028,"Indore":1.030,"Nagpur":1.032 };
+const CATS={
+  Zomato:["North Indian","Biryani","Pizza & Fast Food","Chinese","South Indian","Desserts"],
+  Blinkit:["Grocery Staples","Snacks & Beverages","Fruits & Vegetables","Personal Care","Electronics","Home & Kitchen"],
+  District:["Movies","Live Events","Dining Out","Sports & Arenas"],
+  Hyperpure:["Fresh Produce","Staples & Grains","Dairy","Packaging"]
+};
+const CATW={
+  Zomato:[0.26,0.22,0.18,0.13,0.12,0.09],
+  Blinkit:[0.30,0.22,0.16,0.12,0.11,0.09],
+  District:[0.42,0.26,0.20,0.12],
+  Hyperpure:[0.34,0.30,0.20,0.16]
+};
+// business base (₹ cr, month 0, all-India) and monthly growth factor
+const BIZBASE={Zomato:2050,Blinkit:1650,District:170,Hyperpure:310};
+const BIZGROW={Zomato:1.012,Blinkit:1.075,District:1.020,Hyperpure:1.018};
+// District lumpiness: IPL bump Apr–May, festive bump Oct–Nov, movie season Dec
+const DISTRICT_SEASON=[1.35,1.30,0.85,0.80,0.90,0.95,1.45,1.30,1.20,0.85,0.80,1.05];
+// mild festive bump for commerce in Oct–Nov
+const COMMERCE_SEASON=[1.00,1.00,0.98,0.99,1.01,1.02,1.12,1.08,1.03,0.98,0.97,1.02];
+
+// tiny seeded PRNG so numbers look organic but are reproducible
+let seed=20260807;
+function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+function jitter(){return 0.96+rnd()*0.08;}
+
+// Build cube: CUBE[m][biz][city][catIdx] = ₹ cr
+const CUBE=[];
+const cityWSum=Object.values(CITYW).reduce((a,b)=>a+b,0);
+for(let m=0;m<12;m++){
+  const monthObj={};
+  for(const b of BIZ){
+    let bizTotal=BIZBASE[b]*Math.pow(BIZGROW[b],m);
+    bizTotal*= (b==="District")?DISTRICT_SEASON[m]:COMMERCE_SEASON[m];
+    const cityObj={};
+    for(const c of CITIES){
+      const share=(CITYW[c]*Math.pow(CITYGROW[c],m))/cityWSum;
+      // District only meaningful in bigger cities
+      const districtDamp=(b==="District"&&CITYW[c]<0.3)?0.35:1;
+      const cityRev=bizTotal*share*districtDamp*jitter();
+      cityObj[c]=CATW[b].map(w=>cityRev*w*jitter());
+    }
+    monthObj[b]=cityObj;
+  }
+  CUBE.push(monthObj);
+}
+
+/* ============== slicing helpers ============== */
+const S={time:"FY",biz:"All",city:"All",grain:"M"};
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const activeBiz=()=>S.biz==="All"?BIZ:[S.biz];
+const activeCities=()=>S.city==="All"?CITIES:[S.city];
+
+function sliceTotal(months,bizList,cityList){
+  let t=0;
+  for(const m of months) for(const b of bizList) for(const c of cityList) t+=sum(CUBE[m][b][c]);
+  return t;
+}
+function seriesByMonth(bizList,cityList){ // per month totals for one biz set
+  return MONTHS.map((_,m)=>sliceTotal([m],bizList,cityList));
+}
+function prevPeriod(months){ // equal-length window immediately before; null if none
+  const start=months[0], len=months.length;
+  if(start-len<0)return null;
+  return Array.from({length:len},(_,i)=>start-len+i);
+}
+const fmt=v=>"₹"+Math.round(v).toLocaleString("en-IN")+" cr";
+const pct=v=>(v>=0?"+":"")+(v*100).toFixed(1)+"%";
+
+/* ============== charts ============== */
+Chart.defaults.color="#93A0AE";
+Chart.defaults.borderColor="#28313C";
+Chart.defaults.font.family="'IBM Plex Mono',monospace";
+Chart.defaults.font.size=11;
+
+const trendChart=new Chart(document.getElementById("trendChart"),{
+  type:"bar",
+  data:{labels:[],datasets:[]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:"bottom",labels:{boxWidth:10,boxHeight:10,padding:14}},
+      tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`}}},
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>"₹"+v.toLocaleString("en-IN")}}}}
+});
+const mixChart=new Chart(document.getElementById("mixChart"),{
+  type:"doughnut",
+  data:{labels:[],datasets:[{data:[],backgroundColor:[],borderColor:"#171D24",borderWidth:3}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:"62%",
+    plugins:{legend:{position:"bottom",labels:{boxWidth:10,boxHeight:10,padding:14}},
+      tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.parsed)} (${(ctx.parsed/sum(ctx.dataset.data)*100).toFixed(1)}%)`}}}}
+});
+const cityChart=new Chart(document.getElementById("cityChart"),{
+  type:"bar",
+  data:{labels:[],datasets:[{data:[],backgroundColor:"#4C7DD9",borderRadius:3,barThickness:14}]},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+fmt(ctx.parsed.x)}}},
+    scales:{x:{ticks:{callback:v=>"₹"+v.toLocaleString("en-IN")}},y:{grid:{display:false}}}}
+});
+const catChart=new Chart(document.getElementById("catChart"),{
+  type:"bar",
+  data:{labels:[],datasets:[{data:[],backgroundColor:[],borderRadius:3,barThickness:14}]},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+fmt(ctx.parsed.x)}}},
+    scales:{x:{ticks:{callback:v=>"₹"+v.toLocaleString("en-IN")}},y:{grid:{display:false}}}}
+});
+
+/* ============== table sorting state ============== */
+let sortKey="Total",sortDir=-1;
+
+/* ============== master render ============== */
+function render(){
+  const months=QTRS[S.time], bizList=activeBiz(), cityList=activeCities();
+  const prev=prevPeriod(months);
+
+  /* --- KPIs --- */
+  const total=sliceTotal(months,bizList,cityList);
+  const prevTotal=prev?sliceTotal(prev,bizList,cityList):null;
+  const growth=prevTotal?(total-prevTotal)/prevTotal:null;
+  const bizTotals=BIZ.map(b=>({b,v:sliceTotal(months,[b],cityList)}));
+  const topBiz=bizTotals.slice().sort((a,b)=>b.v-a.v)[0];
+  const cityTotals=cityList.map(c=>({c,v:sliceTotal(months,bizList,[c])}));
+  const topCity=cityTotals.slice().sort((a,b)=>b.v-a.v)[0];
+  // fastest-growing city needs a previous window
+  let fastCity=null;
+  if(prev&&cityList.length>1){
+    fastCity=cityTotals.map(o=>{
+      const p=sliceTotal(prev,bizList,[o.c]);
+      return {c:o.c,g:p?(o.v-p)/p:0};
+    }).sort((a,b)=>b.g-a.g)[0];
+  }
+  const periodLabel=S.time==="FY"?"vs H2 unavailable — full-year view":"vs previous quarter";
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi"><div class="lbl">Revenue · ${S.time==="FY"?"FY26":S.time+" FY26"}</div>
+      <div class="val">${fmt(total)}</div>
+      <div class="dlt ${growth==null?"flat":growth>=0?"up":"down"}">${growth==null?"— period-on-period Δ needs a prior window":pct(growth)+" "+periodLabel}</div></div>
+    <div class="kpi"><div class="lbl">Largest business</div>
+      <div class="val" style="color:${BIZCOLOR[topBiz.b]}">${topBiz.b}</div>
+      <div class="dlt flat">${(topBiz.v/total*100).toFixed(1)}% of slice revenue</div></div>
+    <div class="kpi"><div class="lbl">Top city</div>
+      <div class="val">${topCity.c}</div>
+      <div class="dlt flat">${fmt(topCity.v)}</div></div>
+    <div class="kpi"><div class="lbl">Fastest-growing city</div>
+      <div class="val">${fastCity?fastCity.c:"—"}</div>
+      <div class="dlt ${fastCity?"up":"flat"}">${fastCity?pct(fastCity.g)+" QoQ":"select a quarter"}</div></div>
+    <div class="kpi"><div class="lbl">Active slice</div>
+      <div class="val" style="font-size:15px;line-height:1.4;padding-top:4px">${S.time} · ${S.biz} · ${S.city}</div>
+      <div class="dlt flat">grain: ${S.grain==="M"?"monthly":"quarterly"}</div></div>`;
+
+  /* --- insight strip (data → insight, auto-written) --- */
+  let ins;
+  const blinkitFY=seriesByMonth(["Blinkit"],cityList), zomatoFY=seriesByMonth(["Zomato"],cityList);
+  const crossIdx=blinkitFY.findIndex((v,i)=>v>zomatoFY[i]);
+  if(S.biz==="District"){
+    ins=`<b>District is lumpy by design.</b> Note the IPL bump (Apr–May) and the festive/live-events spike (Oct–Nov). Judging District on a single quarter would mislead — annual trend is the honest grain.`;
+  }else if(S.biz==="Blinkit"){
+    ins=`<b>Blinkit is the compounding story</b> — ~7% month-on-month growth in this simulation. Watch the tier-2 rows in the drill-down: smaller cities are growing off a small base.`;
+  }else if(fastCity&&fastCity.g>0.08){
+    ins=`<b>${fastCity.c} is the quarter's breakout</b> at ${pct(fastCity.g)} QoQ. Before investing more, drill down: is the growth broad-based across businesses, or one campaign spike?`;
+  }else if(crossIdx>0&&S.biz==="All"){
+    ins=`<b>The crossover:</b> in this simulation Blinkit's monthly revenue overtakes Zomato's around <b>${MONTHS[crossIdx]}</b> — mirroring the real FY26 story where Blinkit's NOV crossed food delivery's. Structural shifts show up first as two lines crossing.`;
+  }else{
+    ins=`<b>Reading tip:</b> slice by one business, then one city, and watch every chart recompute — that's an OLAP dice operation on the same cube.`;
+  }
+  document.getElementById("insight").innerHTML=`<span class="tag">Auto-insight</span>${ins}`;
+
+  /* --- trend chart --- */
+  let labels,datasets;
+  if(S.grain==="M"){
+    labels=months.map(m=>MONTHS[m]);
+    datasets=bizList.map(b=>({label:b,data:months.map(m=>sliceTotal([m],[b],cityList)),backgroundColor:BIZCOLOR[b],borderRadius:2,barPercentage:.7}));
+  }else{
+    const qs=S.time==="FY"?["Q1","Q2","Q3","Q4"]:[S.time];
+    labels=qs.map(q=>q+" FY26");
+    datasets=bizList.map(b=>({label:b,data:qs.map(q=>sliceTotal(QTRS[q],[b],cityList)),backgroundColor:BIZCOLOR[b],borderRadius:2,barPercentage:.55}));
+  }
+  trendChart.data.labels=labels;trendChart.data.datasets=datasets;trendChart.update();
+  document.getElementById("trendSub").textContent=(bizList.length>1?"Stacked by business":bizList[0])+" · "+(S.city==="All"?"all cities":S.city)+" · ₹ crore";
+
+  /* --- mix donut --- */
+  mixChart.data.labels=bizTotals.map(o=>o.b);
+  mixChart.data.datasets[0].data=bizTotals.map(o=>o.v);
+  mixChart.data.datasets[0].backgroundColor=bizTotals.map(o=>BIZCOLOR[o.b]);
+  mixChart.update();
+
+  /* --- top cities --- */
+  const ct=CITIES.map(c=>({c,v:sliceTotal(months,bizList,[c])})).sort((a,b)=>b.v-a.v).slice(0,10);
+  cityChart.data.labels=ct.map(o=>o.c);
+  cityChart.data.datasets[0].data=ct.map(o=>o.v);
+  cityChart.data.datasets[0].backgroundColor=ct.map(o=>o.c===S.city?"#E9EEF3":(S.biz==="All"?"#4C7DD9":BIZCOLOR[S.biz]));
+  cityChart.update();
+  document.getElementById("citySub").textContent=(S.biz==="All"?"All businesses":S.biz)+" · "+S.time+" · ₹ crore";
+
+  /* --- categories --- */
+  const catRows=[];
+  for(const b of bizList){
+    CATS[b].forEach((name,i)=>{
+      let v=0;
+      for(const m of months) for(const c of cityList) v+=CUBE[m][b][c][i];
+      catRows.push({name:bizList.length>1?`${name} · ${b}`:name,v,color:BIZCOLOR[b]});
+    });
+  }
+  catRows.sort((a,b)=>b.v-a.v);
+  const topCats=catRows.slice(0,8);
+  catChart.data.labels=topCats.map(o=>o.name);
+  catChart.data.datasets[0].data=topCats.map(o=>o.v);
+  catChart.data.datasets[0].backgroundColor=topCats.map(o=>o.color);
+  catChart.update();
+  document.getElementById("catSub").textContent=(bizList.length>1?"Across all businesses":bizList[0])+" · "+S.time+" · ₹ crore";
+
+  /* --- drill-down table --- */
+  const rows=CITIES.map(c=>{
+    const r={City:c};
+    for(const b of BIZ)r[b]=sliceTotal(months,[b],[c]);
+    r.Total=sliceTotal(months,BIZ,[c]);
+    r.Delta=prev?(r.Total-sliceTotal(prev,BIZ,[c]))/sliceTotal(prev,BIZ,[c]):null;
+    return r;
+  });
+  rows.sort((a,b)=>{
+    const av=a[sortKey]??-1,bv=b[sortKey]??-1;
+    return sortKey==="City"?sortDir*String(av).localeCompare(bv):sortDir*(av-bv);
+  });
+  const maxTotal=Math.max(...rows.map(r=>r.Total));
+  const cols=["City",...BIZ,"Total","Delta"];
+  let html="<thead><tr>"+cols.map(c=>`<th data-k="${c}" class="${c===sortKey?"sorted":""}">${c==="Delta"?"Δ period":c}${c===sortKey?(sortDir<0?" ▼":" ▲"):""}</th>`).join("")+"</tr></thead><tbody>";
+  for(const r of rows){
+    html+=`<tr><td>${r.City}</td>`;
+    for(const b of BIZ)html+=`<td>${Math.round(r[b]).toLocaleString("en-IN")}</td>`;
+    html+=`<td><span class="bar" style="width:${Math.max(4,r.Total/maxTotal*70)}px;background:${S.biz==="All"?"#4C7DD9":BIZCOLOR[S.biz]}"></span>${Math.round(r.Total).toLocaleString("en-IN")}</td>`;
+    html+=`<td class="${r.Delta==null?"":r.Delta>=0?"pos":"neg"}">${r.Delta==null?"—":pct(r.Delta)}</td></tr>`;
+  }
+  html+="</tbody>";
+  const tbl=document.getElementById("drillTable");
+  tbl.innerHTML=html;
+  tbl.querySelectorAll("th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1;}
+    render();
+  });
+}
+
+/* ============== controls ============== */
+document.getElementById("timeChips").querySelectorAll(".chip").forEach(ch=>ch.onclick=()=>{
+  document.getElementById("timeChips").querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  ch.classList.add("on");S.time=ch.dataset.t;render();
+});
+document.getElementById("bizChips").querySelectorAll(".chip").forEach(ch=>ch.onclick=()=>{
+  document.getElementById("bizChips").querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  ch.classList.add("on");S.biz=ch.dataset.b;render();
+});
+document.getElementById("grainChips").querySelectorAll(".chip").forEach(ch=>ch.onclick=()=>{
+  document.getElementById("grainChips").querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  ch.classList.add("on");S.grain=ch.dataset.g;render();
+});
+const citySel=document.getElementById("citySel");
+CITIES.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;citySel.appendChild(o);});
+citySel.onchange=()=>{S.city=citySel.value;render();};
+
+render();
+</script>
+</body>
+</html>

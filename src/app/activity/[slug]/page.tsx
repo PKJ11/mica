@@ -2,22 +2,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PdfViewer from "@/components/PdfViewer";
 import { requireStudent } from "@/lib/auth";
-import { ACTIVITIES } from "@/lib/activities";
+import { ACTIVITIES, isPublicActivity } from "@/lib/activities";
 
 export default async function ActivityPage({ params }: { params: Promise<{ slug: string }> }) {
-  await requireStudent();
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
   if (!activity || activity.hidden) notFound();
+  if (!isPublicActivity(activity)) await requireStudent();
 
   const src = `/api/activity/${activity.slug}`;
   const course = activity.course ?? "abamdl";
+  const backHref = course === "vnit" ? "/vnit" : `/courses/${course}`;
   const isPdf = activity.file.toLowerCase().endsWith(".pdf");
 
   return (
     <div className="viewer">
       <div className="viewer-bar">
-        <Link href={`/courses/${course}`} className="btn-ghost">
+        <Link href={backHref} className="btn-ghost">
           ← Back
         </Link>
         <div className="viewer-title">

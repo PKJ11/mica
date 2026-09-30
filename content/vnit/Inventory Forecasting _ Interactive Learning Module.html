@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inventory Forecasting | Interactive Learning Module</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#ECEFF3; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#15223A; --muted:#556277; --line:#D2D9E2; --frame:#9FAABA;
+  --accent:#F5C400; --accent-ink:#2B2300; --pos:#127A58; --neg:#B83A30; --info:#2D5DA6;
+  --pos-bg:rgba(18,122,88,.1); --neg-bg:rgba(184,58,48,.09);
+  --paper:#FFFFFF; --paper-ink:#1B2130; --paper-muted:#6A7282; --a-tint:#D8E5F7; --ab-tint:#FFE36E;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+    --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+    --paper:#F3F1EB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+  --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+  --paper:#F3F1EB;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0 0 .5em;font-weight:700;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,4.2vw,2.9rem)}
+h2{font-size:1.55rem;margin-top:2.2rem}
+h3{font-size:1.15rem;margin-top:1.6rem}
+p{margin:0 0 1em;max-width:72ch}
+a{color:var(--info)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+:focus-visible{outline:3px solid var(--info);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:100dvh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);padding:26px 18px 30px}
+.brand{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.2;margin:0 0 4px}
+.brand-sub{color:var(--muted);font-size:.9rem;margin:0 0 20px}
+.btn.navtoggle{display:none}
+.nav{list-style:none;margin:0;padding:0}
+.nav a{display:grid;grid-template-columns:28px 1fr 16px;align-items:baseline;gap:4px;padding:7px 8px;border-radius:7px;color:var(--ink);text-decoration:none;font-size:.97rem;line-height:1.3}
+.nav a:hover{background:var(--surface-2)}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.nav .n{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.nav a[aria-current="page"] .n{color:var(--accent-ink)}
+.nav .seen{font-size:.8rem;color:var(--pos)}
+.nav a[aria-current="page"] .seen{color:var(--accent-ink)}
+.navgroup{margin:16px 8px 6px;color:var(--muted);font-size:.85rem;font-weight:600}
+main{padding:44px clamp(18px,4.5vw,64px) 90px;max-width:960px;width:100%}
+.mod{display:none}
+.mod.on{display:block}
+.lede{font-size:1.15rem;color:var(--muted);max-width:66ch}
+.modnum{font-family:var(--mono);color:var(--muted);font-size:.9rem;margin:0 0 6px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:18px 0}
+.formula{overflow-x:auto;border:1.5px solid var(--frame);background:var(--surface);padding:14px 20px;margin:18px 0;border-radius:10px;font-size:1.12rem}
+.formula .fname{display:block;color:var(--muted);font-size:.9rem;margin-bottom:4px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em;line-height:1.25}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .3em 1px}
+.fr>span:last-child{padding:1px .3em 0}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;background:var(--surface-2);border:1px solid var(--line)}
+.callout.trap{background:var(--neg-bg);border-color:rgba(184,58,48,.35)}
+.callout.good{background:var(--pos-bg);border-color:rgba(18,122,88,.35)}
+.callout b.t{display:block;margin-bottom:4px;font-family:var(--display)}
+.callout p:last-child{margin-bottom:0}
+details.ex{background:var(--surface);border:1px dashed var(--muted);border-radius:10px;padding:12px 18px;margin:18px 0}
+details.ex summary{cursor:pointer;font-weight:600}
+details.ex[open] summary{margin-bottom:8px}
+.tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+td.num,th.num,.level td,.level th,.rtbl td,.rtbl th{white-space:nowrap}
+th{font-weight:600;background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.btn{font:600 .97rem var(--body);border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line)}
+.pager a{text-decoration:none;color:var(--ink);max-width:48%}
+.pager small{display:block;color:var(--muted)}
+.pager .nx{text-align:right;margin-left:auto}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13.5px/1.55 var(--mono)}
+ul.clean,ol.clean{padding-left:1.2em;max-width:72ch}
+ul.clean li,ol.clean li{margin:.3em 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+.receipts{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:14px 12px;margin:16px 0}
+.receipt{position:relative;background:var(--paper);color:var(--paper-ink);font:12.5px/1.5 var(--mono);padding:10px 11px 20px;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;
+  mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;transition:background .15s}
+.receipt .shop{text-align:center;font-weight:600;border-bottom:1px dashed #b9bec8;padding-bottom:5px;margin-bottom:5px}
+.receipt .rh{display:flex;justify-content:space-between;color:var(--paper-muted);border-bottom:1px dashed #b9bec8;padding-bottom:4px;margin-bottom:5px;font-size:11.5px}
+.receipt ul{list-style:none;margin:0;padding:0}
+.receipt li{display:flex;justify-content:space-between;gap:6px}
+.receipt li.m{font-weight:600}
+.receipt li.m span:first-child::before{content:"\25B8 "}
+.receipt .tot{border-top:1px dashed #b9bec8;margin-top:5px;padding-top:4px;display:flex;justify-content:space-between;color:var(--paper-muted)}
+.receipt.a{background:var(--a-tint)}
+.receipt.ab,.receipt.hot{background:var(--ab-tint)}
+.receipt.big{font-size:14px;padding:16px 18px 26px;max-width:280px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.9rem;color:var(--muted);margin:6px 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+.pick{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.pl{font-weight:600;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .92rem var(--body);border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer}
+.chip:hover:not(:disabled){border-color:var(--ink)}
+.chip.onA{background:var(--info);border-color:var(--info);color:#fff}
+.chip.onB,.chip.onS{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:disabled{opacity:.35;cursor:not-allowed;border-style:dashed;text-decoration:line-through}
+.lab .receipts{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px}
+.lab .receipt{font-size:11.5px;padding:8px 9px 18px}
+.lab .receipt .rh span:last-child{display:none}
+.receipt .rh{white-space:nowrap}
+.result{border-top:1px solid var(--line);margin-top:10px;padding-top:14px}
+.eq{font-size:1.06rem;margin:8px 0;line-height:2.1;overflow-x:auto}
+.eq b{font-family:var(--display);font-size:1.15em}
+.interp{color:var(--muted);margin-top:6px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.presets .btn{padding:5px 12px;font-size:.88rem}
+.gauge{margin:14px 0 4px;position:relative;height:40px}
+.gauge .bar{position:absolute;left:0;right:0;top:8px;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--neg-bg) 0 33.33%,var(--pos-bg) 33.33% 100%);border:1px solid var(--line)}
+.gauge .one{position:absolute;left:33.33%;top:2px;height:24px;border-left:2px dashed var(--muted)}
+.gauge .mk{position:absolute;top:0;width:4px;height:28px;margin-left:-2px;background:var(--ink);border-radius:2px;transition:left .25s}
+.gauge .ticks{position:absolute;top:26px;left:0;right:0;font-size:.78rem;color:var(--muted)}
+.gauge .ticks span{position:absolute;transform:translateX(-50%)}
+.pill{white-space:nowrap;display:inline-block;font-size:.82rem;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.pos{background:var(--pos-bg);color:var(--pos);border-color:transparent}
+.pill.neg{background:var(--neg-bg);color:var(--neg);border-color:transparent}
+.pill.mut{color:var(--muted)}
+
+.hero{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center;margin:26px 0 10px}
+.hero-rule{font-family:var(--display);font-size:1.5rem;font-weight:700;margin:0 0 10px}
+.hero dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;max-width:54ch}
+.hero dt{font-weight:700;font-family:var(--display)}
+.hero dd{margin:0;color:var(--muted)}
+
+.level{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px 18px;margin:14px 0}
+.level h4{font-family:var(--display);font-size:1.05rem;margin:0 0 6px}
+.level .meta{color:var(--muted);font-size:.92rem;margin-bottom:6px}
+tr.pruned td{color:var(--muted)}
+tr.pruned td:first-child{text-decoration:line-through}
+tr.pass td{background:var(--pos-bg)}
+.lset{font-size:.95rem;margin-top:8px}
+.ctrl{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:8px 0}
+.ctrl input[type=range]{width:100%;accent-color:var(--info)}
+.ctrl{grid-template-columns:minmax(0,15em) minmax(0,1fr) auto}
+.ctrl output{font-weight:600;min-width:9ch;text-align:right;font-variant-numeric:tabular-nums}
+
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:18px 0 26px}
+.exbtn{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink);font:inherit;line-height:1.3}
+.exbtn:hover{border-color:var(--ink)}
+.exbtn[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.exbtn .no{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.exbtn .tt{display:block;font-weight:600;font-size:.95rem;margin:2px 0 4px}
+.exbtn .biz{font-size:.8rem;color:var(--muted)}
+.q{background:var(--surface);border:1.5px solid var(--info);padding:12px 18px;border-radius:10px;margin:18px 0}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:10px 0}
+.step h4{margin:0 0 6px;font-family:var(--display);font-size:1rem}
+.step .sn{font-family:var(--mono);color:var(--muted);margin-right:8px;font-weight:400}
+.rb{border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:10px 0;background:var(--surface-2)}
+.rb .rt{font-weight:700;margin:0 0 4px}
+.fl{margin:6px 0;line-height:2.2;overflow-x:auto}
+.fl .fk{display:inline-block;min-width:110px;margin-right:6px;font-weight:600;color:var(--muted);font-size:.9rem}
+.fl b{font-family:var(--display);font-size:1.1em}
+.fl small{color:var(--muted);font-size:.9rem}
+.check{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.check input{font:inherit;width:120px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.fb{font-weight:600}
+.fb.ok{color:var(--pos)} .fb.no{color:var(--neg)}
+.decision{background:var(--pos-bg);border:1px solid rgba(18,122,88,.35);border-radius:10px;padding:14px 18px;margin:16px 0}
+.decision b.t{font-family:var(--display);display:block;margin-bottom:4px}
+
+textarea{width:100%;min-height:210px;font:13.5px/1.55 var(--mono);padding:12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+th.sortable{cursor:pointer}
+th.sortable:hover{text-decoration:underline}
+.err{color:var(--neg);font-weight:600}
+
+.qz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:14px 0}
+.qz .qp{font-weight:600;margin-bottom:10px}
+.qz .opts{display:grid;gap:8px}
+.qz button.opt{text-align:left;font:inherit;padding:9px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.qz button.opt:hover:not(:disabled){border-color:var(--ink)}
+.qz button.opt.right{border-color:var(--pos);background:var(--pos-bg)}
+.qz button.opt.wrong{border-color:var(--neg);background:var(--neg-bg)}
+.qz button.opt:disabled{cursor:default}
+.qz .why{margin-top:10px;color:var(--muted)}
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding:10px 0;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+
+/* ---- inventory module additions ---- */
+.bincard{background:var(--paper);color:var(--paper-ink);font:12.5px/1.45 var(--mono);padding:14px 14px 10px;border-radius:3px;border:1px solid #c9cfd8;width:300px;max-width:100%}
+.bincard .bt{font-weight:600;text-align:center;font-size:13.5px}
+.bincard .bs{text-align:center;color:var(--paper-muted);border-bottom:1.5px solid #9aa2af;padding-bottom:6px;margin-bottom:2px}
+.bincard table{font-size:12px;width:100%}
+.bincard th,.bincard td{padding:3px 5px;border-bottom:1px dashed #c9cfd8;background:transparent;color:var(--paper-ink);white-space:nowrap}
+.bincard th{color:var(--paper-muted);font-weight:600}
+.bincard td.num,.bincard th.num{text-align:right}
+.bincard tr.ro td{background:#FFE9A8}
+.bincard tr.rc td{background:#D8E5F7}
+.bincard td.bn{white-space:normal}
+.bincard .bn{color:var(--paper-muted);font-size:11px;padding:0 5px 3px;border-bottom:1px dashed #c9cfd8}
+.bincard .bf{display:flex;justify-content:space-between;color:var(--paper-muted);margin-top:7px}
+
+.chainwrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start;margin:16px 0}
+.flowbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.flowbar .btn{padding:6px 14px;font-size:.92rem}
+.flowbar .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chain{list-style:none;margin:0;padding:0}
+.crow{display:flex;align-items:center;gap:8px}
+.node{flex:0 0 172px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit;color:var(--ink);line-height:1.25}
+.node:hover{border-color:var(--ink)}
+.node .nr{display:block;font-size:.8rem;color:var(--muted)}
+.node .nn{font-weight:600;font-size:.97rem}
+.node[aria-pressed="true"]{border-color:var(--info);box-shadow:inset 0 0 0 1.5px var(--info)}
+.node.nside{flex:0 0 128px;padding:6px 9px}
+.node.nside .nn{font-size:.88rem}
+.sidearrow{color:var(--muted);font-size:.8rem;text-align:center;line-height:1.15;flex:0 0 74px}
+.sidearrow small{font-size:.74rem}
+.lk{display:flex;align-items:center;gap:10px;padding:3px 0 3px 70px;min-height:40px}
+.lk .ar{font-size:1.25rem;line-height:1;width:18px;text-align:center;color:var(--info);font-weight:700}
+.lk .ll{font-size:.84rem;color:var(--muted);line-height:1.25}
+.chain.f-info .lk .ar{color:var(--pos)}
+.chain.f-money .lk .ar{color:var(--neg)}
+.lk.none .ar{opacity:.25}
+.detail{position:sticky;top:20px}
+.detail dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:8px 0 0}
+.detail dt{font-weight:600}
+.detail dd{margin:0;color:var(--muted)}
+
+.match{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:10px 16px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.match:last-of-type{border-bottom:0}
+.match select,.cap select,.fld select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.match select.right{border-color:var(--pos);background:var(--pos-bg)}
+.match select.wrong{border-color:var(--neg);background:var(--neg-bg)}
+
+.chart{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px 10px 4px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .cap{font-size:.88rem;color:var(--muted);padding:4px 6px 6px}
+.g-grid{stroke:var(--line);stroke-width:1}
+.g-t{fill:var(--muted);font:11.5px var(--body)}
+.g-tl{fill:var(--ink);font:600 12px var(--body)}
+.g-stock{stroke:var(--info);stroke-width:2.2;fill:none}
+.g-fc{stroke:var(--neg);stroke-width:2;fill:none;stroke-dasharray:6 4}
+.g-rop{stroke:var(--ink);stroke-width:1.3;stroke-dasharray:5 4;fill:none}
+.g-ss{stroke:var(--pos);stroke-width:1.5;stroke-dasharray:3 3;fill:none}
+.g-ord{stroke:var(--neg);stroke-width:2;fill:none}
+.g-hold{stroke:var(--info);stroke-width:2;fill:none}
+.g-tot{stroke:var(--ink);stroke-width:2.4;fill:none}
+.f-info{fill:var(--info)} .f-pos{fill:var(--pos)} .f-neg{fill:var(--neg)} .f-ink{fill:var(--ink)} .f-mut{fill:var(--frame)} .f-acc{fill:var(--accent)}
+.f-posbg{fill:var(--pos-bg)} .f-negbg{fill:var(--neg-bg)} .f-shade{fill:var(--surface-2)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.86rem;color:var(--muted);padding:2px 6px 8px}
+.lg i{display:inline-block;width:18px;height:0;border-top:2.5px solid;vertical-align:4px;margin-right:6px}
+.lg i.d{border-top-style:dashed}
+.lg b.sq{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.kpi .kl{font-size:.84rem;color:var(--muted);line-height:1.25}
+.kpi .kv{font-family:var(--display);font-weight:700;font-size:1.35rem;line-height:1.2;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi.bad .kv{color:var(--neg)} .kpi.good .kv{color:var(--pos)}
+.fields{align-items:end;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px 14px;margin:6px 0 12px}
+.fld label{display:block;font-size:.88rem;font-weight:600;margin-bottom:3px}
+.fld input{font:inherit;width:100%;padding:6px 9px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg .btn{padding:6px 14px;font-size:.92rem}
+.seg .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.cap-in input{font:inherit;width:72px;padding:4px 6px;border-radius:6px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);text-align:right}
+tr.hl td{background:var(--pos-bg)}
+tr.warn td{background:var(--neg-bg)}
+.cls{display:inline-block;min-width:22px;text-align:center;font-weight:700;border-radius:5px;padding:0 6px;font-size:.85rem}
+.cls.A{background:var(--info);color:#fff} .cls.B{background:var(--accent);color:var(--accent-ink)} .cls.C{background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
+.qz .again{margin-left:8px;font:600 .88rem var(--body);background:none;border:0;color:var(--info);cursor:pointer;text-decoration:underline;padding:0}
+.qz .tag{font-size:.82rem;color:var(--muted);font-weight:400;display:block;margin-bottom:2px}
+.check .lbl{font-weight:600}
+.ztbl td,.ztbl th{text-align:center}
+.small{font-size:.9rem;color:var(--muted)}
+#abc-tbl td:nth-child(2),#cap-out td:first-child,#cap-in td:first-child{white-space:nowrap}
+#abc-tbl th{white-space:nowrap}
+#cap-in,#cap-out{font-size:.9rem}
+#cap-in th,#cap-out th{vertical-align:bottom;white-space:normal!important;line-height:1.25}
+#cap-in th:first-child,#cap-out th:first-child{min-width:130px}
+#cap-in th,#cap-in td,#cap-out th,#cap-out td{padding:7px 8px}
+#cap-out td:nth-child(5){min-width:128px}
+
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:0;height:auto;z-index:5;padding:12px 16px;border-right:0;border-bottom:1px solid var(--line);padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .side-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand-sub{display:none}
+  .brand{margin:0}
+  .btn.navtoggle{display:inline-block}
+  .navwrap{display:none;max-height:70vh;overflow:auto;margin-top:10px}
+  .side.open .navwrap{display:block}
+  main{padding-top:28px}
+  .hero{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .pick{grid-template-columns:1fr;gap:6px}
+  .chainwrap{grid-template-columns:1fr}
+  .detail{position:static}
+  .match{grid-template-columns:1fr;gap:6px}
+}
+@media (max-width:420px){
+  .node{flex-basis:140px}
+  .node.nside{flex-basis:112px}
+  .sidearrow{flex-basis:58px}
+  .lk{padding-left:50px}
+  .ctrl{grid-template-columns:1fr auto}
+  .ctrl label{grid-column:1 / -1}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="side-top">
+      <div>
+        <p class="brand">Inventory Forecasting</p>
+        <p class="brand-sub">Interactive learning module</p>
+      </div>
+      <button class="btn navtoggle" id="navtoggle" aria-expanded="false" aria-controls="navwrap">Chapters</button>
+    </div>
+    <nav class="navwrap" id="navwrap" aria-label="Chapters"><ul class="nav" id="nav"></ul></nav>
+  </aside>
+
+  <main id="main">
+
+<!-- ============ INTRO ============ -->
+<section class="mod" id="start" data-nav="Introduction" data-group="Supply chain basics">
+  <h1>Inventory Forecasting</h1>
+  <p class="lede">Every packet on a store shelf has travelled a long way: from a factory, through agents, distributors and warehouses, to the store. Inventory planning decides how much stock to keep at each point of this journey and when to order more. In this module we follow one product, Toor Dal (1 kg pack), from Latur Dal Mill to the shelves of Dhanvanshi Super Store.</p>
+
+  <div class="hero">
+    <div class="bincard" aria-label="Sample bin card">
+      <div class="bt">Madavi Warehouse</div>
+      <div class="bs">Bin card: Toor Dal 1 kg</div>
+      <table>
+        <tr><th>Date</th><th class="num">In</th><th class="num">Out</th><th class="num">Balance</th></tr>
+        <tr><td>30 Sep</td><td class="num"></td><td class="num"></td><td class="num">960</td></tr>
+        <tr><td>01 Oct</td><td class="num"></td><td class="num">118</td><td class="num">842</td></tr>
+        <tr><td>02 Oct</td><td class="num"></td><td class="num">126</td><td class="num">716</td></tr>
+        <tr class="ro"><td>03 Oct</td><td class="num"></td><td class="num">121</td><td class="num">595</td></tr>
+        <tr><td colspan="4" class="bn">Balance below 689: order for 1,980 packs sent to Kavya Distributors</td></tr>
+        <tr><td>04 Oct</td><td class="num"></td><td class="num">115</td><td class="num">480</td></tr>
+        <tr><td>05 Oct</td><td class="num"></td><td class="num">130</td><td class="num">350</td></tr>
+        <tr><td>06 Oct</td><td class="num"></td><td class="num">119</td><td class="num">231</td></tr>
+        <tr><td>07 Oct</td><td class="num"></td><td class="num">124</td><td class="num">107</td></tr>
+        <tr class="rc"><td>08 Oct</td><td class="num">1,980</td><td class="num">122</td><td class="num">1,965</td></tr>
+      </table>
+      <div class="bf"><span>Reorder level</span><span>689 packs</span></div>
+    </div>
+    <div>
+      <p class="hero-rule">Order 1,980 packs when the balance falls to 689</p>
+      <dl>
+        <dt>120 packs</dt><dd>Average daily sale of toor dal across the three Dhanvanshi branches.</dd>
+        <dt>5 days</dt><dd>Lead time: from placing an order with Kavya Distributors to stock being ready at Madavi Warehouse.</dd>
+        <dt>89 packs</dt><dd>Safety stock: a buffer for days when sales are higher than usual.</dd>
+        <dt>689 packs</dt><dd>Reorder point: 120 &times; 5 days + 89. When the balance reaches this level, the next order goes out.</dd>
+        <dt>1,980 packs</dt><dd>Order quantity: 99 cartons of 20 packs each, worked out using the Economic Order Quantity.</dd>
+      </dl>
+    </div>
+  </div>
+  <p class="small">The balance on 7 October (107 packs) came close to the safety stock of 89. The order arrived just in time.</p>
+
+  <h2>Learning outcomes</h2>
+  <p>After completing this module, you will be able to:</p>
+  <ul class="clean">
+    <li>Describe the nodes, links and flows of a supply chain, and explain the role of each party from manufacturer to customer.</li>
+    <li>Calculate lead-time demand, safety stock, reorder point and order quantity, including the effect of MoQ and case packs.</li>
+    <li>Choose a service level and explain what it costs in extra stock.</li>
+    <li>Forecast demand using moving averages and exponential smoothing, and measure forecast error.</li>
+    <li>Analyse inventory using days of inventory, inventory turnover and ABC classification.</li>
+    <li>Prepare a simple replenishment plan for a warehouse.</li>
+  </ul>
+
+  <h2>The supply chain in this module</h2>
+  <p>Latur Dal Mill makes the toor dal. Arjun C&amp;F Agent stores the mill's stock in our region and sends it to Kavya Distributors. Kavya Distributors supplies large retailers such as Dhanvanshi Super Store, and also Nithansh Stockists, who serve small kirana shops. Dhanvanshi keeps its stock at Madavi Warehouse and sends it to its three branches at Gandhi Chowk, Station Road and Civil Lines. Niharika Logistics runs the trucks between these points. Practice problems also use FoodJoe, a food delivery business with a central kitchen, and Aman Mart, a retail chain.</p>
+
+  <h2>How this module is organised</h2>
+  <p>Chapters 1 and 2 cover the basic structure of a supply chain and how goods move through it. Chapters 3 to 7 cover inventory planning: types and costs of inventory, lead time, MoQ, service level, safety stock, reorder point and demand forecasting. Chapter 8 covers inventory analysis, and Chapter 9 puts everything together in a monthly plan for Madavi Warehouse. Chapter 10 has ten solved problems and a formula sheet. Most chapters end with two questions to check your understanding.</p>
+  <div class="row"><a class="btn primary" href="#c1">Start Chapter 1: Nodes and flows</a></div>
+</section>
+
+<!-- ============ C1 ============ -->
+<section class="mod" id="c1" data-nav="Nodes and flows" data-n="1">
+  <p class="modnum">Chapter 1</p>
+  <h1>Supply chain: nodes and flows</h1>
+  <p class="lede">A supply chain is the network of businesses and places through which a product reaches the customer. Before we plan any inventory, we must know where stock is kept and who orders from whom.</p>
+
+  <h2>Nodes and links</h2>
+  <p>A <b>node</b> is a point in the supply chain where stock is made, stored or sold: a factory, a warehouse, a distributor's godown or a shop. A <b>link</b> connects two nodes: the truck route, the order process and the payment terms between them. Inventory sits at nodes, and it also sits on links while it is being transported.</p>
+  <p>The toor dal chain has the following nodes:</p>
+  <ul class="clean">
+    <li><b>Manufacturer:</b> Latur Dal Mill buys raw toor from farmers and APMC traders, cleans it, splits it into dal and packs it in 1 kg packs.</li>
+    <li><b>C&amp;F agent (Carrying and Forwarding agent):</b> Arjun C&amp;F Agent keeps the mill's stock in our region and dispatches it to distributors as per the mill's instructions. The stock still belongs to the mill. Arjun earns a commission for storing and handling it.</li>
+    <li><b>Distributor:</b> Kavya Distributors buys stock from the mill, keeps it in its own godown, and sells it to large retailers and to stockists on credit.</li>
+    <li><b>Stockist:</b> Nithansh Stockists buys smaller lots from Kavya Distributors and supplies kirana shops in nearby towns.</li>
+    <li><b>Warehouse (distribution centre):</b> Madavi Warehouse is Dhanvanshi's own warehouse. It buys from Kavya Distributors and supplies all three Dhanvanshi branches.</li>
+    <li><b>Retailer:</b> the three Dhanvanshi Super Store branches sell to the final customer.</li>
+    <li><b>Customer:</b> the household that buys the pack. All demand in the chain starts here.</li>
+  </ul>
+
+  <h2>Three flows</h2>
+  <p>Three things move along the links. <b>Material</b> (the dal itself) moves downstream, from the mill towards the customer. <b>Information</b> (orders, sales data, stock reports) mostly moves upstream, from the customer side towards the mill. <b>Money</b> also moves upstream, as each buyer pays its supplier. Use the buttons to switch between the flows, and click any node to read about it.</p>
+
+  <div class="flowbar seg" role="group" aria-label="Choose a flow">
+    <button class="btn" data-flow="material" aria-pressed="true">Material flow</button>
+    <button class="btn" data-flow="info" aria-pressed="false">Information flow</button>
+    <button class="btn" data-flow="money" aria-pressed="false">Money flow</button>
+  </div>
+  <div class="chainwrap">
+    <ol class="chain" id="chain"></ol>
+    <div class="panel detail" id="node-detail" aria-live="polite"></div>
+  </div>
+
+  <div class="callout">
+    <b class="t">Where is Niharika Logistics?</b>
+    <p>Niharika Logistics is not a node. It does not buy or sell the dal; it moves it from one node to the next. While the dal is on a Niharika truck, it is still inventory. It is called pipeline (or in-transit) stock, and it belongs to whoever owns the goods during transit.</p>
+  </div>
+
+  <h2>Upstream and downstream</h2>
+  <p>For Madavi Warehouse, Kavya Distributors, Arjun C&amp;F Agent and the mill are <b>upstream</b> (the supply side). The three branches and the customers are <b>downstream</b> (the demand side). Every planning decision at a node depends on how fast its upstream partner can supply and how much its downstream partner will ask for.</p>
+
+  <h2>Activity: name the node</h2>
+  <p>Choose the correct type of node for each description, then check your answers.</p>
+  <div class="panel" id="match"></div>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c1"></div>
+</section>
+
+<!-- ============ C2 ============ -->
+<section class="mod" id="c2" data-nav="Logistics and distribution" data-n="2">
+  <p class="modnum">Chapter 2</p>
+  <h1>Logistics and distribution planning</h1>
+  <p class="lede">Logistics is the work of moving and storing goods so that the right quantity reaches the right node at the right time, at a reasonable cost.</p>
+
+  <h2>Parts of logistics</h2>
+  <ul class="clean">
+    <li><b>Inbound logistics:</b> goods coming into a node. For Madavi Warehouse, this is the dal coming from Kavya Distributors.</li>
+    <li><b>Outbound logistics:</b> goods going out of a node. For Madavi Warehouse, this is the stock sent to the three branches.</li>
+    <li><b>Warehousing:</b> receiving, checking, storing, picking and dispatching stock. At receipt, the warehouse prepares a Goods Receipt Note (GRN) after checking the quantity and quality.</li>
+    <li><b>Reverse logistics:</b> goods moving back up the chain, such as damaged packs, near-expiry stock and returns.</li>
+  </ul>
+
+  <h2>Full truck load or part truck load?</h2>
+  <p>In India, most consumer goods move by road. A transporter such as Niharika Logistics offers two options. In a <b>full truck load (FTL)</b>, one customer books the whole truck and pays a fixed amount per trip, whatever the load. In a <b>part truck load (PTL)</b>, the customer pays per kg, and the transporter combines loads of several customers in one truck. PTL is cheaper for small loads, but usually takes one or two extra days because goods are sorted at the transporter's hub.</p>
+  <div class="lab">
+    <p style="margin-top:0"><b>Niharika Logistics rates:</b> FTL (9-tonne truck) &#8377;18,000 per trip. PTL &#8377;3 per kg.</p>
+    <div class="ctrl"><label for="ftl-kg">Load to be sent</label><input type="range" id="ftl-kg" min="500" max="9000" step="100" value="4500"><output id="ftl-kg-out"></output></div>
+    <div class="kpis" id="ftl-out"></div>
+    <p class="interp" id="ftl-msg" style="margin-bottom:0"></p>
+  </div>
+  <div class="formula"><span class="fname">Break-even load between FTL and PTL</span>Break-even load = <span class="fr"><span>FTL rate per trip</span><span>PTL rate per kg</span></span> = <span class="fr"><span>18,000</span><span>3</span></span> = 6,000 kg</div>
+
+  <h2>Network design: hub and spoke</h2>
+  <p>Dhanvanshi does not ask Kavya Distributors to deliver to each branch separately. Kavya delivers to Madavi Warehouse (the <b>hub</b>), and the warehouse sends stock to the branches (the <b>spokes</b>). This gives larger, cheaper inbound deliveries and one place to hold safety stock for all branches. The warehouse sends one truck on a <b>milk run</b>, a fixed route that visits Gandhi Chowk, Station Road and Civil Lines in one trip, instead of three separate trucks.</p>
+
+  <h2>Distribution planning</h2>
+  <p>Distribution planning decides how much stock each branch should get, and when. Each branch sends a daily indent (request) to the warehouse. The warehouse adds up the branch requirements to decide what it must order from Kavya Distributors. When the warehouse has enough stock, every branch gets what it asked for. When stock is short, the planner must decide who gets how much. The simple measure used for this is <b>days of cover</b>.</p>
+  <div class="formula"><span class="fname">Days of cover</span>Days of cover = <span class="fr"><span>Stock in hand</span><span>Average daily demand</span></span></div>
+
+  <h3>Allocation exercise</h3>
+  <p>A Kavya Distributors delivery is late, so today's milk run can carry only <b>250 packs</b> of toor dal. The next truck will reach the branches after <b>4 days</b>. Split the 250 packs among the three branches and see how long each branch can last.</p>
+  <div class="lab">
+    <div class="tbl-wrap"><table>
+      <tr><th>Branch</th><th class="num">Stock now</th><th class="num">Daily demand</th></tr>
+      <tr><td>Gandhi Chowk</td><td class="num">60</td><td class="num">55</td></tr>
+      <tr><td>Station Road</td><td class="num">90</td><td class="num">40</td></tr>
+      <tr><td>Civil Lines</td><td class="num">20</td><td class="num">25</td></tr>
+    </table></div>
+    <div id="alloc-sliders"></div>
+    <p><b id="alloc-left"></b></p>
+    <div class="presets"><button class="btn" id="alloc-eq">Equal split</button><button class="btn" id="alloc-fair">Fair share (equal days of cover)</button><button class="btn" id="alloc-reset">Clear</button></div>
+    <div class="chart" id="alloc-chart"></div>
+    <p class="interp" id="alloc-msg"></p>
+  </div>
+  <div class="callout">
+    <b class="t">Fair share allocation</b>
+    <p>Add the stock at all branches to the stock available for dispatch: 60 + 90 + 20 + 250 = 420 packs. Total daily demand is 55 + 40 + 25 = 120 packs, so the system can cover 420 &divide; 120 = 3.5 days. Fair share gives each branch enough to reach 3.5 days of cover. All branches then run short at about the same time, instead of one branch running out early while another has extra stock.</p>
+  </div>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c2"></div>
+</section>
+
+<!-- ============ C3 ============ -->
+<section class="mod" id="c3" data-nav="Inventory types and costs" data-n="3" data-group="Inventory planning">
+  <p class="modnum">Chapter 3</p>
+  <h1>Inventory: types and costs</h1>
+  <p class="lede">Inventory is stock kept for future use or sale. Every node holds some inventory, because supply and demand never match exactly day by day.</p>
+
+  <h2>Types of inventory by stage</h2>
+  <p>At Latur Dal Mill, raw toor bought from the mandi is <b>raw material</b>. Toor that has been cleaned and split but not yet packed is <b>work in progress (WIP)</b>. Packed 1 kg packs are <b>finished goods</b>. For Kavya Distributors, Madavi Warehouse and the branches, everything they hold is finished goods (also called merchandise).</p>
+
+  <h2>Types of inventory by purpose</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Type</th><th>Why it exists</th><th>Toor dal example</th></tr>
+    <tr><td>Cycle stock</td><td>We order in lots, not one pack at a time, so stock is used up gradually between two deliveries.</td><td>Madavi Warehouse receives 1,980 packs and uses them over about 16 days.</td></tr>
+    <tr><td>Safety stock</td><td>Protects against demand that is higher than forecast, or deliveries that come late.</td><td>89 packs kept as a buffer at Madavi Warehouse.</td></tr>
+    <tr><td>Pipeline stock</td><td>Stock that has been dispatched but not yet received.</td><td>Dal on a Niharika Logistics truck between Kavya Distributors and Madavi Warehouse.</td></tr>
+    <tr><td>Anticipation stock</td><td>Built up in advance for a known rise in demand, such as a festival or a price increase.</td><td>Extra stock bought in September for Dussehra and Diwali.</td></tr>
+    <tr><td>Dead stock</td><td>Stock that is not selling, is damaged, or is close to expiry.</td><td>Packs with torn seals, or a slow pack size that nobody buys.</td></tr>
+  </table></div>
+
+  <h2>Costs of inventory</h2>
+  <ul class="clean">
+    <li><b>Ordering cost (S):</b> the cost of placing and receiving one order, such as raising the purchase order, booking the truck, unloading, quality check and preparing the GRN. It does not depend on the quantity ordered. For Madavi Warehouse, it is about &#8377;1,500 per order.</li>
+    <li><b>Holding cost (H):</b> the cost of keeping one unit in stock for a year. It includes interest on the money blocked in stock, warehouse rent, insurance, damage, pilferage and expiry. It is usually expressed as a percentage of the item's cost per year. Dhanvanshi uses 24% a year, so for a pack costing &#8377;140, H = 0.24 &times; 140 = &#8377;33.60 per pack per year.</li>
+    <li><b>Stock-out cost:</b> the loss when stock is not available: the lost margin on that sale, and the risk that the customer shifts to another store. This cost is hard to measure, but it is real. We deal with it in Chapter 5.</li>
+  </ul>
+
+  <h2>The sawtooth pattern</h2>
+  <p>When an order of Q packs arrives, stock jumps up by Q. It then falls day by day as the branches draw stock, until the next order arrives. The stock level never goes below the safety stock when demand is as expected. On average, half the order quantity is in stock at any time, plus the safety stock.</p>
+  <div class="formula"><span class="fname">Average inventory</span>Average inventory = <span class="fr"><span>Q</span><span>2</span></span> + Safety stock</div>
+  <div class="lab">
+    <div class="ctrl"><label for="saw-q">Order quantity (Q)</label><input type="range" id="saw-q" min="400" max="5000" step="20" value="1000"><output id="saw-q-out"></output></div>
+    <div class="ctrl"><label for="saw-ss">Safety stock</label><input type="range" id="saw-ss" min="0" max="300" step="1" value="89"><output id="saw-ss-out"></output></div>
+    <div class="chart" id="saw-chart"></div>
+    <div class="kpis" id="saw-kpis"></div>
+  </div>
+
+  <h2>The trade-off between ordering and holding</h2>
+  <p>If Madavi Warehouse orders small quantities, it places many orders in a year, so ordering cost is high but average stock (and holding cost) is low. If it orders large quantities, it places few orders, but holds more stock. The chart below shows both costs for toor dal, with annual demand D = 120 &times; 365 = 43,800 packs.</p>
+  <div class="formula"><span class="fname">Annual ordering cost and annual holding cost of cycle stock</span>Ordering cost = <span class="fr"><span>D</span><span>Q</span></span> &times; S &nbsp;&nbsp;&nbsp; Holding cost = <span class="fr"><span>Q</span><span>2</span></span> &times; H</div>
+  <div class="chart" id="cost-chart"></div>
+  <p>The total cost is lowest where the two curves cross. This quantity is called the Economic Order Quantity, which we calculate in Chapter 6. The cost of holding safety stock (safety stock &times; H) is added on top; it does not change with Q.</p>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c3"></div>
+</section>
+<!-- ============ C4 ============ -->
+<section class="mod" id="c4" data-nav="Lead time and MoQ" data-n="4">
+  <p class="modnum">Chapter 4</p>
+  <h1>Lead time and Minimum Order Quantity</h1>
+  <p class="lede">Two facts about the supplier shape every ordering decision: how long it takes to get the stock, and how little we are allowed to order.</p>
+
+  <h2>What is lead time?</h2>
+  <p><b>Lead time</b> is the time from the moment an order is raised to the moment the stock is received, checked and ready to issue or sell. It is not only the travel time of the truck. For Madavi Warehouse ordering toor dal from Kavya Distributors, the lead time has four parts:</p>
+  <div class="lab">
+    <div class="ctrl"><label for="lt-1">Order processing at Kavya Distributors</label><input type="range" id="lt-1" min="0" max="4" step="1" value="1"><output id="lt-1-out"></output></div>
+    <div class="ctrl"><label for="lt-2">Picking, packing and dispatch</label><input type="range" id="lt-2" min="0" max="4" step="1" value="1"><output id="lt-2-out"></output></div>
+    <div class="ctrl"><label for="lt-3">Transit by Niharika Logistics</label><input type="range" id="lt-3" min="1" max="6" step="1" value="2"><output id="lt-3-out"></output></div>
+    <div class="ctrl"><label for="lt-4">Unloading, quality check and GRN</label><input type="range" id="lt-4" min="0" max="3" step="1" value="1"><output id="lt-4-out"></output></div>
+    <div class="result" id="lt-out"></div>
+  </div>
+  <div class="formula"><span class="fname">Lead-time demand</span>Lead-time demand = Average daily demand (d) &times; Lead time in days (L)</div>
+  <p>Lead-time demand is the stock needed to keep selling while we wait for the order to arrive. If the stock in hand is less than the lead-time demand when we place the order, the shelf will go empty before the goods arrive.</p>
+  <div class="callout trap">
+    <b class="t">Lead time is not fixed</b>
+    <p>A truck gets stuck at a toll plaza, the supplier is short of stock, or the GRN waits because the warehouse is busy. Lead time varies from order to order. A planner should look at the actual lead times of the last ten or twenty orders, not the time promised by the supplier. We use this variation in Chapter 5.</p>
+  </div>
+
+  <h2>Minimum Order Quantity (MoQ)</h2>
+  <p><b>MoQ</b> is the smallest quantity a supplier will accept in one order. Suppliers set an MoQ because each order has a fixed cost for them too: processing, picking, loading and transport. A mill may also produce in batches. Along with the MoQ, most goods move in <b>case packs</b> (cartons or bags): toor dal comes in cartons of 20 packs, so an order must be a multiple of 20.</p>
+  <div class="formula"><span class="fname">Order quantity after MoQ and case pack</span>Order quantity = larger of { Required quantity rounded up to full cases, &nbsp;MoQ }</div>
+  <p>When the requirement is smaller than the MoQ, the extra quantity comes into stock and blocks money until it is sold. For fast-moving items this hardly matters. For slow-moving items, the MoQ can create months of stock.</p>
+  <div class="lab">
+    <div class="presets"><button class="btn" data-moq="toor">Toor Dal 1 kg (fast-moving)</button><button class="btn" data-moq="hing">Hing 50 g (slow-moving)</button></div>
+    <div class="fields">
+      <div class="fld"><label for="mq-req">Required quantity (packs)</label><input id="mq-req" type="number" min="1" inputmode="numeric"></div>
+      <div class="fld"><label for="mq-case">Case pack (packs per case)</label><input id="mq-case" type="number" min="1" inputmode="numeric"></div>
+      <div class="fld"><label for="mq-moq">MoQ (packs)</label><input id="mq-moq" type="number" min="0" inputmode="numeric"></div>
+      <div class="fld"><label for="mq-d">Average daily sale (packs)</label><input id="mq-d" type="number" min="0.1" step="any" inputmode="decimal"></div>
+      <div class="fld"><label for="mq-cost">Cost per pack (&#8377;)</label><input id="mq-cost" type="number" min="0" step="any" inputmode="decimal"></div>
+    </div>
+    <div class="result" id="mq-out"></div>
+  </div>
+  <div class="callout good">
+    <b class="t">What can a buyer do about a high MoQ?</b>
+    <p>Ask for the MoQ to be applied on the total value of the order across several items (a mixed-SKU MoQ), buy together with another branch or buyer, accept the MoQ only for items with a long shelf life, or buy the slow item through a stockist such as Nithansh Stockists, who can supply smaller lots at a slightly higher price.</p>
+  </div>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c4"></div>
+</section>
+
+<!-- ============ C5 ============ -->
+<section class="mod" id="c5" data-nav="Service level and safety stock" data-n="5">
+  <p class="modnum">Chapter 5</p>
+  <h1>Service level, stock-outs and safety stock</h1>
+  <p class="lede">Demand is never exactly 120 packs a day. Some days it is 90, some days 160. Safety stock protects the shelf on the busy days, and the service level decides how much protection we buy.</p>
+
+  <h2>Stock-outs and their cost</h2>
+  <p>A <b>stock-out</b> happens when a customer wants an item and it is not available. In a store, the customer may buy another brand, come back later, or go to another shop. The last case is the costliest: we lose the sale, and we may lose the customer's future visits. A branch that often runs out of staples like toor dal quickly gets a reputation for it.</p>
+
+  <h2>Two ways to measure service</h2>
+  <ul class="clean">
+    <li><b>Cycle service level (CSL):</b> the percentage of order cycles in which there is no stock-out. A CSL of 95% means that in 95 out of 100 replenishment cycles, stock does not run out before the next order arrives.</li>
+    <li><b>Fill rate:</b> the percentage of customer demand met from stock. If customers asked for 43,800 packs in a year and 43,650 were supplied, the fill rate is 43,650 &divide; 43,800 = 99.7%.</li>
+  </ul>
+  <p>Fill rate is usually much higher than CSL, because a stock-out in a cycle often lasts only a few hours at the end of the cycle. In this module, "service level" means the cycle service level.</p>
+
+  <h2>Safety stock</h2>
+  <p>If daily demand varies with a standard deviation of &sigma;<sub>d</sub>, then demand over a lead time of L days varies with a standard deviation of &sigma;<sub>d</sub> &times; &radic;L (assuming each day's demand is independent of the others). Safety stock is a multiple of this spread. The multiple is the Z value of the chosen service level, read from the standard normal table.</p>
+  <div class="formula"><span class="fname">Safety stock</span>Safety stock (SS) = Z &times; &sigma;<sub>d</sub> &times; &radic;L</div>
+  <div class="tbl-wrap"><table class="ztbl">
+    <tr><th>Service level</th><td>80%</td><td>85%</td><td>90%</td><td>95%</td><td>97%</td><td>98%</td><td>99%</td><td>99.9%</td></tr>
+    <tr><th>Z</th><td>0.84</td><td>1.04</td><td>1.28</td><td>1.65</td><td>1.88</td><td>2.05</td><td>2.33</td><td>3.09</td></tr>
+  </table></div>
+  <p>For toor dal at Madavi Warehouse, d = 120 packs, &sigma;<sub>d</sub> = 24 packs and L = 5 days. At 95%, SS = 1.65 &times; 24 &times; &radic;5 = 88.5, which we round up to 89 packs. Always round safety stock up.</p>
+
+  <div class="lab">
+    <div class="ctrl"><label for="sl">Service level</label><input type="range" id="sl" min="80" max="99.9" step="0.1" value="95"><output id="sl-out"></output></div>
+    <div class="chart" id="sl-chart"></div>
+    <div class="kpis" id="sl-kpis"></div>
+    <p class="interp" id="sl-msg" style="margin-bottom:0"></p>
+  </div>
+  <div class="callout">
+    <b class="t">Why the cost rises so fast</b>
+    <p>Going from 90% to 95% needs 29% more safety stock. Going from 95% to 99% needs another 41%, and from 99% to 99.9% another 33%. The last few percent of service are the most expensive. That is why stores keep a high service level for staples and high-value items, and a lower one for slow, low-margin items.</p>
+  </div>
+
+  <h2>When lead time also varies</h2>
+  <p>If the supplier's lead time is uncertain, with a standard deviation of &sigma;<sub>L</sub> days, the safety stock must cover both sources of variation.</p>
+  <div class="formula"><span class="fname">Safety stock with variable demand and variable lead time</span>SS = Z &times; &radic;( L &times; &sigma;<sub>d</sub><sup>2</sup> + d<sup>2</sup> &times; &sigma;<sub>L</sub><sup>2</sup> )</div>
+  <p>If Kavya's deliveries vary by just one day (&sigma;<sub>L</sub> = 1), SS = 1.65 &times; &radic;(5 &times; 24<sup>2</sup> + 120<sup>2</sup> &times; 1<sup>2</sup>) = 1.65 &times; &radic;17,280 = 217 packs. That is more than double the 89 packs needed for demand variation alone. An unreliable supplier costs a lot of extra stock.</p>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c5"></div>
+</section>
+
+<!-- ============ C6 ============ -->
+<section class="mod" id="c6" data-nav="Reorder point and replenishment" data-n="6">
+  <p class="modnum">Chapter 6</p>
+  <h1>Reorder point and replenishment</h1>
+  <p class="lede">We now have all the pieces to answer the two questions of replenishment: when to order, and how much to order.</p>
+
+  <h2>When to order: the reorder point</h2>
+  <p>The <b>reorder point (ROP)</b> is the stock level at which a new order must be placed. It is enough to cover the lead-time demand, plus the safety stock for days of higher demand.</p>
+  <div class="formula"><span class="fname">Reorder point</span>ROP = (d &times; L) + SS = (120 &times; 5) + 89 = <b>689 packs</b></div>
+  <p>When comparing stock with the ROP, use the <b>inventory position</b>, not just the stock on the shelf. If an order is already on the way, it must be counted, or the planner will order twice.</p>
+  <div class="formula"><span class="fname">Inventory position</span>Inventory position = Stock in hand + Stock on order &minus; Pending customer orders (backorders)</div>
+
+  <h2>How much to order: Economic Order Quantity</h2>
+  <p>In Chapter 3 we saw that ordering cost falls and holding cost rises as the order quantity increases. The Economic Order Quantity (EOQ) is the quantity at which the total of the two is lowest.</p>
+  <div class="formula"><span class="fname">Economic Order Quantity</span>EOQ = &radic;<span class="fr"><span>2 &times; D &times; S</span><span>H</span></span> = &radic;<span class="fr"><span>2 &times; 43,800 &times; 1,500</span><span>33.60</span></span> = 1,977.6 packs</div>
+  <p>Rounded up to full cartons of 20, Madavi Warehouse orders <b>1,980 packs</b> (99 cartons), about 22 orders a year, or one order every 16 to 17 days. Kavya's MoQ for toor dal is 500 packs, which is below the EOQ, so the MoQ does not change anything here. If the EOQ were below the MoQ, we would order the MoQ.</p>
+  <div class="callout">
+    <b class="t">EOQ is a guide, not a rule</b>
+    <p>EOQ assumes steady demand, a fixed price and unlimited space. The total cost curve is flat near the EOQ, so ordering 1,800 or 2,200 packs costs only slightly more. Planners adjust the EOQ to fit truck capacity, storage space, shelf life and quantity discounts.</p>
+  </div>
+
+  <h2>Two ways of reviewing stock</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th></th><th>Continuous review (s, Q)</th><th>Periodic review (R, S)</th></tr>
+    <tr><td>When is stock checked?</td><td>After every transaction, usually by the ERP or billing software.</td><td>At fixed intervals, for example every Monday (R = 7 days).</td></tr>
+    <tr><td>When is an order placed?</td><td>As soon as the inventory position reaches the reorder point s.</td><td>At every review.</td></tr>
+    <tr><td>How much is ordered?</td><td>A fixed quantity Q, such as the EOQ.</td><td>Enough to bring the inventory position up to a target level S. The quantity changes each time.</td></tr>
+    <tr><td>Safety stock covers</td><td>The lead time L.</td><td>The review period plus the lead time, R + L.</td></tr>
+    <tr><td>Suits</td><td>Fast-moving and high-value items, with good system data.</td><td>Many items from one supplier, ordered together on a fixed day.</td></tr>
+  </table></div>
+  <div class="formula"><span class="fname">Periodic review: safety stock and order-up-to level</span>SS = Z &times; &sigma;<sub>d</sub> &times; &radic;(R + L) &nbsp;&nbsp;&nbsp; S = d &times; (R + L) + SS &nbsp;&nbsp;&nbsp; Order quantity = S &minus; Inventory position</div>
+  <p>For toor dal with a weekly review (R = 7): SS = 1.65 &times; 24 &times; &radic;12 = 138 packs and S = 120 &times; 12 + 138 = 1,578 packs. The periodic system needs more safety stock, because between two reviews nobody is watching the stock.</p>
+
+  <h2>Replenishment simulator</h2>
+  <p>The simulator runs Madavi Warehouse for 60 days using a continuous review system. Every day, demand is drawn at random around 120 packs. When the inventory position falls to the ROP, an order of Q packs is placed and arrives after the lead time. Change the settings and see when stock-outs happen.</p>
+  <div class="lab">
+    <div class="ctrl"><label for="sim-sl">Service level</label><input type="range" id="sim-sl" min="50" max="99.9" step="0.1" value="95"><output id="sim-sl-out"></output></div>
+    <div class="ctrl"><label for="sim-q">Order quantity (Q)</label><input type="range" id="sim-q" min="300" max="4000" step="20" value="1980"><output id="sim-q-out"></output></div>
+    <div class="ctrl"><label for="sim-l">Lead time (L)</label><input type="range" id="sim-l" min="1" max="12" step="1" value="5"><output id="sim-l-out"></output></div>
+    <div class="ctrl"><label for="sim-sd">Daily demand variation (&sigma;<sub>d</sub>)</label><input type="range" id="sim-sd" min="0" max="60" step="1" value="24"><output id="sim-sd-out"></output></div>
+    <div class="row" style="margin:8px 0 4px"><label><input type="checkbox" id="sim-late"> Supplier is sometimes late (by 1 or 2 days)</label></div>
+    <div class="row" style="margin:8px 0"><button class="btn primary" id="sim-run">Run another 60 days</button><span class="small" id="sim-set"></span></div>
+    <div class="chart" id="sim-chart"></div>
+    <div class="kpis" id="sim-kpis"></div>
+    <p class="interp" id="sim-msg" style="margin-bottom:0"></p>
+  </div>
+  <div class="callout good">
+    <b class="t">Things to try</b>
+    <p>Set the variation to 0: no stock-outs at any service level. Set the service level to 50%: the safety stock becomes zero and stock-outs appear in about half the cycles. Tick "Supplier is sometimes late" at 95%: the safety stock, which only covers demand variation, is no longer enough. Reduce Q to 600: more orders, more cycles, and so more chances of a stock-out.</p>
+  </div>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c6"></div>
+</section>
+
+<!-- ============ C7 ============ -->
+<section class="mod" id="c7" data-nav="Demand forecasting" data-n="7">
+  <p class="modnum">Chapter 7</p>
+  <h1>Demand forecasting for inventory</h1>
+  <p class="lede">So far we have taken daily demand as 120 packs. In practice, this number comes from a forecast. A better forecast means less safety stock and fewer stock-outs.</p>
+
+  <h2>Twelve months of sales</h2>
+  <p>The table shows monthly sales of toor dal (1 kg) across all three Dhanvanshi branches for the financial year 2025-26. Notice the jump in October, the Dussehra and Diwali month.</p>
+  <div class="tbl-wrap"><table id="fc-data"></table></div>
+
+  <h2>Three simple methods</h2>
+  <p>In the formulas, A<sub>t</sub> is the actual sale in month t and F<sub>t</sub> is the forecast for month t.</p>
+  <div class="formula"><span class="fname">Moving average of the last n months</span>F<sub>t+1</sub> = <span class="fr"><span>A<sub>t</sub> + A<sub>t&minus;1</sub> + &hellip; + A<sub>t&minus;n+1</sub></span><span>n</span></span></div>
+  <div class="formula"><span class="fname">Weighted moving average (3 months)</span>F<sub>t+1</sub> = 0.5 &times; A<sub>t</sub> + 0.3 &times; A<sub>t&minus;1</sub> + 0.2 &times; A<sub>t&minus;2</sub></div>
+  <div class="formula"><span class="fname">Simple exponential smoothing</span>F<sub>t+1</sub> = &alpha; &times; A<sub>t</sub> + (1 &minus; &alpha;) &times; F<sub>t</sub> &nbsp;&nbsp;<small class="small">where 0 &lt; &alpha; &lt; 1, and the first forecast is the first actual sale</small></div>
+  <p>A moving average gives equal weight to the last n months. A weighted moving average gives more weight to recent months. Exponential smoothing gives weight to all past months, with the weight falling as the months get older. A higher &alpha; means the forecast follows recent sales more closely.</p>
+
+  <h2>Measuring forecast error</h2>
+  <p>Error in month t is e<sub>t</sub> = A<sub>t</sub> &minus; F<sub>t</sub>. We compare the methods over the same six months, October to March.</p>
+  <div class="formula"><span class="fname">Error measures over n months</span>MAE = <span class="fr"><span>&Sigma; |e<sub>t</sub>|</span><span>n</span></span> &nbsp;&nbsp;&nbsp; MAPE = <span class="fr"><span>&Sigma; |e<sub>t</sub>| / A<sub>t</sub></span><span>n</span></span> &times; 100 &nbsp;&nbsp;&nbsp; Bias = <span class="fr"><span>&Sigma; e<sub>t</sub></span><span>n</span></span></div>
+  <p>MAE is the average size of the error in packs. MAPE is the average error as a percentage of sales, useful for comparing items of different sizes. Bias shows the direction: a positive bias means the forecast is usually too low (risk of stock-outs); a negative bias means it is usually too high (risk of excess stock).</p>
+
+  <div class="lab">
+    <div class="seg" role="group" aria-label="Forecasting method" id="fc-method">
+      <button class="btn" data-m="ma" aria-pressed="true">Moving average</button>
+      <button class="btn" data-m="wma" aria-pressed="false">Weighted moving average</button>
+      <button class="btn" data-m="ses" aria-pressed="false">Exponential smoothing</button>
+    </div>
+    <div class="ctrl" id="fc-n-row" style="margin-top:12px"><label for="fc-n">Number of months (n)</label><input type="range" id="fc-n" min="2" max="6" step="1" value="3"><output id="fc-n-out"></output></div>
+    <div class="ctrl" id="fc-a-row" style="margin-top:12px"><label for="fc-a">Smoothing constant (&alpha;)</label><input type="range" id="fc-a" min="0.05" max="0.95" step="0.05" value="0.3"><output id="fc-a-out"></output></div>
+    <div class="chart" id="fc-chart"></div>
+    <div class="kpis" id="fc-kpis"></div>
+    <div class="tbl-wrap"><table id="fc-compare"></table></div>
+  </div>
+
+  <div class="callout trap">
+    <b class="t">No simple method can predict Diwali</b>
+    <p>All three methods miss the October jump, and then over-forecast November because they are still reacting to October. Methods based only on the last few months cannot know about a festival. In practice, planners take the base forecast from these methods and add a festival uplift based on last year. Last October, sales were about 23% above the April to September average, so the planner would add a similar uplift for this October and build anticipation stock in September.</p>
+  </div>
+
+  <h2>From a monthly forecast to the reorder point</h2>
+  <p>A monthly forecast of 3,660 packs means about 3,660 &divide; 30 = 122 packs a day. This daily figure is the d in the lead-time demand and reorder point. The standard deviation of the forecast errors is used as &sigma;<sub>d</sub> in the safety stock formula: the more accurate the forecast, the smaller the safety stock.</p>
+
+  <h3>The same calculation in Python</h3>
+<pre class="code">import numpy as np
+import pandas as pd
+
+sales = pd.Series([3480, 3560, 3420, 3590, 3650, 3610, 4380, 3930, 3640, 3700, 3560, 3760],
+                  index=pd.period_range("2025-04", periods=12, freq="M"))
+
+w = np.array([0.2, 0.3, 0.5])                                   # oldest to latest
+ma3  = sales.rolling(3).mean().shift(1)                         # moving average, n = 3
+wma3 = sales.rolling(3).apply(lambda x: (x * w).sum(), raw=True).shift(1)
+ses  = sales.ewm(alpha=0.3, adjust=False).mean().shift(1)       # exponential smoothing
+
+for name, f in [("MA", ma3), ("WMA", wma3), ("SES", ses)]:
+    e = (sales - f).iloc[-6:]                                    # October to March
+    print(name, "MAE", round(e.abs().mean()), "MAPE", round((e.abs() / sales.iloc[-6:]).mean() * 100, 1),
+          "Bias", round(e.mean()))</pre>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c7"></div>
+</section>
+<!-- ============ C8 ============ -->
+<section class="mod" id="c8" data-nav="DOI, turnover and ABC" data-n="8" data-group="Inventory analysis">
+  <p class="modnum">Chapter 8</p>
+  <h1>Inventory analysis: days of inventory, turnover and ABC</h1>
+  <p class="lede">Planning tells us what to order. Analysis tells us whether the stock we hold is working for the business, or just sitting in the warehouse.</p>
+
+  <h2>Inventory turnover and days of inventory</h2>
+  <p>Stock is valued at cost, so we compare it with the <b>cost of goods sold (COGS)</b>, not with sales revenue.</p>
+  <div class="formula"><span class="fname">Average inventory</span>Average inventory = <span class="fr"><span>Opening inventory + Closing inventory</span><span>2</span></span></div>
+  <div class="formula"><span class="fname">Inventory turnover</span>Inventory turnover = <span class="fr"><span>COGS for the period</span><span>Average inventory</span></span></div>
+  <div class="formula"><span class="fname">Days of inventory (DOI), also called days of inventory on hand</span>DOI = <span class="fr"><span>Average inventory</span><span>COGS for the period</span></span> &times; Days in the period = <span class="fr"><span>Days in the period</span><span>Inventory turnover</span></span></div>
+  <p>Turnover tells us how many times the stock is sold and replaced in a period. DOI tells us how many days the current stock would last at the normal rate of consumption. A higher turnover (lower DOI) means less money blocked in stock, as long as stock-outs do not go up.</p>
+  <div class="lab">
+    <div class="fields">
+      <div class="fld"><label for="kp-open">Opening inventory (&#8377; lakh)</label><input id="kp-open" type="number" step="any" value="38" inputmode="decimal"></div>
+      <div class="fld"><label for="kp-close">Closing inventory (&#8377; lakh)</label><input id="kp-close" type="number" step="any" value="39.6" inputmode="decimal"></div>
+      <div class="fld"><label for="kp-cogs">COGS for the period (&#8377; lakh)</label><input id="kp-cogs" type="number" step="any" value="476.7" inputmode="decimal"></div>
+      <div class="fld"><label for="kp-days">Days in the period</label><input id="kp-days" type="number" step="1" value="365" inputmode="numeric"></div>
+    </div>
+    <div class="result" id="kp-out"></div>
+  </div>
+  <div class="callout">
+    <b class="t">DOI and days of cover</b>
+    <p>DOI looks back: it uses past COGS. Days of cover (Chapter 2) looks ahead: it divides current stock by forecast demand. Both are in days, and both are useful. Before a festival, days of cover is the better measure, since past consumption understates the coming demand.</p>
+  </div>
+
+  <h2>ABC analysis</h2>
+  <p>A warehouse may stock hundreds of items, and the planner cannot give equal attention to all. ABC analysis ranks items by their <b>annual consumption value</b> (annual units &times; unit cost) and puts them into three classes. It follows the Pareto principle: a few items account for most of the value.</p>
+  <ul class="clean">
+    <li><b>A items:</b> roughly the top 70% of value, usually 10 to 25% of items. Tight control, frequent review, accurate forecasts.</li>
+    <li><b>B items:</b> the next 20% of value. Normal control.</li>
+    <li><b>C items:</b> the last 10% of value, often half the items. Simple rules, larger lots, occasional review.</li>
+  </ul>
+  <p>Method: sort items by annual consumption value, largest first. Work out each item's share of the total and the cumulative share. An item goes into class A if the cumulative share <i>before</i> it is below the A cut-off, and into class B if the cumulative share before it is below the B cut-off. The rest are class C.</p>
+  <p>The table shows 20 items at Madavi Warehouse. Annual value and stock are in &#8377; lakh, at cost. DOI for each item is its current stock value divided by its average daily consumption value.</p>
+  <div class="lab">
+    <div class="ctrl"><label for="abc-a">Class A up to</label><input type="range" id="abc-a" min="50" max="85" step="5" value="70"><output id="abc-a-out"></output></div>
+    <div class="ctrl"><label for="abc-b">Class B up to</label><input type="range" id="abc-b" min="75" max="98" step="1" value="90"><output id="abc-b-out"></output></div>
+    <div class="ctrl"><label for="abc-slow">Flag items with DOI above</label><input type="range" id="abc-slow" min="30" max="120" step="5" value="60"><output id="abc-slow-out"></output></div>
+    <div class="chart" id="abc-chart"></div>
+    <div class="kpis" id="abc-sum"></div>
+    <div class="tbl-wrap"><table id="abc-tbl"></table></div>
+    <p class="interp" id="abc-msg" style="margin-bottom:0"></p>
+  </div>
+  <div class="callout trap">
+    <b class="t">Slow-moving stock hides in class C</b>
+    <p>Class C items are small in value, so nobody watches them, and that is where DOI grows. Hing is flagged because of the high MoQ we saw in Chapter 4. Check DOI item by item, not only for the whole warehouse. The overall DOI of about 30 days looks healthy even though some items have more than three months of stock.</p>
+  </div>
+  <p>Many companies combine ABC with an <b>XYZ</b> classification based on how steady the demand is (X steady, Y variable, Z very irregular). An AX item such as toor dal can run on tight automatic reorder points, while a CZ item may be ordered only against confirmed demand.</p>
+
+  <h3>The same analysis in Python</h3>
+<pre class="code">import numpy as np
+import pandas as pd
+
+# df has columns: item, annual_value, stock_value   (values in Rs lakh)
+df = df.sort_values("annual_value", ascending=False)
+df["share"]   = df["annual_value"] / df["annual_value"].sum() * 100
+df["cum_pct"] = df["share"].cumsum()
+before = df["cum_pct"] - df["share"]                            # cumulative share before the item
+df["class"] = np.select([before &lt; 70, before &lt; 90], ["A", "B"], default="C")
+df["doi"]   = df["stock_value"] / (df["annual_value"] / 365)
+print(df[df["doi"] &gt; 60])                                       # slow-moving items</pre>
+
+  <h2>Check your understanding</h2>
+  <div class="mcq" data-set="c8"></div>
+</section>
+
+<!-- ============ C9 ============ -->
+<section class="mod" id="c9" data-nav="Capstone: monthly plan" data-n="9">
+  <p class="modnum">Chapter 9</p>
+  <h1>Capstone: replenishment plan for Madavi Warehouse</h1>
+  <p class="lede">It is Monday morning at Madavi Warehouse. The planner must decide which of five items to order from Kavya Distributors today, and how much. Every value in the white boxes can be changed.</p>
+
+  <h2>Steps followed for each item</h2>
+  <ol class="clean">
+    <li>Safety stock: SS = Z &times; &sigma;<sub>d</sub> &times; &radic;L, rounded up.</li>
+    <li>Reorder point: ROP = d &times; L + SS.</li>
+    <li>Inventory position: IP = Stock in hand + Stock on order.</li>
+    <li>If IP &le; ROP, place an order. Otherwise, no order today.</li>
+    <li>Order quantity: EOQ = &radic;(2DS / H) with D = 365 &times; d, then the larger of EOQ and MoQ, rounded up to full cases.</li>
+    <li>Stock just before the order arrives = IP &minus; d &times; L. If this is negative, the item will run out before the delivery. Ask for an urgent delivery.</li>
+  </ol>
+  <div class="lab">
+    <div class="row" style="margin-bottom:8px"><span class="pl">Service level:</span><div class="seg" role="group" aria-label="Service level" id="cap-sl"></div></div>
+    <p class="small" style="margin:0 0 10px">Ordering cost S = &#8377;1,500 per order. Holding cost = 24% of unit cost per year.</p>
+    <h3 style="margin-top:6px">Inputs</h3>
+    <div class="tbl-wrap"><table id="cap-in"></table></div>
+    <h3>Plan</h3>
+    <div class="tbl-wrap"><table id="cap-out"></table></div>
+    <div class="kpis" id="cap-sum"></div>
+  </div>
+  <div class="callout good">
+    <b class="t">Things to try</b>
+    <p>Change the service level to 99% and see which item crosses its reorder point. Set the stock on order for sunflower oil to 0: the order that was already on the way was the only reason it did not need a new order. Increase the ghee forecast by 40% for Diwali and see what happens to its EOQ and MoQ. Reduce the sugar lead time to 1 day and see if the stock-out risk goes away.</p>
+  </div>
+  <div class="callout">
+    <b class="t">Reading the plan</b>
+    <p>With the starting values, toor dal is just above its reorder point, so it will need an order within a day. Sunflower oil does not need an order because 1,200 bottles are already on the way. Basmati rice and sugar are ordered at their EOQ. Ghee is ordered at the MoQ because its EOQ is smaller than Kavya's MoQ. Sugar was not ordered in time: even with today's order, the warehouse will run short before the delivery arrives.</p>
+  </div>
+</section>
+
+<!-- ============ C10 ============ -->
+<section class="mod" id="c10" data-nav="Practice problems" data-n="10" data-group="Practice">
+  <p class="modnum">Chapter 10</p>
+  <h1>Ten solved problems</h1>
+  <p class="lede">Each problem gives a business situation, the data and a question. Solve it on your own first, check your answer, and then open the solution one step at a time.</p>
+  <div class="exgrid" id="ex-grid" role="group" aria-label="Select a problem"></div>
+  <div id="ex-body"></div>
+
+  <h2 style="margin-top:3rem">Formula sheet</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Measure</th><th>Formula</th><th>Toor dal at Madavi Warehouse</th></tr>
+    <tr><td>Lead time</td><td>Order processing + dispatch + transit + receipt</td><td>1 + 1 + 2 + 1 = 5 days</td></tr>
+    <tr><td>Lead-time demand</td><td>d &times; L</td><td>120 &times; 5 = 600 packs</td></tr>
+    <tr><td>Safety stock</td><td>Z &times; &sigma;<sub>d</sub> &times; &radic;L</td><td>1.65 &times; 24 &times; &radic;5 = 89 packs</td></tr>
+    <tr><td>Safety stock (variable lead time)</td><td>Z &times; &radic;(L&sigma;<sub>d</sub><sup>2</sup> + d<sup>2</sup>&sigma;<sub>L</sub><sup>2</sup>)</td><td>217 packs if &sigma;<sub>L</sub> = 1 day</td></tr>
+    <tr><td>Reorder point</td><td>d &times; L + SS</td><td>600 + 89 = 689 packs</td></tr>
+    <tr><td>Inventory position</td><td>In hand + on order &minus; backorders</td><td>&nbsp;</td></tr>
+    <tr><td>EOQ</td><td>&radic;(2DS / H)</td><td>&radic;(2 &times; 43,800 &times; 1,500 / 33.60) = 1,978 &rarr; 1,980</td></tr>
+    <tr><td>Order quantity with MoQ</td><td>max(requirement in full cases, MoQ)</td><td>max(1,980, 500) = 1,980</td></tr>
+    <tr><td>Average inventory (planning)</td><td>Q / 2 + SS</td><td>990 + 89 = 1,079 packs</td></tr>
+    <tr><td>Periodic review</td><td>SS = Z&sigma;<sub>d</sub>&radic;(R + L), S = d(R + L) + SS</td><td>R = 7: SS = 138, S = 1,578</td></tr>
+    <tr><td>Days of cover</td><td>Stock &divide; forecast daily demand</td><td>1,200 &divide; 120 = 10 days</td></tr>
+    <tr><td>Inventory turnover</td><td>COGS &divide; average inventory</td><td>&nbsp;</td></tr>
+    <tr><td>Days of inventory</td><td>Average inventory &divide; COGS &times; days = days &divide; turnover</td><td>&nbsp;</td></tr>
+    <tr><td>Forecast error</td><td>MAE = &Sigma;|e| / n, MAPE = &Sigma;(|e| / A) / n &times; 100, Bias = &Sigma;e / n</td><td>e = Actual &minus; Forecast</td></tr>
+  </table></div>
+</section>
+
+  </main>
+</div>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const IN=(n,d=0)=>Number(n).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+const R=n=>"\u20B9"+IN(Math.round(n));
+const f=(x,d=2)=>isFinite(x)?(Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toFixed(d):"\u2014";
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const kpi=(l,v,cls)=>`<div class="kpi ${cls||""}"><div class="kl">${l}</div><div class="kv">${v}</div></div>`;
+
+/* ---------- statistics ---------- */
+function invN(p){
+  const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],
+  b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],
+  c=[-0.007784894002430293,-0.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
+  d=[0.007784695709041462,0.3224671290700398,2.445134137142996,3.754408661907416];
+  const pl=0.02425;let q,r;
+  if(p<pl){q=Math.sqrt(-2*Math.log(p));return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  if(p<=1-pl){q=p-0.5;r=q*q;return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+  q=Math.sqrt(-2*Math.log(1-p));return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+/* Z rounded the way textbook tables show it (1.645 -> 1.65) */
+const Z=sl=>{if(sl<=50)return 0;const z=invN(sl/100);return Math.round(Math.round(z*1000)/10)/100;};
+const npdf=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ---------- chart helpers ---------- */
+function niceTicks(lo,hi,n){
+  const span=hi-lo||1,step0=span/(n||5),mag=Math.pow(10,Math.floor(Math.log10(step0))),err=step0/mag;
+  const step=(err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;const out=[];
+  for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(Math.round(v*1e6)/1e6);return out;
+}
+function frame(el,h,x0,x1,y0,y1,m){
+  const W=Math.max(300,Math.min(900,(el.clientWidth||600)-20));
+  m=Object.assign({l:50,r:26,t:12,b:30},m||{});
+  const sx=v=>m.l+(v-x0)/(x1-x0||1)*(W-m.l-m.r), sy=v=>m.t+(1-(v-y0)/(y1-y0||1))*(h-m.t-m.b);
+  return {W,h,m,sx,sy,x0,x1,y0,y1};
+}
+function yAxis(F,ticks,fmt){
+  return ticks.map(v=>`<line class="g-grid" x1="${F.m.l}" x2="${F.W-F.m.r}" y1="${F.sy(v)}" y2="${F.sy(v)}"/><text class="g-t" x="${F.m.l-6}" y="${F.sy(v)+4}" text-anchor="end">${fmt?fmt(v):IN(v)}</text>`).join("");
+}
+function xLabels(F,items){return items.map(o=>`<text class="g-t" x="${F.sx(o.v)}" y="${F.h-F.m.b+17}" text-anchor="middle">${o.l}</text>`).join("");}
+const path=(F,pts)=>pts.map((p,i)=>(i?"L":"M")+F.sx(p[0]).toFixed(1)+","+F.sy(p[1]).toFixed(1)).join("");
+const svg=(F,inner,label)=>`<svg viewBox="0 0 ${F.W} ${F.h}" role="img" aria-label="${label}">${inner}</svg>`;
+const RENDER=[];
+const reg=fn=>{RENDER.push(fn);return fn;};
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>RENDER.forEach(fn=>fn()),150);});
+
+/* ---------- navigation ---------- */
+const mods=$$(".mod");
+const nav=$("#nav");
+let visited=new Set(store.get("inv-module-visited")||[]);
+function buildNav(){
+  let html="";
+  mods.forEach(m=>{
+    if(m.dataset.group)html+=`<li class="navgroup">${m.dataset.group}</li>`;
+    html+=`<li><a href="#${m.id}" data-id="${m.id}"><span class="n">${m.dataset.n||""}</span><span>${m.dataset.nav}</span><span class="seen">${visited.has(m.id)?"\u2713":""}</span></a></li>`;
+  });
+  nav.innerHTML=html;
+}
+function addPagers(){
+  mods.forEach((m,i)=>{
+    const p=mods[i-1],n=mods[i+1];if(i===0)return;
+    const d=document.createElement("div");d.className="pager";
+    const lab=x=>x.dataset.n?`Chapter ${x.dataset.n}: ${x.dataset.nav}`:x.dataset.nav;
+    d.innerHTML=(p?`<a href="#${p.id}"><small>Previous</small>${lab(p)}</a>`:"")+(n?`<a class="nx" href="#${n.id}"><small>Next</small>${lab(n)}</a>`:"");
+    m.appendChild(d);
+  });
+}
+function show(){
+  const id=(location.hash||"#start").slice(1);
+  const el=document.getElementById(id);
+  const target=el&&el.classList.contains("mod")?id:"start";
+  mods.forEach(m=>m.classList.toggle("on",m.id===target));
+  visited.add(target);store.set("inv-module-visited",[...visited]);
+  buildNav();
+  $$("#nav a").forEach(a=>{if(a.dataset.id===target)a.setAttribute("aria-current","page");});
+  $("#side").classList.remove("open");$("#navtoggle").setAttribute("aria-expanded","false");
+  window.scrollTo(0,0);
+  RENDER.forEach(fn=>fn());
+}
+$("#navtoggle").addEventListener("click",()=>{const s=$("#side");s.classList.toggle("open");$("#navtoggle").setAttribute("aria-expanded",s.classList.contains("open"));});
+
+/* ---------- multiple-choice questions ---------- */
+/* Correct answers are placed so that positions are balanced across the whole module,
+   no two consecutive questions share the same position, and no A-B-C / D-C-B runs appear. */
+function positions(n,k){
+  let best=null;
+  for(let t=0;t<2000;t++){
+    const s=[];for(let i=0;i<n;i++)s.push(i%k);shuffle(s);
+    let ok=true;
+    for(let i=1;i<n&&ok;i++)if(s[i]===s[i-1])ok=false;
+    for(let i=2;i<n&&ok;i++){const a=s[i-2],b=s[i-1],c=s[i];if((b-a===1&&c-b===1)||(a-b===1&&b-c===1))ok=false;}
+    if(ok)return s;best=s;
+  }
+  return best;
+}
+const MCQ={};   // set id -> array of questions
+const QALL=[];  // every question in page order
+function addQ(set,q){(MCQ[set]=MCQ[set]||[]).push(q);q.set=set;QALL.push(q);}
+let mcqAns=store.get("inv-module-mcq")||{};
+function mcqHTML(q,num){
+  const chosen=mcqAns[q.id];const done=chosen!==undefined;
+  const opts=q.order.map(o=>{let cls="";if(done){if(o===q.correct)cls="right";else if(o===chosen)cls="wrong";}
+    return `<button class="opt ${cls}" data-qid="${q.id}" data-o="${encodeURIComponent(o)}" ${done?"disabled":""}>${o}</button>`;}).join("");
+  const ok=chosen===q.correct;
+  return `<div class="qz" id="q-${q.id}"><div class="qp">${num?num+". ":""}${q.p}</div><div class="opts">${opts}</div>${done?`<p class="why"><b style="color:${ok?"var(--pos)":"var(--neg)"}">${ok?"Correct.":"Not correct."}</b> ${q.why}${ok?"":` <button class="again" data-again="${q.id}">Try again</button>`}</p>`:""}</div>`;
+}
+function renderSet(box){const qs=MCQ[box.dataset.set]||[];box.innerHTML=qs.map((q,i)=>mcqHTML(q,i+1)).join("");}
+function rerenderQ(id){const q=QALL.find(x=>x.id===id);const el=document.getElementById("q-"+id);if(!q||!el)return;
+  const num=q.set.startsWith("p")?0:(MCQ[q.set].indexOf(q)+1);el.outerHTML=mcqHTML(q,num);}
+document.addEventListener("click",ev=>{
+  const b=ev.target.closest("button.opt[data-qid]");
+  if(b){mcqAns[b.dataset.qid]=decodeURIComponent(b.dataset.o);store.set("inv-module-mcq",mcqAns);rerenderQ(b.dataset.qid);return;}
+  const a=ev.target.closest("button.again");
+  if(a){delete mcqAns[a.dataset.again];store.set("inv-module-mcq",mcqAns);rerenderQ(a.dataset.again);}
+});
+function finaliseMCQ(){
+  const pos=positions(QALL.length,4);
+  QALL.forEach((q,i)=>{const w=shuffle(q.wrong.slice());w.splice(pos[i],0,q.correct);q.order=w;});
+  $$(".mcq[data-set]").forEach(renderSet);
+}
+
+/* chapter questions */
+addQ("c1",{id:"c1a",p:"In which direction does money flow in the toor dal supply chain?",
+  correct:"From the customer towards Latur Dal Mill (upstream)",
+  wrong:["From Latur Dal Mill towards the customer (downstream)","Only between Dhanvanshi Super Store and its customers","It does not move along the chain; each node pays only the transporter"],
+  why:"Each buyer pays its supplier: the customer pays Dhanvanshi, Dhanvanshi pays Kavya Distributors, and Kavya pays the mill. So money moves upstream, opposite to the material."});
+addQ("c1",{id:"c1b",p:"Which of the following is <i>not</i> a node in the toor dal supply chain?",
+  correct:"The Niharika Logistics truck route from Kavya Distributors to Madavi Warehouse",
+  wrong:["Madavi Warehouse","Arjun C&amp;F Agent","Nithansh Stockists"],
+  why:"A node is a place where stock is made, stored or sold. The truck route is a link between two nodes. Stock on the truck is pipeline stock."});
+addQ("c2",{id:"c2a",p:"Niharika Logistics charges &#8377;18,000 per full truck (FTL) and &#8377;3 per kg for part load (PTL). Kavya Distributors has to send 4,500 kg. Which option is cheaper?",
+  correct:"PTL, costing &#8377;13,500",
+  wrong:["FTL, costing &#8377;18,000","Both cost the same","FTL, because a full truck is always cheaper per kg"],
+  why:"PTL costs 4,500 &times; 3 = &#8377;13,500. The load is below the break-even of 18,000 &divide; 3 = 6,000 kg, so PTL is cheaper, though it may take a day or two longer."});
+addQ("c2",{id:"c2b",p:"Madavi Warehouse does not have enough toor dal to meet every branch's need until the next truck. What does fair share allocation try to do?",
+  correct:"Give every branch the same days of cover, so all branches run short at about the same time",
+  wrong:["Give every branch the same number of packs","Send all the stock to the branch with the highest sales","Supply the branches in the order in which their indents arrived"],
+  why:"Fair share brings all branches to equal days of cover. An equal number of packs ignores the difference in demand and stock between branches."});
+addQ("c3",{id:"c3a",p:"Five tonnes of toor dal is on a Niharika Logistics truck between Kavya Distributors and Madavi Warehouse. What type of inventory is it?",
+  correct:"Pipeline (in-transit) stock",
+  wrong:["Safety stock","Anticipation stock","Dead stock"],
+  why:"Stock that has been dispatched but not yet received is pipeline stock. It is still inventory and still blocks money."});
+addQ("c3",{id:"c3b",p:"Madavi Warehouse doubles its order quantity for toor dal from 1,000 to 2,000 packs. Safety stock does not change. What happens?",
+  correct:"Average cycle stock doubles and the number of orders per year halves",
+  wrong:["Average cycle stock halves and the number of orders per year doubles","Both average stock and the number of orders per year double","Only the safety stock goes up"],
+  why:"Average cycle stock is Q &divide; 2, so it goes from 500 to 1,000 packs. Orders per year are D &divide; Q, so they fall from 43.8 to 21.9."});
+addQ("c4",{id:"c4a",p:"Which is the correct way to measure lead time for Madavi Warehouse?",
+  correct:"From raising the order to the stock being received, checked and ready to issue",
+  wrong:["From dispatch at Kavya Distributors to arrival at Madavi Warehouse","From raising the order to dispatch at Kavya Distributors","Only the travel time of the Niharika Logistics truck"],
+  why:"Lead time covers everything between raising the order and being able to use the stock: processing, dispatch, transit, unloading, quality check and GRN."});
+addQ("c4",{id:"c4b",p:"Madavi Warehouse needs 400 packs of an item, but the supplier's MoQ is 1,000 packs, so it orders 1,000. What happens to the extra 600 packs?",
+  correct:"They stay in stock and block working capital until they are sold",
+  wrong:["They become safety stock, so the reorder point can be set to zero","The supplier takes them back at the end of the month","They reduce the lead time of the next order"],
+  why:"The extra quantity is additional cycle stock. It does not change demand or lead time, so the reorder point stays the same; the next order is simply delayed until the stock is used."});
+addQ("c5",{id:"c5a",p:"What does a 95% cycle service level mean?",
+  correct:"In 95 out of 100 order cycles, stock does not run out before the next delivery",
+  wrong:["95% of every customer's demand is met from stock","The shelf is full 95% of the time","95% of the supplier's deliveries arrive on time"],
+  why:"Cycle service level counts order cycles without a stock-out. The share of demand met from stock is the fill rate, a different measure."});
+addQ("c5",{id:"c5b",p:"The lead time of an item increases from 4 days to 16 days, and daily demand variation stays the same. What happens to the safety stock?",
+  correct:"It doubles",
+  wrong:["It becomes four times as large","It stays the same","It increases by 12 days of demand"],
+  why:"Safety stock depends on &radic;L. &radic;16 &divide; &radic;4 = 4 &divide; 2 = 2, so safety stock doubles."});
+addQ("c6",{id:"c6a",p:"Daily demand is 50 units, lead time is 6 days and safety stock is 40 units. What is the reorder point?",
+  correct:"340 units",
+  wrong:["300 units","260 units","90 units"],
+  why:"ROP = d &times; L + SS = 50 &times; 6 + 40 = 340 units."});
+addQ("c6",{id:"c6b",p:"Dhanvanshi's Civil Lines branch counts its stock every Monday and orders enough to bring it up to a fixed level. Which policy is this?",
+  correct:"Periodic review, order-up-to (R, S)",
+  wrong:["Continuous review, fixed quantity (s, Q)","Economic Order Quantity ordering","Ordering only when the shelf is empty"],
+  why:"A fixed review day and a variable order quantity up to a target level is the periodic review (R, S) policy."});
+addQ("c7",{id:"c7a",p:"In simple exponential smoothing, what happens when &alpha; is increased from 0.2 to 0.8?",
+  correct:"The forecast reacts faster to recent sales, but also follows random ups and downs",
+  wrong:["The forecast becomes smoother and slower to react","The forecast ignores the latest month","The forecast error always goes down"],
+  why:"With &alpha; = 0.8, 80% of the new forecast comes from the latest month, so the forecast follows recent sales closely, including random noise."});
+addQ("c7",{id:"c7b",p:"Over six months, the bias (average of Actual &minus; Forecast) is +250 packs. What is the risk?",
+  correct:"Forecasts are usually too low, so stock-outs are likely",
+  wrong:["Forecasts are usually too high, so extra stock will pile up","There is no risk, since a positive bias means the forecast is accurate","There is no risk as long as MAPE is below 10%"],
+  why:"A positive bias means actual sales are, on average, higher than the forecast. Stock planned on this forecast will fall short."});
+addQ("c8",{id:"c8a",p:"A warehouse holds stock worth &#8377;30 lakh. Its annual cost of goods sold is &#8377;3.65 crore. What is its days of inventory?",
+  correct:"30 days",
+  wrong:["12 days","73 days","10 days"],
+  why:"Daily COGS = &#8377;3.65 crore &divide; 365 = &#8377;1 lakh. DOI = 30 &divide; 1 = 30 days. Turnover = 365 &divide; 30 = about 12 times a year."});
+addQ("c8",{id:"c8b",p:"Which statement about class A items in ABC analysis is correct?",
+  correct:"They are a small number of items that make up most of the consumption value, so they need the closest control",
+  wrong:["They are the items with the highest number of units sold","They are low-cost items that can be bought in bulk","They are slow-moving items that should be cleared"],
+  why:"ABC ranks items by annual consumption value, not units. A few items, such as basmati rice and sunflower oil at Madavi Warehouse, carry most of the value."});
+
+/* ---------- chapter 1: chain ---------- */
+const NODES={
+  mill:{n:"Latur Dal Mill",r:"Manufacturer",own:"Yes",hold:"Raw toor, dal being processed, and packed 1 kg packs",from:"Farmers and traders at the APMC mandi",note:"Converts raw toor into packed dal. Holds all three stages of inventory: raw material, work in progress and finished goods."},
+  arjun:{n:"Arjun C&amp;F Agent",r:"C&amp;F agent",own:"No. The stock belongs to the mill",hold:"The mill's finished packs for the whole region",from:"Receives stock transfers from Latur Dal Mill",note:"Stores and forwards the mill's stock, raises invoices on the mill's behalf and earns a commission on the value handled. It does not buy or sell the stock."},
+  kavya:{n:"Kavya Distributors",r:"Distributor",own:"Yes",hold:"Stock bought from the mill, kept in its own godown",from:"Latur Dal Mill, with goods delivered through Arjun C&amp;F Agent",note:"Supplies large retailers like Dhanvanshi and smaller stockists. Gives credit to its buyers, so it also finances part of the chain."},
+  nith:{n:"Nithansh Stockists",r:"Stockist",own:"Yes",hold:"Small lots for kirana shops",from:"Kavya Distributors",note:"Serves small kirana shops in nearby towns and villages that cannot buy in the quantities Kavya Distributors requires."},
+  madavi:{n:"Madavi Warehouse",r:"Warehouse (distribution centre)",own:"Yes, Dhanvanshi owns this stock",hold:"Stock for all three Dhanvanshi branches, including the common safety stock",from:"Kavya Distributors",note:"The hub of Dhanvanshi's network. Receives large deliveries and sends smaller daily lots to the branches on a milk run."},
+  br:{n:"Dhanvanshi Super Store",r:"Retailer (3 branches)",own:"Yes",hold:"Shelf stock and a small back-room stock at Gandhi Chowk, Station Road and Civil Lines",from:"Madavi Warehouse, through a daily indent",note:"Sells to the final customer. Billing (POS) data from the branches is the most important information in the whole chain, because it shows real demand."},
+  cust:{n:"Customer",r:"End consumer",own:"\u2014",hold:"A packet or two in the kitchen",from:"Dhanvanshi Super Store",note:"All demand in the chain starts here. Every other node is only responding to this demand."}
+};
+const MAIN=["mill","arjun","kavya","madavi","br","cust"];
+const LINKS={
+  material:["Full truckloads by Niharika Logistics","Part loads by Niharika Logistics","Deliveries by Niharika Logistics","Milk run: one truck visits all three branches","Customer carries the pack home"],
+  info:["Stock and dispatch reports to the mill","Kavya's purchase orders to the mill","Dhanvanshi's purchase orders to Kavya","Daily indents from each branch","Sales recorded at the billing counter"],
+  money:["Commission paid to Arjun; buyers pay the mill","Kavya pays the mill, within 21 days","Dhanvanshi pays Kavya, within 30 days","No payment: internal stock transfer","Cash, UPI and card payments"]
+};
+const SIDE={material:"Small lots in a tempo",info:"Orders on phone and WhatsApp",money:"Paid on 7 days' credit"};
+let flow="material",selNode="madavi";
+function drawChain(){
+  const ch=$("#chain");const up=flow!=="material";
+  ch.className="chain f-"+flow;
+  let h="";
+  MAIN.forEach((k,i)=>{
+    const N=NODES[k];
+    h+=`<li class="crow"><button class="node" data-node="${k}" aria-pressed="${selNode===k}"><span class="nr">${N.r}</span><span class="nn">${N.n}</span></button>`;
+    if(k==="kavya")h+=`<span class="sidearrow">${up?"\u2190":"\u2192"}<br><small>${SIDE[flow]}</small></span><button class="node nside" data-node="nith" aria-pressed="${selNode==="nith"}"><span class="nr">Stockist</span><span class="nn">Nithansh Stockists</span></button>`;
+    h+=`</li>`;
+    if(i<MAIN.length-1){const none=flow==="money"&&i===3;h+=`<li class="lk${none?" none":""}"><span class="ar" aria-hidden="true">${up?"\u2191":"\u2193"}</span><span class="ll">${LINKS[flow][i]}</span></li>`;}
+  });
+  ch.innerHTML=h;
+  const N=NODES[selNode];
+  $("#node-detail").innerHTML=`<h3 style="margin-top:0">${N.n}</h3><p style="margin-bottom:0">${N.note}</p><dl><dt>Type of node</dt><dd>${N.r}</dd><dt>Owns the stock?</dt><dd>${N.own}</dd><dt>Stock held</dt><dd>${N.hold}</dd><dt>Gets stock from</dt><dd>${N.from}</dd></dl>`;
+}
+$("#chain").addEventListener("click",ev=>{const b=ev.target.closest(".node");if(!b)return;selNode=b.dataset.node;drawChain();
+  if(window.innerWidth<=900)$("#node-detail").scrollIntoView({behavior:"smooth",block:"nearest"});});
+$$(".flowbar [data-flow]").forEach(b=>b.addEventListener("click",()=>{flow=b.dataset.flow;$$(".flowbar [data-flow]").forEach(x=>x.setAttribute("aria-pressed",x===b));drawChain();}));
+drawChain();
+
+/* activity: name the node (dropdowns with pattern-free answer positions) */
+(function(){
+  const TYPES=["Manufacturer","C&F agent","Distributor","Stockist","Warehouse","Retailer","Transporter"];
+  const ITEMS=[
+    ["Buys raw toor from the mandi, splits it into dal and packs it in 1 kg packs.","Manufacturer"],
+    ["Stores the mill's stock in the region and dispatches it on the mill's instructions, earning a commission. It never owns the stock.","C&F agent"],
+    ["Buys stock from the mill, keeps it in its godown and sells to large retailers on 30 days' credit.","Distributor"],
+    ["Buys small lots and supplies kirana shops in nearby towns.","Stockist"],
+    ["Holds stock for all three Dhanvanshi branches and sends a milk-run truck to them every day.","Warehouse"],
+    ["Moves goods between the other parties but never buys or sells them.","Transporter"],
+    ["Sells toor dal to households at the billing counter.","Retailer"]
+  ];
+  const pos=positions(ITEMS.length,TYPES.length);
+  const box=$("#match");
+  box.innerHTML=ITEMS.map((it,i)=>{
+    const others=shuffle(TYPES.filter(t=>t!==it[1]));others.splice(pos[i],0,it[1]);
+    return `<div class="match"><label for="mt-${i}">${i+1}. ${it[0]}</label><select id="mt-${i}" data-ans="${it[1].replace("&","&amp;")}"><option value="">Choose&hellip;</option>${others.map(o=>`<option>${o.replace("&","&amp;")}</option>`).join("")}</select></div>`;
+  }).join("")+`<div class="row" style="margin-top:12px"><button class="btn primary" id="mt-check">Check answers</button><button class="btn" id="mt-reset">Clear</button><span class="fb" id="mt-fb" aria-live="polite"></span></div>`;
+  $("#mt-check").addEventListener("click",()=>{let c=0,n=0;$$("#match select").forEach(s=>{s.classList.remove("right","wrong");if(!s.value)return;n++;const ok=s.value===s.dataset.ans;if(ok)c++;s.classList.add(ok?"right":"wrong");});
+    const fb=$("#mt-fb");if(!n){fb.className="fb no";fb.textContent="Choose an answer for at least one description.";return;}
+    fb.className="fb "+(c===ITEMS.length?"ok":"no");fb.textContent=c===ITEMS.length?"All 7 correct.":`${c} of ${ITEMS.length} correct${n<ITEMS.length?` (${ITEMS.length-n} not answered)`:""}. Fix the ones marked in red.`;});
+  $("#mt-reset").addEventListener("click",()=>{$$("#match select").forEach(s=>{s.value="";s.classList.remove("right","wrong");});$("#mt-fb").textContent="";});
+})();
+
+/* ---------- chapter 2 ---------- */
+function ftl(){
+  const kg=+$("#ftl-kg").value,p=kg*3,t=18000;$("#ftl-kg-out").textContent=IN(kg)+" kg";
+  $("#ftl-out").innerHTML=kpi("PTL cost",R(p),p<t?"good":"")+kpi("FTL cost",R(t),t<p?"good":"")+kpi("PTL cost per kg","\u20B93.00")+kpi("FTL cost per kg","\u20B9"+f(t/kg,2));
+  $("#ftl-msg").textContent=p<t?`PTL is cheaper by ${R(t-p)}. Below 6,000 kg, pay by the kg.`:p>t?`FTL is cheaper by ${R(p-t)}. Above 6,000 kg, book the full truck.`:"At 6,000 kg both options cost the same.";
+}
+$("#ftl-kg").addEventListener("input",ftl);ftl();
+
+const BR=[{n:"Gandhi Chowk",s:60,d:55},{n:"Station Road",s:90,d:40},{n:"Civil Lines",s:20,d:25}];
+const TRUCK=250,NEXT=4;
+(function(){
+  const box=$("#alloc-sliders");
+  box.innerHTML=BR.map((b,i)=>`<div class="ctrl"><label for="al-${i}">Send to ${b.n}</label><input type="range" id="al-${i}" min="0" max="${TRUCK}" step="10" value="0"><output id="al-${i}-out"></output></div>`).join("");
+  const sl=BR.map((_,i)=>$("#al-"+i));
+  const draw=reg(function(){
+    const a=sl.map(s=>+s.value),left=TRUCK-a.reduce((x,y)=>x+y,0);
+    a.forEach((v,i)=>$(`#al-${i}-out`).textContent=v+" packs");
+    $("#alloc-left").textContent=left>0?`${left} packs still to be allocated.`:"All 250 packs allocated.";
+    const cov=BR.map((b,i)=>(b.s+a[i])/b.d);
+    const el=$("#alloc-chart"),F=frame(el,60+BR.length*46,0,Math.max(6,Math.ceil(Math.max(...cov))),0,1,{l:108,b:30,t:8});
+    let g=niceTicks(0,F.x1,6).map(v=>`<line class="g-grid" x1="${F.sx(v)}" x2="${F.sx(v)}" y1="${F.m.t}" y2="${F.h-F.m.b}"/><text class="g-t" x="${F.sx(v)}" y="${F.h-F.m.b+16}" text-anchor="middle">${v}</text>`).join("");
+    BR.forEach((b,i)=>{const y=F.m.t+10+i*46,w=F.sx(cov[i])-F.sx(0);g+=`<text class="g-tl" x="${F.m.l-8}" y="${y+18}" text-anchor="end">${b.n}</text><rect x="${F.sx(0)}" y="${y}" width="${Math.max(0,w)}" height="26" rx="4" class="${cov[i]<NEXT?"f-neg":"f-info"}"/><text class="g-tl" x="${F.sx(cov[i])+6}" y="${y+18}">${f(cov[i],1)} days</text>`;});
+    g+=`<line class="g-rop" x1="${F.sx(NEXT)}" x2="${F.sx(NEXT)}" y1="${F.m.t}" y2="${F.h-F.m.b}"/><text class="g-t" x="${F.sx(NEXT)+4}" y="${F.m.t+8}">next truck</text>`;
+    el.innerHTML=svg(F,g,"Days of cover by branch")+`<div class="cap">Days of cover after today's delivery = (stock now + packs sent) &divide; daily demand. Red bars run out before the next truck.</div>`;
+    const short=BR.filter((b,i)=>cov[i]<NEXT);
+    const lost=BR.reduce((s,b,i)=>s+Math.max(0,NEXT*b.d-(b.s+a[i])),0);
+    $("#alloc-msg").innerHTML=short.length?`${short.map(b=>b.n).join(", ")} will run out before the next truck. Expected packs short across branches: <b>${IN(Math.round(lost))}</b>.${left>0?" Allocate the remaining packs first.":""}`:"Every branch has enough stock to last until the next truck.";
+  });
+  sl.forEach((s,i)=>s.addEventListener("input",()=>{const others=sl.reduce((t,x,j)=>t+(j===i?0:+x.value),0);if(+s.value>TRUCK-others)s.value=TRUCK-others;draw();}));
+  const set=v=>{v.forEach((x,i)=>sl[i].value=x);draw();};
+  $("#alloc-eq").addEventListener("click",()=>set([80,80,90]));
+  $("#alloc-fair").addEventListener("click",()=>{
+    const tot=BR.reduce((s,b)=>s+b.s,0)+TRUCK,dd=BR.reduce((s,b)=>s+b.d,0),days=tot/dd;
+    let v=BR.map(b=>Math.max(0,Math.round((days*b.d-b.s)/10)*10));const diff=TRUCK-v.reduce((x,y)=>x+y,0);v[2]+=diff;set(v);});
+  $("#alloc-reset").addEventListener("click",()=>set([0,0,0]));
+  draw();
+})();
+
+/* ---------- chapter 3 ---------- */
+const TD={d:120,sd:24,L:5,cost:140,S:1500,hp:0.24};TD.D=TD.d*365;TD.H=TD.cost*TD.hp;
+const sawDraw=reg(function(){
+  const Q=+$("#saw-q").value,SS=+$("#saw-ss").value;
+  $("#saw-q-out").textContent=IN(Q)+" packs";$("#saw-ss-out").textContent=SS+" packs";
+  const days=60,cyc=Q/TD.d,pts=[];let t=0;
+  while(t<days){pts.push([t,SS+Q]);const e=Math.min(days,t+cyc);pts.push([e,SS+Q-(e-t)*TD.d]);if(e<days)pts.push([e,SS]);t=e;}
+  const el=$("#saw-chart"),ymax=Math.max(1200,Math.ceil((SS+Q)*1.08/100)*100),F=frame(el,250,0,days,0,ymax);
+  const avg=Q/2+SS;
+  let g=yAxis(F,niceTicks(0,ymax,5))+xLabels(F,[0,10,20,30,40,50,60].map(v=>({v,l:"Day "+v})));
+  g+=`<path class="g-stock" d="${path(F,pts)}"/>`;
+  g+=`<line class="g-ss" x1="${F.sx(0)}" x2="${F.sx(days)}" y1="${F.sy(SS)}" y2="${F.sy(SS)}"/>`;
+  g+=`<line class="g-rop" x1="${F.sx(0)}" x2="${F.sx(days)}" y1="${F.sy(avg)}" y2="${F.sy(avg)}"/>`;
+  el.innerHTML=svg(F,g,"Sawtooth stock pattern")+`<div class="lg"><span><i style="border-color:var(--info)"></i>Stock level</span><span><i class="d" style="border-color:var(--ink)"></i>Average inventory</span><span><i class="d" style="border-color:var(--pos)"></i>Safety stock</span></div>`;
+  const n=TD.D/Q;
+  $("#saw-kpis").innerHTML=kpi("Orders per year",f(n,1))+kpi("Days between orders",f(Q/TD.d,1))+kpi("Average inventory",IN(Math.round(avg))+" packs")+kpi("Annual ordering cost",R(n*TD.S))+kpi("Annual holding cost",R(avg*TD.H))+kpi("Total",R(n*TD.S+avg*TD.H));
+  costDraw(Q);
+});
+function costDraw(Qcur){
+  const el=$("#cost-chart"),qs=[];for(let q=200;q<=5000;q+=50)qs.push(q);
+  const oc=q=>TD.D/q*TD.S,hc=q=>q/2*TD.H;
+  const F=frame(el,260,200,5000,0,160000,{l:62});
+  let g=yAxis(F,niceTicks(0,160000,4),v=>"\u20B9"+IN(v/1000)+"k")+xLabels(F,[1000,2000,3000,4000,5000].map(v=>({v,l:IN(v)})));
+  const clip=v=>Math.min(v,160000);
+  g+=`<path class="g-ord" d="${path(F,qs.map(q=>[q,clip(oc(q))]))}"/><path class="g-hold" d="${path(F,qs.map(q=>[q,clip(hc(q))]))}"/><path class="g-tot" d="${path(F,qs.map(q=>[q,clip(oc(q)+hc(q))]))}"/>`;
+  const qc=Math.max(200,Math.min(5000,Qcur));
+  g+=`<line class="g-rop" x1="${F.sx(qc)}" x2="${F.sx(qc)}" y1="${F.m.t}" y2="${F.h-F.m.b}"/><circle cx="${F.sx(qc)}" cy="${F.sy(clip(oc(qc)+hc(qc)))}" r="5" class="f-ink"/><text class="g-t" x="${F.sx(qc)+6}" y="${F.m.t+10}">Q = ${IN(Qcur)}</text>`;
+  el.innerHTML=svg(F,g,"Ordering, holding and total cost against order quantity")+`<div class="lg"><span><i style="border-color:var(--neg)"></i>Ordering cost</span><span><i style="border-color:var(--info)"></i>Holding cost (cycle stock)</span><span><i style="border-color:var(--ink)"></i>Total</span></div><div class="cap">Order quantity (packs) on the horizontal axis. The marker moves with the order quantity slider above.</div>`;
+}
+["saw-q","saw-ss"].forEach(id=>$("#"+id).addEventListener("input",sawDraw));sawDraw();
+
+/* ---------- chapter 4 ---------- */
+function ltDraw(){
+  const v=[1,2,3,4].map(i=>+$("#lt-"+i).value);v.forEach((x,i)=>$(`#lt-${i+1}-out`).textContent=x+(x===1?" day":" days"));
+  const L=v.reduce((a,b)=>a+b,0);
+  $("#lt-out").innerHTML=`<div class="eq">Lead time L = ${v.join(" + ")} = <b>${L} days</b></div><div class="eq">Lead-time demand = d &times; L = 120 &times; ${L} = <b>${IN(120*L)} packs</b></div><p class="interp" style="margin:0">Madavi Warehouse needs at least ${IN(120*L)} packs in stock when it places the order, or it will run short before the delivery arrives.${L>5?` Each extra day of lead time needs 120 more packs of stock.`:""}</p>`;
+}
+[1,2,3,4].forEach(i=>$("#lt-"+i).addEventListener("input",ltDraw));ltDraw();
+
+const MQP={toor:{req:1130,cs:20,moq:500,d:120,c:140},hing:{req:60,cs:24,moq:240,d:4,c:100}};
+function mqSet(k){const p=MQP[k];$("#mq-req").value=p.req;$("#mq-case").value=p.cs;$("#mq-moq").value=p.moq;$("#mq-d").value=p.d;$("#mq-cost").value=p.c;mqDraw();}
+function mqDraw(){
+  const req=+$("#mq-req").value,cs=+$("#mq-case").value,moq=+$("#mq-moq").value,d=+$("#mq-d").value,c=+$("#mq-cost").value,out=$("#mq-out");
+  if(!(req>0&&cs>0&&moq>=0&&d>0&&c>=0)){out.innerHTML=`<p class="err">Enter a positive value in every box.</p>`;return;}
+  const cases=Math.ceil(req/cs),byCase=cases*cs,moqR=Math.ceil(moq/cs)*cs,q=Math.max(byCase,moqR),ex=q-req,bind=moqR>byCase;
+  out.innerHTML=`<div class="eq">Cases needed = ${fr(IN(req),IN(cs))} = ${f(req/cs,2)} &rarr; <b>${cases} cases</b> = ${IN(byCase)} packs</div>
+  <div class="eq">MoQ = ${IN(moq)} packs${moqR!==moq?` &rarr; ${IN(moqR)} packs in full cases`:""}</div>
+  <div class="eq">Order quantity = larger of (${IN(byCase)}, ${IN(moqR)}) = <b>${IN(q)} packs</b> ${bind?'<span class="pill neg">MoQ decides</span>':'<span class="pill pos">Requirement decides</span>'}</div>
+  <div class="kpis">${kpi("Extra packs over requirement",IN(ex))+kpi("Extra days of stock",f(ex/d,1),ex/d>30?"bad":"")+kpi("Money blocked in extra stock",R(ex*c))}</div>`;
+}
+$$("[data-moq]").forEach(b=>b.addEventListener("click",()=>mqSet(b.dataset.moq)));
+["mq-req","mq-case","mq-moq","mq-d","mq-cost"].forEach(id=>$("#"+id).addEventListener("input",mqDraw));
+mqSet("toor");
+
+/* ---------- chapter 5 ---------- */
+const slDraw=reg(function(){
+  const sl=+$("#sl").value,z=Z(sl),sdL=TD.sd*Math.sqrt(TD.L),ss=Math.ceil(z*sdL),rop=TD.d*TD.L+ss,mu=TD.d*TD.L;
+  $("#sl-out").textContent=f(sl,1)+"%";
+  const el=$("#sl-chart"),F=frame(el,240,mu-4*sdL,mu+4*sdL,0,npdf(0)*1.12,{l:20,r:20,b:34});
+  const xs=[];for(let x=-4;x<=4.0001;x+=0.05)xs.push(x);
+  const P=x=>[mu+x*sdL,npdf(x)];
+  const zc=Math.min(4,z);
+  const left=xs.filter(x=>x<=zc).map(P).concat([P(zc)]),right=[P(zc)].concat(xs.filter(x=>x>zc).map(P));
+  const area=pts=>path(F,[[pts[0][0],0]].concat(pts,[[pts[pts.length-1][0],0]]))+"Z";
+  let g=`<path class="f-posbg" d="${area(left)}"/>${right.length>1?`<path class="f-negbg" d="${area(right)}"/>`:""}<path class="g-hold" d="${path(F,xs.map(P))}"/>`;
+  g+=`<line class="g-grid" x1="${F.m.l}" x2="${F.W-F.m.r}" y1="${F.sy(0)}" y2="${F.sy(0)}"/>`;
+  [-3,-2,-1,0,1,2,3].forEach(k=>{const v=mu+k*sdL;g+=`<text class="g-t" x="${F.sx(v)}" y="${F.h-F.m.b+16}" text-anchor="middle">${IN(Math.round(v))}</text>`;});
+  g+=`<line class="g-rop" x1="${F.sx(mu)}" x2="${F.sx(mu)}" y1="${F.sy(0)}" y2="${F.sy(npdf(0))}"/>`;
+  g+=`<line class="g-tot" x1="${F.sx(mu+zc*sdL)}" x2="${F.sx(mu+zc*sdL)}" y1="${F.sy(0)}" y2="${F.m.t}"/><text class="g-tl" x="${F.sx(mu+zc*sdL)+(z>2.6?-6:6)}" y="${F.m.t+12}" text-anchor="${z>2.6?"end":"start"}">ROP ${IN(rop)} (Z = ${f(z,2)})</text>`;
+  el.innerHTML=svg(F,g,"Distribution of demand during lead time")+`<div class="cap">Demand during the 5-day lead time: average ${IN(mu)} packs, standard deviation 24 &times; &radic;5 = ${f(sdL,1)} packs. Green area: cycles with no stock-out (${f(sl,1)}%). Red area: cycles with a stock-out.</div>`;
+  const orders=TD.D/1980;
+  $("#sl-kpis").innerHTML=kpi("Z value",f(z,2))+kpi("Safety stock",IN(ss)+" packs")+kpi("Reorder point",IN(rop)+" packs")+kpi("Holding cost of safety stock",R(ss*TD.H)+" a year")+kpi("Stock-out cycles a year",f((1-sl/100)*orders,1));
+  $("#sl-msg").textContent=`With about ${Math.round(orders)} orders a year, a ${f(sl,1)}% service level means roughly ${f((1-sl/100)*orders,1)} cycles a year in which the warehouse runs out before the next delivery.`;
+});
+$("#sl").addEventListener("input",slDraw);
+
+/* ---------- chapter 6: simulator ---------- */
+let simSeed=20261005;
+function simulate(o){
+  const rnd=mulberry32(o.seed),gauss=()=>{let u=0,v=0;while(u===0)u=rnd();v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+  const ss=Math.ceil(Z(o.sl)*o.sd*Math.sqrt(o.L)),rop=o.d*o.L+ss;
+  let oh=rop+Math.round(o.Q/2);const pipe=[],days=[];let orders=0;
+  for(let t=1;t<=60;t++){
+    let arr=0;for(let i=pipe.length-1;i>=0;i--)if(pipe[i].day===t){arr+=pipe[i].q;pipe.splice(i,1);}
+    oh+=arr;
+    const dem=Math.max(0,Math.round(o.d+o.sd*gauss())),sold=Math.min(oh,dem),lost=dem-sold;oh-=sold;
+    let placed=0,guard=0;
+    while(oh+pipe.reduce((s,p)=>s+p.q,0)<=rop&&guard<10){const late=o.late?[0,0,0,1,2][Math.floor(rnd()*5)]:0;pipe.push({day:t+o.L+late+1,q:o.Q});placed+=o.Q;orders++;guard++;}
+    days.push({t,oh,dem,sold,lost,arr,placed});
+  }
+  return {ss,rop,days,orders};
+}
+const simDraw=reg(function(){
+  const o={d:120,sd:+$("#sim-sd").value,L:+$("#sim-l").value,Q:+$("#sim-q").value,sl:+$("#sim-sl").value,late:$("#sim-late").checked,seed:simSeed};
+  $("#sim-sl-out").textContent=f(o.sl,1)+"%";$("#sim-q-out").textContent=IN(o.Q)+" packs";$("#sim-l-out").textContent=o.L+(o.L===1?" day":" days");$("#sim-sd-out").textContent=o.sd+" packs";
+  const r=simulate(o),D=r.days;
+  $("#sim-set").textContent=`Safety stock ${IN(r.ss)} packs, reorder point ${IN(r.rop)} packs.`;
+  const ymax=Math.ceil(Math.max(r.rop,...D.map(x=>x.oh+x.sold))*1.1/100)*100;
+  const el=$("#sim-chart"),F=frame(el,280,0,60,0,ymax,{b:34});
+  let g=yAxis(F,niceTicks(0,ymax,5))+xLabels(F,[1,10,20,30,40,50,60].map(v=>({v,l:v})));
+  D.forEach(x=>{if(x.lost>0)g+=`<rect class="f-negbg" x="${F.sx(x.t-1)}" y="${F.m.t}" width="${F.sx(1)-F.sx(0)}" height="${F.h-F.m.b-F.m.t}"/>`;});
+  g+=`<line class="g-rop" x1="${F.sx(0)}" x2="${F.sx(60)}" y1="${F.sy(r.rop)}" y2="${F.sy(r.rop)}"/><line class="g-ss" x1="${F.sx(0)}" x2="${F.sx(60)}" y1="${F.sy(r.ss)}" y2="${F.sy(r.ss)}"/>`;
+  const pts=[];let prev=D[0].oh+D[0].sold-D[0].arr;pts.push([0,prev]);
+  D.forEach(x=>{const start=x.oh+x.sold;if(x.arr)pts.push([x.t-1,start]);pts.push([x.t,x.oh]);});
+  g+=`<path class="g-stock" d="${path(F,pts)}"/>`;
+  D.forEach(x=>{if(x.placed){const X=F.sx(x.t),Y=F.h-F.m.b;g+=`<path class="f-ink" d="M${X-5},${Y} L${X+5},${Y} L${X},${Y-9}Z"><title>Day ${x.t}: order placed</title></path>`;}
+    if(x.arr){const X=F.sx(x.t-1);g+=`<circle class="f-pos" cx="${X}" cy="${F.sy(x.oh+x.sold)}" r="4.5"><title>Day ${x.t}: ${IN(x.arr)} packs received</title></circle>`;}});
+  g+=`<text class="g-t" x="${F.W-F.m.r}" y="${F.sy(r.rop)-5}" text-anchor="end">ROP ${IN(r.rop)}</text>`;
+  el.innerHTML=svg(F,g,"Stock at Madavi Warehouse over 60 days")+`<div class="lg"><span><i style="border-color:var(--info)"></i>Stock in hand</span><span><i class="d" style="border-color:var(--ink)"></i>Reorder point</span><span><i class="d" style="border-color:var(--pos)"></i>Safety stock</span><span>&#9650; Order placed</span><span><b class="sq" style="background:var(--pos);border-radius:50%"></b>Delivery received</span><span><b class="sq" style="background:var(--neg-bg)"></b>Stock-out day</span></div>`;
+  const dem=D.reduce((s,x)=>s+x.dem,0),sold=D.reduce((s,x)=>s+x.sold,0),so=D.filter(x=>x.lost>0).length,avg=D.reduce((s,x)=>s+x.oh,0)/60;
+  $("#sim-kpis").innerHTML=kpi("Orders placed",r.orders)+kpi("Stock-out days",so,so?"bad":"good")+kpi("Packs not supplied",IN(dem-sold),dem-sold?"bad":"good")+kpi("Fill rate",f(sold/dem*100,1)+"%")+kpi("Average stock",IN(Math.round(avg))+" packs");
+  $("#sim-msg").textContent=so?`Stock ran out on ${so} day${so>1?"s":""}. Customers asked for ${IN(dem)} packs and ${IN(sold)} were supplied.`:`No stock-outs in these 60 days. Average stock was ${IN(Math.round(avg))} packs, worth about ${R(avg*140)}.`;
+});
+["sim-sl","sim-q","sim-l","sim-sd"].forEach(id=>$("#"+id).addEventListener("input",simDraw));
+$("#sim-late").addEventListener("change",simDraw);
+$("#sim-run").addEventListener("click",()=>{simSeed=Math.floor(Math.random()*1e9);simDraw();});
+
+/* ---------- chapter 7: forecasting ---------- */
+const MON=["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+const SALES=[3480,3560,3420,3590,3650,3610,4380,3930,3640,3700,3560,3760];
+$("#fc-data").innerHTML=`<tr><th>Month</th><th class="num">Packs sold</th><th>Month</th><th class="num">Packs sold</th></tr>`+[0,1,2,3,4,5].map(i=>`<tr><td>${MON[i]} 2025</td><td class="num">${IN(SALES[i])}</td><td>${MON[i+6]} ${i<3?"2025":"2026"}</td><td class="num">${IN(SALES[i+6])}</td></tr>`).join("");
+function forecast(m,n,al){ // returns array of length 13 (index 12 = next April)
+  const F=new Array(13).fill(null);
+  if(m==="ma")for(let t=n;t<=12;t++){let s=0;for(let k=1;k<=n;k++)s+=SALES[t-k];F[t]=s/n;}
+  if(m==="wma")for(let t=3;t<=12;t++)F[t]=0.5*SALES[t-1]+0.3*SALES[t-2]+0.2*SALES[t-3];
+  if(m==="ses"){F[1]=SALES[0];for(let t=2;t<=12;t++)F[t]=al*SALES[t-1]+(1-al)*F[t-1];}
+  return F;
+}
+function errs(F){let a=0,p=0,b=0;for(let t=6;t<12;t++){const e=SALES[t]-F[t];a+=Math.abs(e);p+=Math.abs(e)/SALES[t];b+=e;}return {mae:a/6,mape:p/6*100,bias:b/6};}
+let fcM="ma";
+const NAMES={ma:"Moving average",wma:"Weighted moving average",ses:"Exponential smoothing"};
+const fcDraw=reg(function(){
+  const n=+$("#fc-n").value,al=+$("#fc-a").value;
+  $("#fc-n-out").textContent=n+" months";$("#fc-a-out").textContent=f(al,2);
+  $("#fc-n-row").style.display=fcM==="ma"?"":"none";$("#fc-a-row").style.display=fcM==="ses"?"":"none";
+  const Fc=forecast(fcM,n,al),E=errs(Fc);
+  const el=$("#fc-chart"),F=frame(el,270,-0.5,12.5,3000,4600,{l:52});
+  let g=`<rect class="f-shade" x="${F.sx(5.5)}" y="${F.m.t}" width="${F.sx(11.5)-F.sx(5.5)}" height="${F.h-F.m.b-F.m.t}"/>`;
+  g+=yAxis(F,niceTicks(3000,4600,5))+xLabels(F,MON.concat(["Apr*"]).map((l,i)=>({v:i,l})));
+  g+=`<text class="g-t" x="${F.sx(8.5)}" y="${F.m.t+12}" text-anchor="middle">error measured here</text>`;
+  g+=`<path class="g-stock" d="${path(F,SALES.map((v,i)=>[i,v]))}"/>`+SALES.map((v,i)=>`<circle class="f-info" cx="${F.sx(i)}" cy="${F.sy(v)}" r="3.5"/>`).join("");
+  const fp=Fc.map((v,i)=>v===null?null:[i,v]).filter(Boolean);
+  g+=`<path class="g-fc" d="${path(F,fp)}"/>`+fp.map(p=>`<circle class="f-neg" cx="${F.sx(p[0])}" cy="${F.sy(p[1])}" r="${p[0]===12?6:3}"/>`).join("");
+  g+=`<text class="g-tl" x="${F.sx(12)-8}" y="${F.sy(Fc[12])-12}" text-anchor="end">${IN(Math.round(Fc[12]))}</text>`;
+  el.innerHTML=svg(F,g,"Actual sales and forecast")+`<div class="lg"><span><i style="border-color:var(--info)"></i>Actual sales</span><span><i class="d" style="border-color:var(--neg)"></i>${NAMES[fcM]} forecast</span><span>Apr* = forecast for next April</span></div>`;
+  $("#fc-kpis").innerHTML=kpi("Forecast for April 2026",IN(Math.round(Fc[12]))+" packs")+kpi("Per day (&divide; 30)",f(Fc[12]/30,0)+" packs")+kpi("MAE, Oct to Mar",IN(Math.round(E.mae))+" packs")+kpi("MAPE, Oct to Mar",f(E.mape,1)+"%")+kpi("Bias, Oct to Mar",(E.bias>0?"+":"")+IN(Math.round(E.bias)));
+  const rows=[["ma",`Moving average (n = ${n})`,forecast("ma",n,al)],["wma","Weighted moving average (0.5, 0.3, 0.2)",forecast("wma",n,al)],["ses",`Exponential smoothing (&alpha; = ${f(al,2)})`,forecast("ses",n,al)]].map(r=>({k:r[0],l:r[1],e:errs(r[2]),nx:r[2][12]}));
+  const best=rows.reduce((a,b)=>b.e.mape<a.e.mape?b:a);
+  $("#fc-compare").innerHTML=`<tr><th>Method (current settings)</th><th class="num">MAE</th><th class="num">MAPE</th><th class="num">Bias</th><th class="num">April forecast</th></tr>`+rows.map(r=>`<tr class="${r===best?"hl":""}"><td>${r.l}${r===best?' <span class="pill pos">lowest MAPE</span>':""}</td><td class="num">${IN(Math.round(r.e.mae))}</td><td class="num">${f(r.e.mape,1)}%</td><td class="num">${r.e.bias>0?"+":""}${IN(Math.round(r.e.bias))}</td><td class="num">${IN(Math.round(r.nx))}</td></tr>`).join("");
+});
+$$("#fc-method [data-m]").forEach(b=>b.addEventListener("click",()=>{fcM=b.dataset.m;$$("#fc-method [data-m]").forEach(x=>x.setAttribute("aria-pressed",x===b));fcDraw();}));
+["fc-n","fc-a"].forEach(id=>$("#"+id).addEventListener("input",fcDraw));
+
+/* ---------- chapter 8 ---------- */
+function kpDraw(){
+  const o=+$("#kp-open").value,c=+$("#kp-close").value,g=+$("#kp-cogs").value,d=+$("#kp-days").value,out=$("#kp-out");
+  if(!(o>=0&&c>=0&&g>0&&d>0)){out.innerHTML=`<p class="err">Enter positive values. COGS and days must be above zero.</p>`;return;}
+  const avg=(o+c)/2,turn=g/avg,doi=avg/g*d;
+  out.innerHTML=`<div class="eq">Average inventory = ${fr(`${IN(o,1)} + ${IN(c,1)}`,"2")} = <b>&#8377;${IN(avg,2)} lakh</b></div>
+  <div class="eq">Inventory turnover = ${fr(IN(g,1),IN(avg,2))} = <b>${f(turn,2)} times</b> in ${IN(d)} days</div>
+  <div class="eq">DOI = ${fr(IN(avg,2),IN(g,1))} &times; ${IN(d)} = <b>${f(doi,1)} days</b></div>`;
+}
+["kp-open","kp-close","kp-cogs","kp-days"].forEach(id=>$("#"+id).addEventListener("input",kpDraw));kpDraw();
+
+const ABC=[["Basmati Rice 5 kg",96,7.9],["Sunflower Oil 1 L",84,5.5],["Toor Dal 1 kg",61.3,4.0],["Ghee 1 L",54,5.3],["Atta 10 kg",45,2.4],["Sugar 1 kg",32,2.2],["Tea 250 g",21,1.9],["Cashew 500 g",18,3.2],["Detergent Powder 1 kg",12.5,1.1],["Moong Dal 1 kg",11,0.9],["Chana Dal 1 kg",9.5,0.85],["Toothpaste 150 g",7.2,0.7],["Bathing Soap (pack of 4)",6.4,0.6],["Poha 1 kg",5.1,0.5],["Besan 500 g",4.2,0.35],["Jaggery 1 kg",3.3,0.45],["Hing 50 g",2.4,0.6],["Papad 200 g",1.8,0.45],["Agarbatti (pack)",1.2,0.4],["Rock Salt 1 kg",0.8,0.3]];
+const abcDraw=reg(function(){
+  let A=+$("#abc-a").value,B=+$("#abc-b").value;if(B<=A){B=A+1;$("#abc-b").value=B;}
+  const slow=+$("#abc-slow").value;
+  $("#abc-a-out").textContent=A+"%";$("#abc-b-out").textContent=B+"%";$("#abc-slow-out").textContent=slow+" days";
+  const tot=ABC.reduce((s,x)=>s+x[1],0),totS=ABC.reduce((s,x)=>s+x[2],0);let cum=0;
+  const rows=ABC.slice().sort((a,b)=>b[1]-a[1]).map(x=>{const sh=x[1]/tot*100,before=cum;cum+=sh;return {n:x[0],v:x[1],s:x[2],sh,cum,cls:before<A?"A":before<B?"B":"C",doi:x[2]/(x[1]/365)};});
+  const el=$("#abc-chart"),F=frame(el,260,-0.5,rows.length-0.5,0,100,{l:40,r:40,b:22});
+  const vmax=Math.ceil(rows[0].v/20)*20,bw=(F.sx(1)-F.sx(0))*0.7;
+  let g=yAxis(F,[0,25,50,75,100],v=>v+"%");
+  rows.forEach((r,i)=>{const h=r.v/vmax*100;g+=`<rect class="${r.cls==="A"?"f-info":r.cls==="B"?"f-acc":"f-mut"}" x="${F.sx(i)-bw/2}" y="${F.sy(h)}" width="${bw}" height="${F.sy(0)-F.sy(h)}" rx="2"><title>${r.n}: &#8377;${r.v} lakh</title></rect>`;});
+  g+=`<path class="g-tot" d="${path(F,rows.map((r,i)=>[i,r.cum]))}"/>`+rows.map((r,i)=>`<circle class="f-ink" cx="${F.sx(i)}" cy="${F.sy(r.cum)}" r="2.6"/>`).join("");
+  [A,B].forEach(c=>g+=`<line class="g-rop" x1="${F.m.l}" x2="${F.W-F.m.r}" y1="${F.sy(c)}" y2="${F.sy(c)}"/><text class="g-t" x="${F.W-F.m.r+4}" y="${F.sy(c)+4}">${c}%</text>`);
+  el.innerHTML=svg(F,g,"Pareto chart of annual consumption value")+`<div class="lg"><span><b class="sq" style="background:var(--info)"></b>Class A</span><span><b class="sq" style="background:var(--accent)"></b>Class B</span><span><b class="sq" style="background:var(--frame)"></b>Class C</span><span><i style="border-color:var(--ink)"></i>Cumulative % of value (left axis)</span></div><div class="cap">Bars show annual consumption value of each item, largest first (highest bar = &#8377;${rows[0].v} lakh).</div>`;
+  const sum=k=>{const r=rows.filter(x=>x.cls===k);return {n:r.length,v:r.reduce((s,x)=>s+x.v,0)};};
+  $("#abc-sum").innerHTML=["A","B","C"].map(k=>{const s=sum(k);return kpi(`Class ${k}: ${s.n} items (${f(s.n/rows.length*100,0)}% of items)`,f(s.v/tot*100,1)+"% of value");}).join("")+kpi("Overall DOI of the warehouse",f(totS/(tot/365),1)+" days");
+  $("#abc-tbl").innerHTML=`<tr><th>Rank</th><th>Item</th><th class="num">Annual value</th><th class="num">Share</th><th class="num">Cumulative</th><th>Class</th><th class="num">Stock</th><th class="num">DOI (days)</th></tr>`+rows.map((r,i)=>`<tr class="${r.doi>slow?"warn":""}"><td>${i+1}</td><td>${r.n}</td><td class="num">${f(r.v,1)}</td><td class="num">${f(r.sh,1)}%</td><td class="num">${f(r.cum,1)}%</td><td><span class="cls ${r.cls}">${r.cls}</span></td><td class="num">${f(r.s,2)}</td><td class="num">${f(r.doi,0)}${r.doi>slow?" &#9888;":""}</td></tr>`).join("")+`<tr><td></td><td><b>Total</b></td><td class="num"><b>${f(tot,1)}</b></td><td class="num">100%</td><td></td><td></td><td class="num"><b>${f(totS,2)}</b></td><td class="num"><b>${f(totS/(tot/365),0)}</b></td></tr>`;
+  const fl=rows.filter(r=>r.doi>slow);
+  $("#abc-msg").innerHTML=fl.length?`${fl.length} item${fl.length>1?"s have":" has"} more than ${slow} days of stock: ${fl.map(r=>`${r.n} (${r.cls}, ${f(r.doi,0)} days)`).join(", ")}. Together they block &#8377;${f(fl.reduce((s,r)=>s+r.s,0),2)} lakh.`:`No item has more than ${slow} days of stock.`;
+});
+["abc-a","abc-b","abc-slow"].forEach(id=>$("#"+id).addEventListener("input",abcDraw));
+
+/* ---------- chapter 9: capstone ---------- */
+const CAP=[
+  {n:"Toor Dal 1 kg",u:"packs",d:120,sd:24,L:5,oh:720,oo:0,c:140,cs:20,moq:500},
+  {n:"Basmati Rice 5 kg",u:"bags",d:42,sd:10,L:7,oh:320,oo:0,c:620,cs:4,moq:100},
+  {n:"Sunflower Oil 1 L",u:"bottles",d:150,sd:35,L:6,oh:700,oo:1200,c:155,cs:12,moq:600},
+  {n:"Sugar 1 kg",u:"packs",d:200,sd:45,L:3,oh:480,oo:0,c:44,cs:30,moq:1500},
+  {n:"Ghee 1 L",u:"cans",d:30,sd:8,L:8,oh:270,oo:0,c:620,cs:12,moq:600}
+];
+let capSL=95;
+(function(){
+  $("#cap-sl").innerHTML=[90,95,98,99].map(v=>`<button class="btn" data-sl="${v}" aria-pressed="${v===capSL}">${v}%</button>`).join("");
+  $$("#cap-sl [data-sl]").forEach(b=>b.addEventListener("click",()=>{capSL=+b.dataset.sl;$$("#cap-sl [data-sl]").forEach(x=>x.setAttribute("aria-pressed",x===b));capDraw();}));
+  const F=[["d","Forecast per day"],["sd","&sigma;<sub>d</sub>"],["L","Lead time"],["oh","In hand"],["oo","On order"]];
+  $("#cap-in").innerHTML=`<tr><th>Item</th>${F.map(x=>`<th class="num">${x[1]}</th>`).join("")}<th class="num">Unit cost</th><th class="num">Case</th><th class="num">MoQ</th></tr>`+
+    CAP.map((it,i)=>`<tr><td>${it.n}<br><span class="small">${it.u}</span></td>${F.map(x=>`<td class="num cap-in"><input type="number" min="0" step="1" data-i="${i}" data-k="${x[0]}" value="${it[x[0]]}" aria-label="${it.n}: ${x[1].replace(/<[^>]+>/g,"")}"></td>`).join("")}<td class="num">${R(it.c)}</td><td class="num">${it.cs}</td><td class="num">${IN(it.moq)}</td></tr>`).join("");
+  $("#cap-in").addEventListener("input",ev=>{const t=ev.target;if(!t.dataset.k)return;const v=parseFloat(t.value);CAP[+t.dataset.i][t.dataset.k]=isFinite(v)&&v>=0?v:0;capDraw();});
+})();
+function capDraw(){
+  const z=Z(capSL);let tot=0,nOrd=0,risk=0;
+  const rows=CAP.map(it=>{
+    const ss=Math.ceil(z*it.sd*Math.sqrt(it.L)),rop=it.d*it.L+ss,ip=it.oh+it.oo,need=ip<=rop;
+    const D=365*it.d,H=0.24*it.c,eoq=it.d>0?Math.sqrt(2*D*1500/H):0,eoqR=Math.ceil(eoq/it.cs)*it.cs,q=need?Math.max(eoqR,Math.ceil(it.moq/it.cs)*it.cs):0;
+    const before=ip-it.d*it.L,after=before+q,cover=it.d>0?Math.max(0,after)/it.d:0;
+    if(need){tot+=q*it.c;nOrd++;}if(before<0)risk++;
+    return {it,ss,rop,ip,need,eoq,eoqR,q,before,after,cover,moqBind:need&&Math.ceil(it.moq/it.cs)*it.cs>eoqR};
+  });
+  $("#cap-out").innerHTML=`<tr><th>Item</th><th class="num">SS</th><th class="num">ROP</th><th class="num">IP</th><th>Decision</th><th class="num">EOQ</th><th class="num">Order qty</th><th class="num">Order value</th><th class="num">Stock before delivery</th><th class="num">Cover after (days)</th></tr>`+
+  rows.map(r=>`<tr class="${r.before<0?"warn":r.need?"hl":""}"><td>${r.it.n}</td><td class="num">${IN(r.ss)}</td><td class="num">${IN(r.rop)}</td><td class="num">${IN(r.ip)}</td><td>${r.need?'<span class="pill pos">Order now</span>':'<span class="pill mut">No order</span>'}${r.moqBind?' <span class="pill neg">MoQ applies</span>':""}${r.before<0?`<br><span class="small" style="color:var(--neg)">Short by ${IN(Math.round(-r.before))} before delivery</span>`:""}${!r.need&&r.it.d>0?`<br><span class="small">Reaches ROP in ${f((r.ip-r.rop)/r.it.d,1)} days</span>`:""}</td><td class="num">${IN(Math.round(r.eoq))}</td><td class="num">${r.q?IN(r.q):"\u2014"}</td><td class="num">${r.q?R(r.q*r.it.c):"\u2014"}</td><td class="num">${r.need||r.before<0?IN(Math.round(r.before)):"\u2014"}</td><td class="num">${r.need?f(r.cover,1):"\u2014"}</td></tr>`).join("");
+  $("#cap-sum").innerHTML=kpi("Z value",f(z,2))+kpi("Items to order today",nOrd)+kpi("Total order value",R(tot))+kpi("Items at risk of stock-out",risk,risk?"bad":"good");
+}
+capDraw();
+
+/* ---------- chapter 10: practice problems ---------- */
+const T=rows=>`<div class="tbl-wrap"><table>${rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td></tr>`).join("")}</table></div>`;
+const FL=(k,body)=>`<div class="fl"><span class="fk">${k}</span>${body}</div>`;
+const RB=(title,lines)=>`<div class="rb"><p class="rt">${title}</p>${lines.join("")}</div>`;
+const EX=[];
+const addP=(p,q)=>{EX.push(p);if(q){q.id="p"+EX.length;addQ("p"+EX.length,q);p.mcq=q;}};
+
+/* 1 */ addP({title:"Total lead time for cooking oil",biz:"Aman Mart",
+  scenario:"Aman Mart buys sunflower oil from Kavya Distributors. The purchase team has noted how long each step of an order takes.",
+  data:T([["Approval of the purchase order at Aman Mart","1 day"],["Order processing at Kavya Distributors","1 day"],["Picking and dispatch at Kavya's godown","1 day"],["Transit by Niharika Logistics","3 days"],["Unloading, checking and GRN at Aman Mart","1 day"]]),
+  question:"What is the total lead time? If Aman Mart starts the order on Monday, 5 October, on which date will the oil be ready for sale?",
+  check:{label:"Total lead time (days)",ans:7,tol:0},
+  steps:[
+    ["Add all the components",RB("Lead time",[FL("Formula","Lead time = PO approval + order processing + dispatch + transit + receipt"),FL("Working","L = 1 + 1 + 1 + 3 + 1 = <b>7 days</b>")])],
+    ["Find the date",`Monday, 5 October + 7 days = <b>Monday, 12 October</b>. The oil can be sold from that day.`],
+    ["Note what is included","Lead time starts when Aman Mart starts the order, not when Kavya receives it, and ends when the oil is ready to sell, not when the truck arrives. Leaving out the first and last steps would understate the lead time by 2 days, and the reorder point would be too low."]],
+  decision:"Aman Mart can shorten its own part of the lead time. If the store manager is allowed to approve regular orders up to a fixed value, the order reaches Kavya on the same day and the lead time falls to 6 days. That lowers the reorder point by one day's sales. Transit and Kavya's processing time can only be improved by talking to them."},
+  {p:"Which part of the lead time can Aman Mart reduce on its own?",correct:"Approval of the purchase order",wrong:["Transit by Niharika Logistics","Order processing at Kavya Distributors","Picking and dispatch at Kavya's godown"],why:"Approval is Aman Mart's own internal step. The other three are controlled by the supplier or the transporter."});
+
+/* 2 */ addP({title:"Paneer for the central kitchen",biz:"FoodJoe",
+  scenario:"FoodJoe's central kitchen uses about 45 kg of paneer a day. Its dairy supplier delivers 4 days after an order is placed. This morning, the kitchen has 210 kg of paneer.",
+  data:T([["Average daily usage (d)","45 kg"],["Lead time (L)","4 days"],["Stock this morning","210 kg"]]),
+  question:"What is the lead-time demand? Should FoodJoe place the order today, or can it wait until tomorrow?",
+  check:{label:"Lead-time demand (kg)",ans:180,tol:0},
+  steps:[
+    ["Lead-time demand",RB("Lead-time demand",[FL("Formula","Lead-time demand = d &times; L"),FL("Working","= 45 &times; 4 = <b>180 kg</b>")])],
+    ["If the order is placed today","The paneer arrives after 4 days of use. Usage in these 4 days = 180 kg. Stock left when it arrives = 210 &minus; 180 = <b>30 kg</b>."],
+    ["If the order is placed tomorrow","The paneer arrives after 5 days of use. Usage = 45 &times; 5 = 225 kg, but only 210 kg is available. The kitchen will be short by <b>15 kg</b> on the fifth day."]],
+  decision:"FoodJoe must order today. The stock (210 kg) is only a little above the lead-time demand (180 kg). Paneer keeps for only a few days, so FoodJoe cannot hold a large safety stock. A standing daily order with the dairy, adjusted each day, suits a perishable item better than large occasional orders."},
+  {p:"When should FoodJoe place its order?",correct:"Today",wrong:["Tomorrow","Two days from now","When the paneer runs out"],why:"Waiting one day means 5 days of use (225 kg) before the delivery, but only 210 kg is in stock."});
+
+/* 3 */ addP({title:"Tea packs and the MoQ",biz:"Dhanvanshi Super Store",
+  scenario:"Madavi Warehouse needs 430 packs of Tea 250 g to last until the next regular order. Kavya Distributors supplies tea in cases of 36 packs, with a minimum order of 20 cases. The warehouse sells 24 packs a day, and each pack costs &#8377;110.",
+  data:T([["Required quantity","430 packs"],["Case pack","36 packs"],["MoQ","20 cases"],["Average daily sale","24 packs"],["Cost per pack","&#8377;110"]]),
+  question:"How many packs must Madavi Warehouse order? How many extra packs will it hold, how many days will they last, and how much money is blocked in them?",
+  check:{label:"Packs to order",ans:720,tol:0},
+  steps:[
+    ["Round the requirement up to full cases",RB("Case pack rounding",[FL("Formula",`Cases needed = ${fr("Required quantity","Case pack")}, rounded up`),FL("Working",`= ${fr("430","36")} = 11.94 &rarr; <b>12 cases</b> = 432 packs`)])],
+    ["Apply the MoQ",RB("Order quantity",[FL("Formula","Order quantity = larger of (requirement in full cases, MoQ)"),FL("Working","MoQ = 20 &times; 36 = 720 packs. Larger of (432, 720) = <b>720 packs</b>")])],
+    ["Measure the excess",RB("Effect of the MoQ",[FL("Extra packs","720 &minus; 430 = <b>290 packs</b>"),FL("Extra days",`${fr("290","24")} = <b>12.1 days</b> of sales`),FL("Money blocked","290 &times; &#8377;110 = <b>&#8377;31,900</b>")])]],
+  decision:"Tea keeps well, so 12 extra days of stock is acceptable. Still, the warehouse should ask Kavya whether the 20-case MoQ can be met across different tea pack sizes. That way the extra stock would be spread over items that are also needed."});
+
+/* 4 */ addP({title:"Is the bigger MoQ worth the discount?",biz:"Aman Mart",
+  scenario:"Kavya Distributors offers Aman Mart two options for basmati rice (5 kg bags). Option A: MoQ of 100 bags at &#8377;620 a bag. Option B: MoQ of 500 bags at &#8377;600 a bag. Aman Mart sells 100 bags a month. Its ordering cost is &#8377;800 per order and its holding cost is 2% of the item's cost per month. Compare the two options over the next 5 months (500 bags).",
+  data:T([["Monthly demand","100 bags"],["Option A","MoQ 100 bags at &#8377;620"],["Option B","MoQ 500 bags at &#8377;600"],["Ordering cost","&#8377;800 per order"],["Holding cost","2% per month"],["Period","5 months (500 bags)"]]),
+  question:"Find the total cost of each option over 5 months. How much does option B save?",
+  check:{label:"Saving with option B (&#8377;)",ans:1300,tol:1},
+  steps:[
+    ["Formulas used",RB("Cost over the period",[FL("Purchase","Purchase cost = Quantity &times; Price"),FL("Ordering","Ordering cost = Number of orders &times; &#8377;800"),FL("Holding",`Holding cost = Average stock &times; Price &times; 2% &times; Months, &nbsp; Average stock = ${fr("Order size","2")}`)])],
+    ["Option A: 5 orders of 100 bags",RB("Option A",[FL("Purchase","500 &times; 620 = &#8377;3,10,000"),FL("Ordering","5 &times; 800 = &#8377;4,000"),FL("Holding",`${fr("100","2")} = 50 bags; 50 &times; 620 &times; 0.02 &times; 5 = &#8377;3,100`),FL("Total","<b>&#8377;3,17,100</b>")])],
+    ["Option B: 1 order of 500 bags",RB("Option B",[FL("Purchase","500 &times; 600 = &#8377;3,00,000"),FL("Ordering","1 &times; 800 = &#8377;800"),FL("Holding",`${fr("500","2")} = 250 bags; 250 &times; 600 &times; 0.02 &times; 5 = &#8377;15,000`),FL("Total","<b>&#8377;3,15,800</b>")])],
+    ["Compare","Saving with option B = 3,17,100 &minus; 3,15,800 = <b>&#8377;1,300</b>. The discount saves &#8377;10,000 on the price, but most of it is used up by &#8377;11,900 of extra holding cost."]],
+  decision:"Option B is cheaper, but only by &#8377;1,300 (0.4%). It also ties up &#8377;3 lakh on day one and needs space for 500 bags. If Aman Mart has the space and spare cash, and demand is steady, option B is fine. If cash or space is tight, option A is a sensible choice for a very small extra cost."},
+  {p:"Aman Mart has enough storage space and cash. Which option should it choose?",correct:"Option B, which saves &#8377;1,300 over five months",wrong:["Option A, since its total cost is lower","Option B, since it saves &#8377;10,000 on the price","Either option, since both cost the same over five months"],why:"The price saving of &#8377;10,000 is mostly cancelled by &#8377;11,900 more holding cost. The net saving is &#8377;1,300."});
+
+/* 5 */ addP({title:"Reorder point for a branch",biz:"Dhanvanshi Super Store",
+  scenario:"The Station Road branch sells 40 bottles of sunflower oil a day. When it sends an indent to Madavi Warehouse, the oil arrives on the milk run 2 days later. The warehouse is close by and the truck is reliable, so the branch keeps no safety stock for this item. Today it has 150 bottles.",
+  data:T([["Average daily sale (d)","40 bottles"],["Lead time (L)","2 days"],["Safety stock","0"],["Stock today","150 bottles"]]),
+  question:"What is the reorder point? After how many days should the branch send its indent?",
+  check:{label:"Reorder point (bottles)",ans:80,tol:0},
+  steps:[
+    ["Reorder point",RB("Reorder point",[FL("Formula","ROP = d &times; L + SS"),FL("Working","= 40 &times; 2 + 0 = <b>80 bottles</b>")])],
+    ["When is the ROP reached?",`Days until ROP = ${fr("Stock &minus; ROP","d")} = ${fr("150 &minus; 80","40")} = 1.75 days. At the end of tomorrow, stock will be 150 &minus; 80 = 70 bottles, which is below the ROP.`]],
+  decision:"The branch should send its indent tomorrow evening. With no safety stock, a single busy day, such as a Sunday offer, can empty the shelf before the milk run arrives. Many stores keep at least half a day's sales as a buffer even for items supplied from a nearby warehouse."});
+
+/* 6 */ addP({title:"Reorder point with safety stock",biz:"Dhanvanshi Super Store",
+  scenario:"Madavi Warehouse sells an average of 80 packs of Moong Dal 1 kg a day, with a standard deviation of 20 packs a day. Kavya Distributors delivers in 6 days. The warehouse wants a 95% service level (Z = 1.65).",
+  data:T([["Average daily demand (d)","80 packs"],["Standard deviation of daily demand (&sigma;<sub>d</sub>)","20 packs"],["Lead time (L)","6 days"],["Service level","95% (Z = 1.65)"]]),
+  question:"Find the safety stock and the reorder point.",
+  check:{label:"Reorder point (packs)",ans:561,tol:1},
+  steps:[
+    ["Safety stock",RB("Safety stock",[FL("Formula","SS = Z &times; &sigma;<sub>d</sub> &times; &radic;L"),FL("Working","= 1.65 &times; 20 &times; &radic;6 = 1.65 &times; 20 &times; 2.449 = 80.8 &rarr; <b>81 packs</b> (rounded up)")])],
+    ["Reorder point",RB("Reorder point",[FL("Formula","ROP = d &times; L + SS"),FL("Working","= 80 &times; 6 + 81 = 480 + 81 = <b>561 packs</b>")])]],
+  decision:"Madavi Warehouse should order moong dal whenever the inventory position falls to 561 packs. The safety stock of 81 packs is about one day's sales; it covers the busier days in about 95 out of 100 order cycles."});
+
+/* 7 */ addP({title:"The cost of a higher service level",biz:"Aman Mart",
+  scenario:"Aman Mart sells an average of 30 cans of ghee (1 L) a day, with a standard deviation of 9 cans. Lead time is 9 days and each can costs &#8377;620. Holding cost is 24% a year. The store manager wants to raise the service level from 90% (Z = 1.28) to 98% (Z = 2.05) before the festival season.",
+  data:T([["Average daily demand (d)","30 cans"],["&sigma;<sub>d</sub>","9 cans"],["Lead time (L)","9 days"],["Cost per can","&#8377;620"],["Holding cost","24% a year"]]),
+  question:"How much extra safety stock is needed, and what is the extra holding cost per year?",
+  check:{label:"Extra safety stock (cans)",ans:21,tol:0},
+  steps:[
+    ["Safety stock at 90%",RB("SS at 90%",[FL("Formula","SS = Z &times; &sigma;<sub>d</sub> &times; &radic;L"),FL("Working","= 1.28 &times; 9 &times; &radic;9 = 1.28 &times; 9 &times; 3 = 34.56 &rarr; <b>35 cans</b>")])],
+    ["Safety stock at 98%",RB("SS at 98%",[FL("Formula","SS = Z &times; &sigma;<sub>d</sub> &times; &radic;L"),FL("Working","= 2.05 &times; 9 &times; 3 = 55.35 &rarr; <b>56 cans</b>")])],
+    ["Extra stock and its cost",RB("Difference",[FL("Extra cans","56 &minus; 35 = <b>21 cans</b>"),FL("Extra value","21 &times; &#8377;620 = &#8377;13,020"),FL("Holding cost","&#8377;13,020 &times; 24% = <b>&#8377;3,125 a year</b>")])]],
+  decision:"For about &#8377;3,100 a year, Aman Mart cuts the chance of a stock-out in a cycle from 1 in 10 to 1 in 50. Ghee is a high-value item that customers buy by brand, and in the festival season a customer who finds it missing may do the full month's shopping elsewhere. The higher service level is worth it."});
+
+/* 8 */ addP({title:"Days of inventory for a quarter",biz:"Aman Mart",
+  scenario:"The finance team of Aman Mart wants the days of inventory for the July to September quarter (92 days). Opening stock on 1 July was &#8377;18 lakh and closing stock on 30 September was &#8377;22 lakh, both at cost. Cost of goods sold for the quarter was &#8377;69 lakh.",
+  data:T([["Opening inventory","&#8377;18 lakh"],["Closing inventory","&#8377;22 lakh"],["COGS for the quarter","&#8377;69 lakh"],["Days in the quarter","92"]]),
+  question:"Find the average inventory, the inventory turnover for the quarter and the days of inventory.",
+  check:{label:"Days of inventory",ans:26.67,tol:0.1},
+  steps:[
+    ["Average inventory",RB("Average inventory",[FL("Formula",`Average inventory = ${fr("Opening + Closing","2")}`),FL("Working",`= ${fr("18 + 22","2")} = <b>&#8377;20 lakh</b>`)])],
+    ["Inventory turnover",RB("Inventory turnover",[FL("Formula",`Turnover = ${fr("COGS","Average inventory")}`),FL("Working",`= ${fr("69","20")} = <b>3.45 times</b> in the quarter (about 13.7 times a year)`)])],
+    ["Days of inventory",RB("Days of inventory",[FL("Formula",`DOI = ${fr("Average inventory","COGS")} &times; Days = ${fr("Days","Turnover")}`),FL("Working",`= ${fr("20","69")} &times; 92 = ${fr("92","3.45")} = <b>26.67 days</b>`)])]],
+  decision:"About 27 days of inventory is reasonable for a grocery retailer. Closing stock is higher than opening stock because Aman Mart built anticipation stock for Dussehra and Diwali in September. The DOI will look high until the festival sales happen, so this quarter should be compared with the same quarter last year, not with the previous quarter."});
+
+/* 9 */ addP({title:"Which branch holds too much stock?",biz:"Dhanvanshi Super Store",
+  scenario:"The management of Dhanvanshi Super Store compares two branches for the last financial year. Gandhi Chowk had COGS of &#8377;4.2 crore with average inventory of &#8377;35 lakh. Civil Lines had COGS of &#8377;1.8 crore with average inventory of &#8377;30 lakh.",
+  data:T([["Gandhi Chowk: COGS","&#8377;4.2 crore"],["Gandhi Chowk: average inventory","&#8377;35 lakh"],["Civil Lines: COGS","&#8377;1.8 crore"],["Civil Lines: average inventory","&#8377;30 lakh"]]),
+  question:"Find the inventory turnover and days of inventory of both branches. What is the DOI of the Civil Lines branch?",
+  check:{label:"DOI of Civil Lines (days)",ans:60.83,tol:0.1},
+  steps:[
+    ["Convert to the same unit","&#8377;4.2 crore = &#8377;420 lakh and &#8377;1.8 crore = &#8377;180 lakh."],
+    ["Gandhi Chowk",RB("Gandhi Chowk",[FL("Turnover",`${fr("COGS","Average inventory")} = ${fr("420","35")} = <b>12 times</b>`),FL("DOI",`${fr("365","Turnover")} = ${fr("365","12")} = <b>30.4 days</b>`)])],
+    ["Civil Lines",RB("Civil Lines",[FL("Turnover",`${fr("COGS","Average inventory")} = ${fr("180","30")} = <b>6 times</b>`),FL("DOI",`${fr("365","Turnover")} = ${fr("365","6")} = <b>60.8 days</b>`)])]],
+  decision:"Civil Lines sells less than half of what Gandhi Chowk sells but holds almost as much stock, so its DOI is double. The first step is not a blanket cut in orders. Run ABC analysis and item-level DOI at Civil Lines to find the items with more than 60 days of stock, send the excess back through Madavi Warehouse to Gandhi Chowk, and lower the order quantities and reorder points of those items."},
+  {p:"What should management do first at the Civil Lines branch?",correct:"Find the items with high DOI using ABC analysis and item-level DOI",wrong:["Cut all orders for the branch by half","Increase the safety stock of all items","Transfer half of all stock to Gandhi Chowk right away"],why:"A branch-level DOI hides which items are the problem. Item-level analysis shows where the excess is, so action can be targeted without causing stock-outs in fast-moving items."});
+
+/* 10 */ addP({title:"Will the warehouse run out?",biz:"Dhanvanshi Super Store",
+  scenario:"On the morning of Monday, 5 October, Madavi Warehouse has 1,300 bottles of sunflower oil. It issues about 150 bottles a day to the branches. Kavya Distributors takes 6 days to deliver, and the warehouse keeps a safety stock of 250 bottles.",
+  data:T([["Stock on Monday morning, 5 October","1,300 bottles"],["Average daily demand (d)","150 bottles"],["Lead time (L)","6 days"],["Safety stock","250 bottles"]]),
+  question:"On which date should the order be placed as per the reorder point? If the purchase team delays the order until the morning of Friday, 9 October, how many bottles will the warehouse be short before the delivery arrives?",
+  check:{label:"Shortage if ordered on 9 October (bottles)",ans:200,tol:0},
+  steps:[
+    ["Reorder point",RB("Reorder point",[FL("Formula","ROP = d &times; L + SS"),FL("Working","= 150 &times; 6 + 250 = 900 + 250 = <b>1,150 bottles</b>")])],
+    ["Date of reaching the ROP",RB("Days until ROP",[FL("Formula",`Days until ROP = ${fr("Stock &minus; ROP","d")}`),FL("Working",`= ${fr("1,300 &minus; 1,150","150")} = <b>1 day</b>`)])+"Stock reaches 1,150 bottles on the morning of <b>Tuesday, 6 October</b>. The order should go out that day. It will arrive on 12 October, when about 250 bottles (the safety stock) will be left."],
+    ["If the order is placed on 9 October",RB("Delayed order",[FL("Stock on 9 Oct","1,300 &minus; 4 &times; 150 = 700 bottles"),FL("Delivery","9 October + 6 days = Thursday, 15 October"),FL("Demand before delivery","150 &times; 6 = 900 bottles (9 to 14 October)"),FL("Shortage","900 &minus; 700 = <b>200 bottles</b>")])+`Stock lasts ${fr("700","150")} = 4.7 days, so the warehouse runs out on Tuesday, 13 October.`]],
+  decision:"Ordering on the ROP date keeps the safety stock untouched on average. A delay of three days uses up the whole safety stock and more, leaving the branches without oil for about a day and a half. If an order is late, the planner should ask Kavya for a part delivery or send a truck to collect the stock."},
+  {p:"As per the reorder point, on which date should the order be placed?",correct:"Tuesday, 6 October",wrong:["Monday, 5 October","Thursday, 8 October","Friday, 9 October"],why:"Stock falls to the reorder point of 1,150 bottles after one day of issues, on the morning of 6 October."});
+
+(function(){
+  const grid=$("#ex-grid"),body=$("#ex-body");let cur=0,shown=0;
+  grid.innerHTML=EX.map((e,i)=>`<button class="exbtn" data-i="${i}" aria-pressed="false"><span class="no">Problem ${i+1}</span><span class="tt">${e.title}</span><span class="biz">${e.biz}</span></button>`).join("");
+  function render(){
+    const e=EX[cur];
+    $$(".exbtn",grid).forEach((b,i)=>b.setAttribute("aria-pressed",i===cur));
+    body.innerHTML=`<p class="modnum">Problem ${cur+1} of ${EX.length}</p><h2 style="margin-top:0">${e.title}</h2><p class="interp" style="margin-top:0">${e.biz}</p>
+      <p>${e.scenario}</p>${e.data}
+      <div class="q"><b>Question.</b> ${e.question}</div>
+      <div class="check"><label class="lbl" for="ex-ans">${e.check.label}:</label><input id="ex-ans" inputmode="decimal" autocomplete="off"><button class="btn" id="ex-chk">Check</button><span class="fb" id="ex-fb" aria-live="polite"></span></div>
+      ${e.mcq?mcqHTML(e.mcq,0):""}
+      <div id="ex-steps"></div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="ex-next">Show step 1</button><button class="btn" id="ex-allb">Show full solution</button></div>`;
+    shown=0;steps();
+    $("#ex-chk").addEventListener("click",check);
+    $("#ex-ans").addEventListener("keydown",ev=>{if(ev.key==="Enter")check();});
+    $("#ex-next").addEventListener("click",()=>{shown++;steps();});
+    $("#ex-allb").addEventListener("click",()=>{shown=99;steps();});
+  }
+  function steps(){
+    const e=EX[cur],n=e.steps.length;shown=Math.min(shown,n+1);
+    let h=e.steps.slice(0,shown).map((s,i)=>`<div class="step"><h4><span class="sn">Step ${i+1}</span>${s[0]}</h4><div>${s[1]}</div></div>`).join("");
+    if(shown>n)h+=`<div class="decision"><b class="t">Business decision</b>${e.decision}</div>`;
+    $("#ex-steps").innerHTML=h;
+    const nb=$("#ex-next");
+    if(shown>n){nb.disabled=true;nb.textContent="Solution complete";$("#ex-allb").disabled=true;}
+    else{nb.disabled=false;nb.textContent=shown===n?"Show the business decision":`Show step ${shown+1}`;$("#ex-allb").disabled=false;}
+  }
+  function check(){
+    const e=EX[cur],raw=$("#ex-ans").value.trim().replace(/,/g,"").replace(/[^\d.\-]/g,""),v=parseFloat(raw),fb=$("#ex-fb");
+    if(!raw||isNaN(v)){fb.className="fb no";fb.textContent="Enter a number, for example 125";return;}
+    const a=e.check.ans,ok=Math.abs(v-a)<=e.check.tol+1e-9;
+    fb.className="fb "+(ok?"ok":"no");
+    fb.textContent=ok?`Correct: ${IN(a,Number.isInteger(a)?0:2)}`:"Not correct. Go through the steps below and try again.";
+  }
+  grid.addEventListener("click",ev=>{const b=ev.target.closest(".exbtn");if(!b)return;cur=+b.dataset.i;render();body.scrollIntoView({behavior:"smooth",block:"start"});});
+  window.__renderEx=render;
+})();
+
+/* ---------- start ---------- */
+finaliseMCQ();
+window.__renderEx();
+addPagers();window.addEventListener("hashchange",show);show();
+})();
+</script>
+</body>
+</html>

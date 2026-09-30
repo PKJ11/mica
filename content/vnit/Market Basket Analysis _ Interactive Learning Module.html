@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Market Basket Analysis | Interactive Learning Module</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#ECEFF3; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#15223A; --muted:#556277; --line:#D2D9E2; --frame:#9FAABA;
+  --accent:#F5C400; --accent-ink:#2B2300; --pos:#127A58; --neg:#B83A30; --info:#2D5DA6;
+  --pos-bg:rgba(18,122,88,.1); --neg-bg:rgba(184,58,48,.09);
+  --paper:#FFFFFF; --paper-ink:#1B2130; --paper-muted:#6A7282; --a-tint:#D8E5F7; --ab-tint:#FFE36E;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+    --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+    --paper:#F3F1EB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+  --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+  --paper:#F3F1EB;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0 0 .5em;font-weight:700;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,4.2vw,2.9rem)}
+h2{font-size:1.55rem;margin-top:2.2rem}
+h3{font-size:1.15rem;margin-top:1.6rem}
+p{margin:0 0 1em;max-width:72ch}
+a{color:var(--info)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+:focus-visible{outline:3px solid var(--info);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:100dvh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);padding:26px 18px 30px}
+.brand{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.2;margin:0 0 4px}
+.brand-sub{color:var(--muted);font-size:.9rem;margin:0 0 20px}
+.btn.navtoggle{display:none}
+.nav{list-style:none;margin:0;padding:0}
+.nav a{display:grid;grid-template-columns:28px 1fr 16px;align-items:baseline;gap:4px;padding:7px 8px;border-radius:7px;color:var(--ink);text-decoration:none;font-size:.97rem;line-height:1.3}
+.nav a:hover{background:var(--surface-2)}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.nav .n{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.nav a[aria-current="page"] .n{color:var(--accent-ink)}
+.nav .seen{font-size:.8rem;color:var(--pos)}
+.nav a[aria-current="page"] .seen{color:var(--accent-ink)}
+.navgroup{margin:16px 8px 6px;color:var(--muted);font-size:.85rem;font-weight:600}
+main{padding:44px clamp(18px,4.5vw,64px) 90px;max-width:960px;width:100%}
+.mod{display:none}
+.mod.on{display:block}
+.lede{font-size:1.15rem;color:var(--muted);max-width:66ch}
+.modnum{font-family:var(--mono);color:var(--muted);font-size:.9rem;margin:0 0 6px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:18px 0}
+.formula{overflow-x:auto;border:1.5px solid var(--frame);background:var(--surface);padding:14px 20px;margin:18px 0;border-radius:10px;font-size:1.12rem}
+.formula .fname{display:block;color:var(--muted);font-size:.9rem;margin-bottom:4px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em;line-height:1.25}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .3em 1px}
+.fr>span:last-child{padding:1px .3em 0}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;background:var(--surface-2);border:1px solid var(--line)}
+.callout.trap{background:var(--neg-bg);border-color:transparent}
+.callout.good{background:var(--pos-bg);border-color:transparent}
+.callout b.t{display:block;margin-bottom:4px;font-family:var(--display)}
+.callout p:last-child{margin-bottom:0}
+details.ex{background:var(--surface);border:1px dashed var(--muted);border-radius:10px;padding:12px 18px;margin:18px 0}
+details.ex summary{cursor:pointer;font-weight:600}
+details.ex[open] summary{margin-bottom:8px}
+.tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+td.num,th.num,.level td,.level th,.rtbl td,.rtbl th{white-space:nowrap}
+th{font-weight:600;background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.btn{font:600 .97rem var(--body);border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line)}
+.pager a{text-decoration:none;color:var(--ink);max-width:48%}
+.pager small{display:block;color:var(--muted)}
+.pager .nx{text-align:right;margin-left:auto}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13.5px/1.55 var(--mono)}
+ul.clean,ol.clean{padding-left:1.2em;max-width:72ch}
+ul.clean li,ol.clean li{margin:.3em 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+.receipts{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:14px 12px;margin:16px 0}
+.receipt{position:relative;background:var(--paper);color:var(--paper-ink);font:12.5px/1.5 var(--mono);padding:10px 11px 20px;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;
+  mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;transition:background .15s}
+.receipt .shop{text-align:center;font-weight:600;border-bottom:1px dashed #b9bec8;padding-bottom:5px;margin-bottom:5px}
+.receipt .rh{display:flex;justify-content:space-between;color:var(--paper-muted);border-bottom:1px dashed #b9bec8;padding-bottom:4px;margin-bottom:5px;font-size:11.5px}
+.receipt ul{list-style:none;margin:0;padding:0}
+.receipt li{display:flex;justify-content:space-between;gap:6px}
+.receipt li.m{font-weight:600}
+.receipt li.m span:first-child::before{content:"\25B8 "}
+.receipt .tot{border-top:1px dashed #b9bec8;margin-top:5px;padding-top:4px;display:flex;justify-content:space-between;color:var(--paper-muted)}
+.receipt.a{background:var(--a-tint)}
+.receipt.ab,.receipt.hot{background:var(--ab-tint)}
+.receipt.big{font-size:14px;padding:16px 18px 26px;max-width:280px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.9rem;color:var(--muted);margin:6px 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+.pick{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.pl{font-weight:600;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .92rem var(--body);border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer}
+.chip:hover:not(:disabled){border-color:var(--ink)}
+.chip.onA{background:var(--info);border-color:var(--info);color:#fff}
+.chip.onB,.chip.onS{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:disabled{opacity:.35;cursor:not-allowed;border-style:dashed;text-decoration:line-through}
+.lab .receipts{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px}
+.lab .receipt{font-size:11.5px;padding:8px 9px 18px}
+.lab .receipt .rh span:last-child{display:none}
+.receipt .rh{white-space:nowrap}
+.result{border-top:1px solid var(--line);margin-top:10px;padding-top:14px}
+.eq{font-size:1.06rem;margin:8px 0;line-height:2.1;overflow-x:auto}
+.eq b{font-family:var(--display);font-size:1.15em}
+.interp{color:var(--muted);margin-top:6px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.presets .btn{padding:5px 12px;font-size:.88rem}
+.gauge{margin:14px 0 4px;position:relative;height:40px}
+.gauge .bar{position:absolute;left:0;right:0;top:8px;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--neg-bg) 0 33.33%,var(--pos-bg) 33.33% 100%);border:1px solid var(--line)}
+.gauge .one{position:absolute;left:33.33%;top:2px;height:24px;border-left:2px dashed var(--muted)}
+.gauge .mk{position:absolute;top:0;width:4px;height:28px;margin-left:-2px;background:var(--ink);border-radius:2px;transition:left .25s}
+.gauge .ticks{position:absolute;top:26px;left:0;right:0;font-size:.78rem;color:var(--muted)}
+.gauge .ticks span{position:absolute;transform:translateX(-50%)}
+.pill{display:inline-block;font-size:.82rem;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.pos{background:var(--pos-bg);color:var(--pos);border-color:transparent}
+.pill.neg{background:var(--neg-bg);color:var(--neg);border-color:transparent}
+.pill.mut{color:var(--muted)}
+
+.hero{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center;margin:26px 0 10px}
+.hero-rule{font-family:var(--display);font-size:1.5rem;font-weight:700;margin:0 0 10px}
+.hero dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;max-width:54ch}
+.hero dt{font-weight:700;font-family:var(--display)}
+.hero dd{margin:0;color:var(--muted)}
+
+.level{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px 18px;margin:14px 0}
+.level h4{font-family:var(--display);font-size:1.05rem;margin:0 0 6px}
+.level .meta{color:var(--muted);font-size:.92rem;margin-bottom:6px}
+tr.pruned td{color:var(--muted)}
+tr.pruned td:first-child{text-decoration:line-through}
+tr.pass td{background:var(--pos-bg)}
+.lset{font-size:.95rem;margin-top:8px}
+.ctrl{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:8px 0}
+.ctrl input[type=range]{width:100%;accent-color:var(--info)}
+.ctrl output{font-weight:600;min-width:9ch;text-align:right;font-variant-numeric:tabular-nums}
+
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:18px 0 26px}
+.exbtn{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink);font:inherit;line-height:1.3}
+.exbtn:hover{border-color:var(--ink)}
+.exbtn[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.exbtn .no{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.exbtn .tt{display:block;font-weight:600;font-size:.95rem;margin:2px 0 4px}
+.exbtn .biz{font-size:.8rem;color:var(--muted)}
+.q{background:var(--surface);border:1.5px solid var(--info);padding:12px 18px;border-radius:10px;margin:18px 0}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:10px 0}
+.step h4{margin:0 0 6px;font-family:var(--display);font-size:1rem}
+.step .sn{font-family:var(--mono);color:var(--muted);margin-right:8px;font-weight:400}
+.rb{border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:10px 0;background:var(--surface-2)}
+.rb .rt{font-weight:700;margin:0 0 4px}
+.fl{margin:6px 0;line-height:2.2;overflow-x:auto}
+.fl .fk{display:inline-block;min-width:110px;margin-right:6px;font-weight:600;color:var(--muted);font-size:.9rem}
+.fl b{font-family:var(--display);font-size:1.1em}
+.fl small{color:var(--muted);font-size:.9rem}
+.check{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.check input{font:inherit;width:120px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.fb{font-weight:600}
+.fb.ok{color:var(--pos)} .fb.no{color:var(--neg)}
+.decision{background:var(--pos-bg);border-radius:10px;padding:14px 18px;margin:16px 0}
+.decision b.t{font-family:var(--display);display:block;margin-bottom:4px}
+
+textarea{width:100%;min-height:210px;font:13.5px/1.55 var(--mono);padding:12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+th.sortable{cursor:pointer}
+th.sortable:hover{text-decoration:underline}
+.err{color:var(--neg);font-weight:600}
+
+.qz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:14px 0}
+.qz .qp{font-weight:600;margin-bottom:10px}
+.qz .opts{display:grid;gap:8px}
+.qz button.opt{text-align:left;font:inherit;padding:9px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.qz button.opt:hover:not(:disabled){border-color:var(--ink)}
+.qz button.opt.right{border-color:var(--pos);background:var(--pos-bg)}
+.qz button.opt.wrong{border-color:var(--neg);background:var(--neg-bg)}
+.qz button.opt:disabled{cursor:default}
+.qz .why{margin-top:10px;color:var(--muted)}
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding:10px 0;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:0;height:auto;z-index:5;padding:12px 16px;border-right:0;border-bottom:1px solid var(--line);padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .side-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand-sub{display:none}
+  .brand{margin:0}
+  .btn.navtoggle{display:inline-block}
+  .navwrap{display:none;max-height:70vh;overflow:auto;margin-top:10px}
+  .side.open .navwrap{display:block}
+  main{padding-top:28px}
+  .hero{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .pick{grid-template-columns:1fr;gap:6px}
+  .score{top:64px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="side-top">
+      <div>
+        <p class="brand">Market Basket Analysis</p>
+        <p class="brand-sub">Interactive learning module</p>
+      </div>
+      <button class="btn navtoggle" id="navtoggle" aria-expanded="false" aria-controls="navwrap">Chapters</button>
+    </div>
+    <nav class="navwrap" id="navwrap" aria-label="Chapters"><ul class="nav" id="nav"></ul></nav>
+  </aside>
+
+  <main id="main">
+
+<!-- ============ INTRO ============ -->
+<section class="mod" id="start" data-nav="Introduction" data-group="Concepts">
+  <h1>Market Basket Analysis</h1>
+  <p class="lede">Which products do customers buy together? Market Basket Analysis answers this question using sales bills. In this module we start with a few bills from Dhanvanshi Super Store, learn the three key measures (Support, Confidence and Lift), study the Apriori algorithm, and then solve ten business problems step by step.</p>
+
+  <div class="hero">
+    <div class="receipt big" aria-label="Sample bill">
+      <div class="shop">Dhanvanshi Super Store</div>
+      <div class="rh"><span>Bill 08</span><span>3 items</span></div>
+      <ul><li class="m"><span>Bread</span><span>40.00</span></li><li class="m"><span>Butter</span><span>55.00</span></li><li><span>Milk</span><span>30.00</span></li></ul>
+      <div class="tot"><span>Total</span><span>&#8377;125.00</span></div>
+    </div>
+    <div>
+      <p class="hero-rule">Bread &rarr; Butter</p>
+      <dl>
+        <dt>Support 0.50</dt><dd>5 out of 10 bills have both bread and butter.</dd>
+        <dt>Confidence 0.71</dt><dd>Out of 7 customers who bought bread, 5 also bought butter.</dd>
+        <dt>Lift 1.43</dt><dd>Customers who buy bread buy butter 1.43 times as often as an average customer.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <h2>Learning outcomes</h2>
+  <p>After completing this module, you will be able to:</p>
+  <ul class="clean">
+    <li>Calculate Support, Confidence and Lift by hand and explain what each measure tells a manager.</li>
+    <li>Identify rules that look strong on confidence but are no better than chance.</li>
+    <li>Run the Apriori algorithm by hand, including candidate generation and pruning.</li>
+    <li>Convert association rules into business decisions such as shelf placement, combo offers, product bundles, recommendations and cross-selling.</li>
+  </ul>
+
+  <h2>Where is it used?</h2>
+  <p>The idea of a "basket" is not limited to a shopping trolley. Any set of things that occur together can be treated as a basket. Some examples are the items in a grocery bill, the dishes in a food delivery order, the books in an online cart, the products held by a bank customer, and the pages visited in one browsing session.</p>
+
+  <h2>How this module is organised</h2>
+  <p>Chapters 1 to 6 build the concepts using one common dataset: ten bills from Dhanvanshi Super Store, which sells bread, butter, eggs, milk and tea. All calculators in these chapters use the same ten bills, so the numbers you calculate in one chapter appear again in the next. Chapter 7 has ten solved business problems from Dhanvanshi Super Store, FoodJoe and Aman Mart. Chapter 8 lets you find rules from your own data, Chapter 9 is a quiz, and Chapter 10 is a one-page summary for revision.</p>
+  <div class="row"><a class="btn primary" href="#m1">Start Chapter 1: Transactions and itemsets</a></div>
+</section>
+
+<!-- ============ C1 ============ -->
+<section class="mod" id="m1" data-nav="Transactions and itemsets" data-n="1">
+  <p class="modnum">Chapter 1</p>
+  <h1>Transactions and itemsets</h1>
+  <p class="lede">Before we measure anything, let us fix the terms we will use throughout this module.</p>
+
+  <h2>Basic terms</h2>
+  <ul class="clean">
+    <li><b>Item set of the store</b> <i>I</i> = {<i>i</i><sub>1</sub>, <i>i</i><sub>2</sub>, …, <i>i<sub>d</sub></i>}: all the products the store sells. For Dhanvanshi Super Store, <i>d</i> = 5.</li>
+    <li><b>Transaction</b> <i>T</i> &sube; <i>I</i>: the set of items in one bill. Our dataset <i>D</i> has <i>N</i> = 10 transactions.</li>
+    <li><b>Itemset</b> <i>X</i> &sube; <i>I</i>: any group of items. An itemset with <i>k</i> items is called a <b><i>k</i>-itemset</b>. For example, {Bread, Butter} is a 2-itemset.</li>
+    <li><b>Support count</b> &sigma;(<i>X</i>): the number of transactions that contain <i>every</i> item of <i>X</i>.</li>
+  </ul>
+
+  <h2>Ten bills from Dhanvanshi Super Store</h2>
+  <div class="receipts" id="m1-receipts"></div>
+
+  <h2>The same data as a binary matrix</h2>
+  <p>Algorithms do not read bills directly. They read a table with one row for each transaction and one column for each item. A cell has 1 if the item is present in that bill and 0 if it is not. Move your cursor over a row to see the matching bill above.</p>
+  <div class="tbl-wrap"><table id="m1-matrix"></table></div>
+  <div class="callout">
+    <b class="t">Note</b>
+    <p>Market Basket Analysis records only whether an item is present in a bill. Buying one packet of bread or five packets looks the same, and the price is not used. Support, Confidence and Lift are all calculated on this 0/1 table.</p>
+  </div>
+
+  <h2>How many itemsets are possible?</h2>
+  <p>Each item is either in an itemset or not in it. So <i>d</i> items give 2<sup><i>d</i></sup> &minus; 1 non-empty itemsets. This number grows very fast as the number of items increases. This is the reason we need a smart method like the Apriori algorithm.</p>
+  <div class="panel">
+    <div class="ctrl"><label for="m1-d">Number of items (<i>d</i>)</label><input type="range" id="m1-d" min="2" max="60" value="5"><output id="m1-d-out">5</output></div>
+    <p id="m1-d-res" style="margin:6px 0 0"></p>
+  </div>
+
+  <details class="ex"><summary>Practice: how many bills contain both Milk and Eggs?</summary>
+    <p>Bills 03, 04 and 10. So &sigma;({Milk, Eggs}) = 3. Bill 09 has Eggs but no Milk, so it is not counted. Bills with only Milk are also not counted.</p>
+  </details>
+</section>
+
+<!-- ============ C2 ============ -->
+<section class="mod" id="m2" data-nav="Support" data-n="2">
+  <p class="modnum">Chapter 2</p>
+  <h1>Support</h1>
+  <p class="lede">Support answers the first business question: how common is this combination of items?</p>
+
+  <div class="formula"><span class="fname">Support of an itemset</span>
+    Support(<i>X</i>) = <span class="fr"><span>&sigma;(<i>X</i>)</span><span><i>N</i></span></span>
+    &nbsp;&nbsp;&nbsp; and for a rule &nbsp; Support(<i>X</i> &rarr; <i>Y</i>) = <span class="fr"><span>&sigma;(<i>X</i> &cup; <i>Y</i>)</span><span><i>N</i></span></span>
+  </div>
+  <p>Support is a fraction between 0 and 1. It is the probability that a randomly selected bill contains all the items of <i>X</i>, i.e. Support(<i>X</i>) = P(<i>X</i>).</p>
+
+  <div class="callout trap"><b class="t">Common mistake: &cup; means "all of them", not "either"</b>
+    <p>&sigma;(<i>X</i> &cup; <i>Y</i>) counts bills that contain every item of <i>X</i> <em>and</em> every item of <i>Y</i>. Many students wrongly count the bills that have Bread <em>or</em> Butter.</p>
+  </div>
+
+  <h2>Support calculator</h2>
+  <p>Select one or more items. The bills that contain the complete itemset are highlighted in yellow.</p>
+  <div id="lab-support"></div>
+
+  <h2>Minimum support (minsup)</h2>
+  <p>We keep only those itemsets whose support is at least a chosen value called minimum support. Such itemsets are called <b>frequent itemsets</b>. The threshold helps in two ways: it removes combinations that are too rare to act upon, and it reduces the amount of computation.</p>
+  <ul class="clean">
+    <li><b>If minsup is too high</b>, you only find the obvious best-selling items and miss smaller but profitable combinations.</li>
+    <li><b>If minsup is too low</b>, you get thousands of itemsets, many of which appear in only a handful of bills by chance.</li>
+    <li>A large supermarket with thousands of products usually uses a minsup well below 1%, because any one item appears in only a small share of bills. For our small dataset of ten bills we use 30%, i.e. 3 bills.</li>
+  </ul>
+
+  <details class="ex"><summary>Practice: find the support of {Bread, Butter, Milk}</summary>
+    <p>Bills 01, 04 and 08 contain all three items. So Support = 3/10 = 0.30. This is exactly equal to minsup = 30%, so the itemset is frequent.</p>
+  </details>
+</section>
+
+<!-- ============ C3 ============ -->
+<section class="mod" id="m3" data-nav="Confidence" data-n="3">
+  <p class="modnum">Chapter 3</p>
+  <h1>Confidence</h1>
+  <p class="lede">Confidence answers the question: out of the bills that contain <i>X</i>, what fraction also contain <i>Y</i>?</p>
+
+  <div class="formula"><span class="fname">Confidence of the rule X &rarr; Y</span>
+    Confidence(<i>X</i> &rarr; <i>Y</i>) = <span class="fr"><span>&sigma;(<i>X</i> &cup; <i>Y</i>)</span><span>&sigma;(<i>X</i>)</span></span>
+    = <span class="fr"><span>Support(<i>X</i> &cup; <i>Y</i>)</span><span>Support(<i>X</i>)</span></span>
+    = P(<i>Y</i> | <i>X</i>)
+  </div>
+  <p>Confidence is a conditional probability. The denominator is no longer all bills (<i>N</i>); it is only the bills that contain the antecedent <i>X</i>. It tells us how reliable the rule is whenever <i>X</i> is present.</p>
+
+  <h2>Confidence calculator</h2>
+  <p>Blue bills contain <i>X</i> only. Yellow bills contain both <i>X</i> and <i>Y</i>. Confidence = yellow bills &divide; (blue + yellow bills). An item selected in <i>X</i> cannot be selected in <i>Y</i>.</p>
+  <div id="lab-conf"></div>
+
+  <h2>Direction matters</h2>
+  <p>Interchange <i>X</i> and <i>Y</i> in the calculator and see how the answer changes. Confidence(Bread &rarr; Butter) = 5/7 = 0.71, but Confidence(Butter &rarr; Bread) = 5/5 = 1.00, i.e. every customer who bought butter also bought bread. The numerator is the same in both cases; only the denominator changes. For a manager, "suggest butter to bread buyers" and "suggest bread to butter buyers" are two different decisions.</p>
+
+  <div class="callout trap"><b class="t">Limitation of confidence</b>
+    <p>Set the calculator to Bread &rarr; Milk. Confidence is 0.71, which looks high. But 7 of the 10 bills contain milk anyway, so 0.71 is hardly more than what we would expect from any bill. Confidence does not consider how popular the consequent already is. Lift takes care of this.</p>
+  </div>
+
+  <details class="ex"><summary>Practice: find Confidence(Milk &rarr; Eggs) and Confidence(Eggs &rarr; Milk)</summary>
+    <p>&sigma;(Milk, Eggs) = 3, &sigma;(Milk) = 7 and &sigma;(Eggs) = 4. So Confidence(Milk &rarr; Eggs) = 3/7 = 0.43 and Confidence(Eggs &rarr; Milk) = 3/4 = 0.75.</p>
+  </details>
+</section>
+
+<!-- ============ C4 ============ -->
+<section class="mod" id="m4" data-nav="Lift" data-n="4">
+  <p class="modnum">Chapter 4</p>
+  <h1>Lift</h1>
+  <p class="lede">Lift answers the question: when <i>X</i> is in the bill, how many times more likely is <i>Y</i> compared with any bill?</p>
+
+  <div class="formula"><span class="fname">Lift of the rule X &rarr; Y</span>
+    Lift(<i>X</i> &rarr; <i>Y</i>) = <span class="fr"><span>Confidence(<i>X</i> &rarr; <i>Y</i>)</span><span>Support(<i>Y</i>)</span></span>
+    = <span class="fr"><span>Support(<i>X</i> &cup; <i>Y</i>)</span><span>Support(<i>X</i>) &times; Support(<i>Y</i>)</span></span>
+  </div>
+  <p>From probability we know that if <i>X</i> and <i>Y</i> are independent, then Support(<i>X</i> &cup; <i>Y</i>) = Support(<i>X</i>) &times; Support(<i>Y</i>). Lift compares what actually happened with what independence would give.</p>
+
+  <div class="tbl-wrap"><table>
+    <tr><th>Lift</th><th>Meaning</th><th>Typical action</th></tr>
+    <tr><td>&gt; 1</td><td>Positive association: <i>X</i> makes <i>Y</i> more likely</td><td>Keep together, bundle, recommend</td></tr>
+    <tr><td>= 1</td><td>Independent: <i>X</i> tells us nothing about <i>Y</i></td><td>Ignore the rule, even if confidence is high</td></tr>
+    <tr><td>&lt; 1</td><td>Negative association: <i>X</i> makes <i>Y</i> less likely (often substitute products)</td><td>Do not bundle; check for substitution</td></tr>
+  </table></div>
+  <p>Lift is <b>symmetric</b>: Lift(<i>X</i> &rarr; <i>Y</i>) = Lift(<i>Y</i> &rarr; <i>X</i>), because the second form of the formula does not depend on which item is on which side. So lift tells us <em>whether</em> an association exists, and confidence tells us <em>which direction</em> is more useful.</p>
+
+  <h2>Lift calculator</h2>
+  <div class="presets" id="lift-presets"></div>
+  <div id="lab-lift"></div>
+
+  <div class="callout trap"><b class="t">Be careful with rare itemsets</b>
+    <p>Suppose two items each appear in 2 out of 10,000 bills and appear together in just one bill. The lift works out to 2,500, but one bill is not a pattern. Always read lift together with support.</p>
+  </div>
+
+  <details class="ex"><summary>Practice: find the lift of Tea &rarr; Bread</summary>
+    <p>&sigma;(Tea, Bread) = 1 (Bill 07) and &sigma;(Tea) = 3, so Confidence = 1/3 = 0.33. Support(Bread) = 0.70, so Lift = 0.33 / 0.70 = 0.48. Customers who buy tea are less than half as likely as an average customer to buy bread.</p>
+  </details>
+</section>
+
+<!-- ============ C5 ============ -->
+<section class="mod" id="m6" data-nav="Association rules" data-n="5">
+  <p class="modnum">Chapter 5</p>
+  <h1>Association rules</h1>
+  <p class="lede">An association rule converts a frequent itemset into a statement that a manager can act upon.</p>
+
+  <div class="formula"><span class="fname">Association rule</span>
+    <i>X</i> &rarr; <i>Y</i>, &nbsp; where <i>X</i>, <i>Y</i> &sube; <i>I</i> and <i>X</i> &cap; <i>Y</i> = &empty;
+  </div>
+  <p><i>X</i> is called the <b>antecedent</b> (left-hand side, the "if" part) and <i>Y</i> is called the <b>consequent</b> (right-hand side, the "then" part). A rule is called <b>strong</b> when Support(<i>X</i> &rarr; <i>Y</i>) &ge; minsup and Confidence(<i>X</i> &rarr; <i>Y</i>) &ge; minconf. In practice we also check that Lift &gt; 1, because a strong rule can still be independent.</p>
+
+  <h2>Rule mining is done in two steps</h2>
+  <ol class="clean">
+    <li><b>Frequent itemset generation</b>: find all itemsets with support &ge; minsup. This step needs the most computation.</li>
+    <li><b>Rule generation</b>: split every frequent itemset into antecedent and consequent in all possible ways, and keep the rules with confidence &ge; minconf. No fresh scan of the data is needed here, because all the support values are already known from step 1.</li>
+  </ol>
+
+  <h2>Why checking every rule is not practical</h2>
+  <p>With <i>d</i> items, the total number of possible rules is</p>
+  <div class="formula"><span class="fname">Number of possible rules</span><i>R</i> = 3<sup><i>d</i></sup> &minus; 2<sup><i>d</i>+1</sup> + 1</div>
+  <p>Each item can go to the left side, the right side, or neither side, which gives 3<sup><i>d</i></sup> arrangements. From these we remove the arrangements where either side is empty.</p>
+  <div class="panel">
+    <div class="ctrl"><label for="m6-d">Number of items (<i>d</i>)</label><input type="range" id="m6-d" min="2" max="40" value="5"><output id="m6-d-out">5</output></div>
+    <p id="m6-d-res" style="margin:6px 0 0"></p>
+  </div>
+
+  <h2>All rules from one frequent itemset</h2>
+  <p>A frequent <i>k</i>-itemset gives 2<sup><i>k</i></sup> &minus; 2 possible rules. The table below shows all six rules from {Bread, Butter, Milk} with minconf = 70%. Observe that all six rules have the same support, because support belongs to the itemset and does not depend on how we split it.</p>
+  <div class="tbl-wrap"><table id="m6-rules"></table></div>
+  <div class="callout good"><b class="t">A shortcut during rule generation</b>
+    <p>For rules made from the same itemset, moving items from the antecedent to the consequent can never increase confidence, because the denominator Support(<i>X</i>) can only become larger when <i>X</i> becomes smaller. So Confidence(Butter, Milk &rarr; Bread) &ge; Confidence(Butter &rarr; Bread, Milk). If a rule fails minconf, every rule with a smaller antecedent taken from it will also fail.</p>
+  </div>
+
+  <div class="callout trap"><b class="t">Association is not causation</b>
+    <p>The rule Bread &rarr; Butter does not mean that buying bread causes a customer to buy butter. Both may be driven by a third reason, such as shopping for breakfast. Treat every rule as a hypothesis and test the business action (for example, a trial shelf placement or a trial combo) before applying it across all stores.</p>
+  </div>
+</section>
+
+<!-- ============ C6 ============ -->
+<section class="mod" id="m7" data-nav="Apriori algorithm" data-n="6">
+  <p class="modnum">Chapter 6</p>
+  <h1>The Apriori algorithm</h1>
+  <p class="lede">The Apriori algorithm (Agrawal and Srikant, 1994) finds all frequent itemsets without checking all 2<sup><i>d</i></sup> of them. It is based on one simple property.</p>
+
+  <div class="formula"><span class="fname">The Apriori property (downward closure)</span>
+    If an itemset is frequent, all of its subsets are also frequent. Equivalently, if an itemset is infrequent, all of its supersets are also infrequent.
+  </div>
+  <p><b>Reason:</b> if <i>X</i> &sube; <i>Y</i>, every bill that contains <i>Y</i> also contains <i>X</i>. So &sigma;(<i>X</i>) &ge; &sigma;(<i>Y</i>). Support can only decrease as we add items. This property is called <b>anti-monotonicity</b>, and it allows Apriori to reject a candidate without even counting it.</p>
+
+  <h2>Steps of the algorithm</h2>
+  <ol class="clean">
+    <li><b>Scan</b> the data and count every single item. Keep the items with count &ge; minsup. This set is <i>L</i><sub>1</sub>.</li>
+    <li><b>Join</b>: form candidate <i>k</i>-itemsets <i>C<sub>k</sub></i> by combining pairs of frequent (<i>k</i>&minus;1)-itemsets whose union has exactly <i>k</i> items.</li>
+    <li><b>Prune</b>: remove every candidate that has an infrequent (<i>k</i>&minus;1)-subset. By the Apriori property, such a candidate can never be frequent.</li>
+    <li><b>Count</b>: scan the data again and count the remaining candidates. Keep those with count &ge; minsup. This set is <i>L<sub>k</sub></i>.</li>
+    <li><b>Repeat</b> with <i>k</i> + 1 until no new frequent itemsets are found.</li>
+    <li><b>Generate rules</b> from all frequent itemsets and keep those with confidence &ge; minconf.</li>
+  </ol>
+  <pre class="code">Apriori(D, minsup):
+    L1 &larr; frequent 1-itemsets
+    k  &larr; 2
+    while L(k-1) is not empty:
+        Ck &larr; { a &cup; b : a, b in L(k-1), |a &cup; b| = k }        # join
+        Ck &larr; { c in Ck : every (k-1)-subset of c is in L(k-1) }  # prune
+        count every c in Ck with one pass over D                   # scan
+        Lk &larr; { c in Ck : count(c) &ge; minsup }
+        k  &larr; k + 1
+    return L1 &cup; L2 &cup; &hellip;</pre>
+  <p class="interp">Many textbooks join only those itemsets that have the same first <i>k</i>&minus;2 items (after sorting). This gives fewer candidates. The method shown above is easier to follow by hand and gives exactly the same frequent itemsets.</p>
+
+  <h2>Step-by-step run on Dhanvanshi Super Store data</h2>
+  <p>Go through the algorithm one step at a time on our ten bills. Change the minimum support and observe which candidates become frequent, which fail the count, and which get pruned without counting.</p>
+  <div class="panel">
+    <div class="ctrl"><label for="ap-min">Minimum support</label><input type="range" id="ap-min" min="1" max="7" value="3"><output id="ap-min-out"></output></div>
+    <div class="ctrl"><label for="ap-conf">Minimum confidence</label><input type="range" id="ap-conf" min="10" max="100" step="5" value="70"><output id="ap-conf-out"></output></div>
+    <div class="row" style="margin-top:8px"><button class="btn primary" id="ap-next">Next step</button><button class="btn" id="ap-all">Show all steps</button><button class="btn" id="ap-reset">Start again</button></div>
+  </div>
+  <div id="ap-out" aria-live="polite"></div>
+
+  <h2>Limitations of Apriori</h2>
+  <p>Apriori needs one complete scan of the data for every level, and with a low minsup the number of candidates in <i>C</i><sub>2</sub> alone can run into lakhs. Two well-known algorithms reduce this effort. <b>FP-Growth</b> stores the data in a compact prefix tree (FP-tree) using only two scans and finds frequent itemsets without generating candidates. <b>Eclat</b> stores, for every itemset, the list of transaction IDs in which it appears, and finds support by intersecting these lists. All three algorithms give the same frequent itemsets; they differ in speed and memory usage.</p>
+
+  <h2>Apriori in Python and R</h2>
+  <p>On real data, Apriori is run using a library. In Python, the <code>mlxtend</code> library takes a one-hot table like the binary matrix in Chapter 1:</p>
+  <pre class="code">from mlxtend.frequent_patterns import apriori, association_rules
+
+freq  = apriori(onehot_df, min_support=0.3, use_colnames=True)
+rules = association_rules(freq, metric="confidence", min_threshold=0.7)
+rules.sort_values("lift", ascending=False)</pre>
+  <p>In R, the <code>arules</code> package does the same: <code>apriori(trans, parameter = list(supp = 0.3, conf = 0.7))</code>.</p>
+</section>
+
+<!-- ============ C7 ============ -->
+<section class="mod" id="m8" data-nav="10 solved problems" data-n="7" data-group="Practice">
+  <p class="modnum">Chapter 7</p>
+  <h1>Ten solved business problems</h1>
+  <p class="lede">Each problem gives a business situation, the data and a question. Solve it on your own first, check your key answer, and then open the solution one step at a time.</p>
+  <div class="exgrid" id="ex-grid" role="group" aria-label="Select a problem"></div>
+  <div id="ex-body"></div>
+</section>
+
+<!-- ============ C8 ============ -->
+<section class="mod" id="m9" data-nav="Rule finder" data-n="8">
+  <p class="modnum">Chapter 8</p>
+  <h1>Rule finder</h1>
+  <p class="lede">Enter your own transactions, one bill per line, with items separated by commas. The rule finder runs Apriori and lists every rule that meets your thresholds.</p>
+  <div class="row" style="margin-bottom:10px"><span class="pl">Load a dataset:</span><button class="btn" data-load="lab">Dhanvanshi Super Store (Chapter 1)</button><button class="btn" data-load="cap">Dhanvanshi staples (Problem 10)</button><button class="btn" data-load="cafe">FoodJoe Caf&eacute; orders</button></div>
+  <label for="xp-text" class="pl">Transactions</label>
+  <textarea id="xp-text" spellcheck="false"></textarea>
+  <div class="panel">
+    <div class="ctrl"><label for="xp-sup">Minimum support</label><input type="range" id="xp-sup" min="1" max="100" value="30"><output id="xp-sup-out"></output></div>
+    <div class="ctrl"><label for="xp-conf">Minimum confidence</label><input type="range" id="xp-conf" min="0" max="100" step="5" value="60"><output id="xp-conf-out"></output></div>
+    <div class="row"><label><input type="checkbox" id="xp-lift"> Show only rules with lift above 1</label></div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="xp-run">Find rules</button></div>
+  </div>
+  <div id="xp-out" aria-live="polite"></div>
+</section>
+
+<!-- ============ C9 ============ -->
+<section class="mod" id="m10" data-nav="Quiz" data-n="9">
+  <p class="modnum">Chapter 9</p>
+  <h1>Quiz</h1>
+  <p class="lede">Ten questions covering concepts and calculations. Questions marked "store data" use the ten bills of Dhanvanshi Super Store from Chapter 1.</p>
+  <div class="score"><span id="qz-score"></span><button class="btn" id="qz-reset">Reset quiz</button></div>
+  <div id="qz"></div>
+</section>
+
+<!-- ============ C10 ============ -->
+<section class="mod" id="m11" data-nav="Summary sheet" data-n="10">
+  <p class="modnum">Chapter 10</p>
+  <h1>Summary sheet</h1>
+  <div class="tbl-wrap"><table>
+    <tr><th>Measure</th><th>Formula</th><th>Question it answers</th><th>Range</th><th>Same both ways?</th></tr>
+    <tr><td>Support</td><td>&sigma;(X &cup; Y) / N</td><td>How common is the combination?</td><td>0 to 1</td><td>Yes</td></tr>
+    <tr><td>Confidence</td><td>Support(X &cup; Y) / Support(X)</td><td>When X is bought, how often is Y also bought?</td><td>0 to 1</td><td>No</td></tr>
+    <tr><td>Lift</td><td>Confidence(X &rarr; Y) / Support(Y)</td><td>How many times more likely than chance?</td><td>0 and above (1 = independent)</td><td>Yes</td></tr>
+  </table></div>
+
+  <div class="two">
+    <div class="panel">
+      <h3 style="margin-top:0">How to read a rule</h3>
+      <ol class="clean">
+        <li>Is the support high enough to matter for the business?</li>
+        <li>Is the confidence high enough to act upon in this direction?</li>
+        <li>Is the lift clearly above 1? If not, drop the rule.</li>
+        <li>Which direction has higher confidence? Use that direction.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">Apriori in short</h3>
+      <p>Count single items and keep the frequent ones. Join frequent (<i>k</i>&minus;1)-itemsets to form <i>k</i>-item candidates, prune candidates that have an infrequent subset, count the rest and keep the frequent ones. Repeat until no frequent itemset is left. Then split each frequent itemset into rules and keep those above minconf.</p>
+    </div>
+  </div>
+
+  <h2>Points to remember</h2>
+  <ul class="clean">
+    <li><b>High confidence but lift close to 1</b>: the consequent is simply a popular item (Bread &rarr; Milk; Veg puff &rarr; Masala chai at FoodJoe).</li>
+    <li><b>Very high lift but very low support</b>: most likely a chance occurrence in a few bills.</li>
+    <li><b>Lift does not show direction</b>: lift is the same both ways, so use confidence to choose the direction.</li>
+    <li><b>Daily-use staples</b>: items present in most bills pass every threshold but give little insight. Remove them or analyse each category separately.</li>
+    <li><b>Association is not causation</b>: test the action before applying it everywhere.</li>
+    <li><b>&sigma;(X &cup; Y) means "and"</b>: count only bills that contain all items of both sides.</li>
+  </ul>
+  <h2>Useful counts</h2>
+  <ul class="clean">
+    <li>Non-empty itemsets from <i>d</i> items: 2<sup><i>d</i></sup> &minus; 1</li>
+    <li>Possible rules from <i>d</i> items: 3<sup><i>d</i></sup> &minus; 2<sup><i>d</i>+1</sup> + 1</li>
+    <li>Rules from one frequent <i>k</i>-itemset: 2<sup><i>k</i></sup> &minus; 2</li>
+  </ul>
+</section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const f=(x,d=2)=>isFinite(x)?(Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toFixed(d):"\u2014";
+const fx=x=>isFinite(x)?String(Number(x.toFixed(3))):"\u2014";
+const pct=(x,d=0)=>f(x*100,d)+"%";
+const S=a=>"{"+a.join(", ")+"}";
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const IN=n=>n.toLocaleString("en-IN");
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- data ---------- */
+const LAB=[["Bread","Milk","Butter"],["Bread","Butter"],["Milk","Eggs"],["Bread","Milk","Butter","Eggs"],["Bread","Milk"],["Milk","Tea"],["Bread","Butter","Tea"],["Bread","Milk","Butter"],["Eggs","Tea"],["Bread","Milk","Eggs"]];
+const LAB_ITEMS=["Bread","Butter","Eggs","Milk","Tea"];
+const PRICE={Bread:40,Butter:55,Eggs:48,Milk:30,Tea:120,Rice:62,Dal:95,Oil:140,Sugar:45,Biscuits:20};
+const CAP=[["Rice","Dal","Oil"],["Rice","Dal"],["Rice","Oil","Sugar"],["Dal","Oil"],["Rice","Dal","Oil","Sugar"],["Rice","Dal","Oil"],["Sugar","Tea"],["Rice","Dal","Tea"],["Rice","Oil"],["Dal","Oil","Sugar"]];
+const EXPRESS=[["Bread","Butter","Milk"],["Bread","Butter"],["Milk","Biscuits"],["Bread","Butter","Eggs"],["Bread","Milk"],["Biscuits","Tea"],["Bread","Butter","Tea"],["Milk","Eggs"]];
+
+/* ---------- engine ---------- */
+const has=(t,set)=>set.every(i=>t.includes(i));
+const cnt=(tx,set)=>tx.reduce((n,t)=>n+(has(t,set)?1:0),0);
+function metrics(tx,A,B){
+  const N=tx.length,nA=cnt(tx,A),nB=cnt(tx,B),nAB=cnt(tx,A.concat(B));
+  const sA=nA/N,sB=nB/N,sAB=nAB/N,conf=nA?nAB/nA:NaN,lift=nA&&nB?conf/sB:NaN;
+  return {N,nA,nB,nAB,sA,sB,sAB,conf,lift};
+}
+function apriori(tx,minCount,limit){
+  limit=limit||40000;
+  const items=[...new Set(tx.flat())].sort();
+  const key=s=>s.join("\u0001");
+  const levels=[];let prevKeys=null;let k=1;let cands=items.map(i=>[i]);
+  while(cands.length){
+    const rows=[];
+    for(const c of cands){
+      const row={set:c};
+      if(k>1){
+        const bad=c.map((_,i)=>c.filter((__,j)=>j!==i)).find(s=>!prevKeys.has(key(s)));
+        if(bad){row.pruned=true;row.bad=bad;rows.push(row);continue;}
+      }
+      row.count=cnt(tx,c);row.freq=row.count>=minCount;rows.push(row);
+    }
+    const L=rows.filter(r=>r.freq).map(r=>r.set);
+    levels.push({k,rows,L});
+    if(L.length<2)break;
+    const seen=new Set(),next=[];
+    for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){
+      const u=[...new Set(L[i].concat(L[j]))].sort();
+      if(u.length===k+1&&!seen.has(key(u))){seen.add(key(u));next.push(u);}
+      if(next.length>limit)throw new Error("too many");
+    }
+    next.sort((a,b)=>key(a)<key(b)?-1:1);
+    prevKeys=new Set(L.map(key));cands=next;k++;
+  }
+  return levels;
+}
+function subsets(arr){const o=[];for(let m=1;m<(1<<arr.length)-1;m++)o.push(arr.filter((_,i)=>m&(1<<i)));return o;}
+function rulesFrom(tx,levels,minConf){
+  const out=[];
+  levels.forEach(l=>{if(l.k<2)return;l.L.forEach(Sx=>subsets(Sx).forEach(A=>{const B=Sx.filter(x=>!A.includes(x));const m=metrics(tx,A,B);out.push(Object.assign({A,B,pass:m.conf>=minConf-1e-9},m));}));});
+  return out;
+}
+
+/* ---------- bills ---------- */
+function receiptHTML(t,i,cls,marked){
+  const tot=t.reduce((s,x)=>s+(PRICE[x]||50),0);
+  return `<div class="receipt ${cls||""}" data-r="${i}"><div class="rh"><span>Bill ${String(i+1).padStart(2,"0")}</span><span>${t.length} item${t.length>1?"s":""}</span></div><ul>${t.map(x=>`<li class="${marked&&marked.includes(x)?"m":""}"><span>${esc(x)}</span><span>${(PRICE[x]||50).toFixed(0)}</span></li>`).join("")}</ul><div class="tot"><span>Total</span><span>&#8377;${tot}</span></div></div>`;
+}
+
+/* ---------- navigation ---------- */
+const mods=$$(".mod");
+const nav=$("#nav");
+let visited=new Set(store.get("mba-module-visited")||[]);
+function buildNav(){
+  let html="";
+  mods.forEach(m=>{
+    if(m.dataset.group)html+=`<li class="navgroup">${m.dataset.group}</li>`;
+    html+=`<li><a href="#${m.id}" data-id="${m.id}"><span class="n">${m.dataset.n||""}</span><span>${m.dataset.nav}</span><span class="seen">${visited.has(m.id)?"\u2713":""}</span></a></li>`;
+  });
+  nav.innerHTML=html;
+}
+function addPagers(){
+  mods.forEach((m,i)=>{
+    const p=mods[i-1],n=mods[i+1];if(i===0)return;
+    const d=document.createElement("div");d.className="pager";
+    const lab=x=>x.dataset.n?`Chapter ${x.dataset.n}: ${x.dataset.nav}`:x.dataset.nav;
+    d.innerHTML=(p?`<a href="#${p.id}"><small>Previous</small>${lab(p)}</a>`:"")+(n?`<a class="nx" href="#${n.id}"><small>Next</small>${lab(n)}</a>`:"");
+    m.appendChild(d);
+  });
+}
+function show(){
+  const id=(location.hash||"#start").slice(1);
+  const el=document.getElementById(id);
+  const target=el&&el.classList.contains("mod")?id:"start";
+  mods.forEach(m=>m.classList.toggle("on",m.id===target));
+  visited.add(target);store.set("mba-module-visited",[...visited]);
+  buildNav();
+  $$("#nav a").forEach(a=>{if(a.dataset.id===target)a.setAttribute("aria-current","page");});
+  $("#side").classList.remove("open");$("#navtoggle").setAttribute("aria-expanded","false");
+  window.scrollTo(0,0);
+}
+$("#navtoggle").addEventListener("click",()=>{const s=$("#side");s.classList.toggle("open");$("#navtoggle").setAttribute("aria-expanded",s.classList.contains("open"));});
+addPagers();window.addEventListener("hashchange",show);show();
+
+/* ---------- chapter 1 ---------- */
+$("#m1-receipts").innerHTML=LAB.map((t,i)=>receiptHTML(t,i,"",null)).join("");
+$("#m1-matrix").innerHTML=`<tr><th>Bill</th>${LAB_ITEMS.map(x=>`<th class="num">${x}</th>`).join("")}</tr>`+LAB.map((t,i)=>`<tr data-r="${i}"><td class="mono">${String(i+1).padStart(2,"0")}</td>${LAB_ITEMS.map(x=>`<td class="num" style="${t.includes(x)?"font-weight:700":"color:var(--muted)"}">${t.includes(x)?1:0}</td>`).join("")}</tr>`).join("")+`<tr><td><b>&sigma;</b></td>${LAB_ITEMS.map(x=>`<td class="num"><b>${cnt(LAB,[x])}</b></td>`).join("")}</tr>`;
+$$("#m1-matrix tr[data-r]").forEach(tr=>{
+  const r=()=>$(`#m1-receipts .receipt[data-r="${tr.dataset.r}"]`);
+  tr.addEventListener("mouseenter",()=>r().classList.add("hot"));
+  tr.addEventListener("mouseleave",()=>r().classList.remove("hot"));
+});
+const big=n=>n<1e6?IN(Math.round(n)):n.toExponential(2).replace("e+"," \u00D7 10^");
+function m1d(){const d=+$("#m1-d").value;$("#m1-d-out").textContent=d;$("#m1-d-res").innerHTML=`With ${d} items there are <b>${big(Math.pow(2,d)-1)}</b> possible non-empty itemsets.${d>=30?" Checking each of them against lakhs of bills is not practical.":""}`;}
+$("#m1-d").addEventListener("input",m1d);m1d();
+
+/* ---------- calculators ---------- */
+function mountLab(el,mode,A0,B0){
+  const st={A:new Set(A0),B:new Set(B0||[])};
+  const two=mode!=="support";
+  el.innerHTML=`<div class="lab">
+    <div class="pick"><span class="pl">${two?"If the bill has (X)":"Itemset (X)"}</span><div class="chips" data-row="A"></div></div>
+    ${two?`<div class="pick"><span class="pl">then it also has (Y)</span><div class="chips" data-row="B"></div></div>`:""}
+    <div class="legend">${two?`<span><i class="sw" style="background:var(--a-tint)"></i>Contains X only</span><span><i class="sw" style="background:var(--ab-tint)"></i>Contains X and Y</span>`:`<span><i class="sw" style="background:var(--ab-tint)"></i>Contains all items of X</span>`}</div>
+    <div class="receipts"></div><div class="result" aria-live="polite"></div></div>`;
+  function chips(){
+    $$(".chips",el).forEach(c=>{
+      const row=c.dataset.row,other=row==="A"?"B":"A";
+      c.innerHTML=LAB_ITEMS.map(x=>{
+        const on=st[row].has(x),blocked=two&&st[other].has(x);
+        return `<button class="chip ${on?(two?"on"+row:"onS"):""}" aria-pressed="${on}" data-i="${x}" ${blocked?`disabled title="${x} is already selected in ${other==="A"?"X":"Y"}"`:""}>${x}</button>`;
+      }).join("");
+    });
+  }
+  el.addEventListener("click",e=>{
+    const b=e.target.closest(".chip");if(!b||b.disabled)return;
+    const row=b.parentElement.dataset.row,x=b.dataset.i;
+    if(st[row].has(x))st[row].delete(x);else st[row].add(x);
+    render();
+  });
+  el.setRule=(A,B)=>{st.A=new Set(A);st.B=new Set(B);render();};
+  function render(){
+    chips();
+    const A=[...st.A].sort(),B=[...st.B].sort(),U=A.concat(B);
+    $(".receipts",el).innerHTML=LAB.map((t,i)=>{
+      let cls="";
+      if(two){if(A.length&&has(t,A))cls=B.length&&has(t,B)?"ab":"a";}
+      else if(A.length&&has(t,A))cls="ab";
+      return receiptHTML(t,i,cls,U);
+    }).join("");
+    const res=$(".result",el);
+    if(!A.length||(two&&!B.length)){res.innerHTML=`<p class="interp">Select at least one item${two?" in X and one item in Y":""}.</p>`;return;}
+    const m=metrics(LAB,A,B.length?B:A),N=m.N;
+    const X=S(A),Y=S(B),XY=S(U);
+    if(mode==="support"){
+      const s=m.sA;
+      res.innerHTML=`<div class="eq">Support(${X}) = ${fr("&sigma;(X)","N")} = ${fr(m.nA,N)} = <b>${f(s)}</b></div>
+      <p class="interp">${m.nA} out of ${N} bills (${pct(s)}) contain ${A.length>1?"all of ":""}${A.join(A.length>2?", ":" and ")}. At minsup = 30%, this itemset is <span class="pill ${s>=0.3-1e-9?"pos":"neg"}">${s>=0.3-1e-9?"frequent":"not frequent"}</span></p>`;
+      return;
+    }
+    if(!m.nA){res.innerHTML=`<p class="interp">No bill contains all items of ${X}. The rule never applies, so its confidence cannot be calculated.</p>`;return;}
+    const rev=metrics(LAB,B,A);
+    const supLine=`<div class="eq">Support(${X} &rarr; ${Y}) = ${fr("&sigma;(X &cup; Y)","N")} = ${fr(m.nAB,N)} = <b>${f(m.sAB)}</b></div>`;
+    const confLine=`<div class="eq">Confidence(${X} &rarr; ${Y}) = ${fr("&sigma;(X &cup; Y)","&sigma;(X)")} = ${fr(m.nAB,m.nA)} = <b>${f(m.conf)}</b></div>`;
+    const liftLine=`<div class="eq">Lift = ${fr("Confidence(X &rarr; Y)","Support(Y)")} = ${fr(f(m.conf),f(m.sB)+" &nbsp;("+m.nB+"/"+N+")")} = <b>${f(m.lift)}</b></div>`;
+    const gauge=`<div class="gauge" aria-hidden="true"><div class="bar"></div><div class="one"></div><div class="mk" style="left:${Math.min(m.lift,3)/3*100}%"></div><div class="ticks"><span style="left:0">0</span><span style="left:33.33%">1 (independent)</span><span style="left:66.66%">2</span><span style="left:98%">3+</span></div></div>`;
+    const li=m.lift;
+    const liftTxt=li>1.05?`Customers who buy ${X} buy ${Y} <b>${f(li)} times</b> as often as an average customer. <span class="pill pos">positive association</span>`:li>=0.95?`Lift is close to 1, so ${X} and ${Y} are nearly independent. The rule adds very little beyond the normal popularity of ${Y}. <span class="pill mut">nearly independent</span>`:`Customers who buy ${X} are <b>less</b> likely than an average customer to buy ${Y}. <span class="pill neg">negative association</span>`;
+    if(mode==="confidence"){
+      res.innerHTML=supLine+confLine+`<p class="interp">Out of the ${m.nA} bills with ${X}, ${m.nAB} also contain ${Y} (${pct(m.conf)}). In the reverse direction, Confidence(${Y} &rarr; ${X}) = ${fr(rev.nAB,rev.nA)} = ${f(rev.conf)}. For comparison, ${pct(m.sB)} of <em>all</em> bills contain ${Y}.</p>`;
+    }else{
+      res.innerHTML=supLine+confLine+liftLine+gauge+`<p class="interp" style="margin-top:22px">${liftTxt}</p>`;
+    }
+  }
+  render();return el;
+}
+mountLab($("#lab-support"),"support",["Bread","Butter"]);
+mountLab($("#lab-conf"),"confidence",["Bread"],["Butter"]);
+const liftLab=mountLab($("#lab-lift"),"lift",["Bread"],["Milk"]);
+const presets=[[["Bread"],["Milk"]],[["Butter"],["Bread"]],[["Milk"],["Eggs"]],[["Tea"],["Bread"]],[["Butter","Milk"],["Bread"]]];
+$("#lift-presets").innerHTML='<span class="pl" style="align-self:center">Try these:</span>'+presets.map((p,i)=>`<button class="btn" data-p="${i}">${p[0].join(", ")} &rarr; ${p[1].join(", ")}</button>`).join("");
+$("#lift-presets").addEventListener("click",e=>{const b=e.target.closest("[data-p]");if(b){const p=presets[+b.dataset.p];liftLab.setRule(p[0],p[1]);}});
+
+/* ---------- chapter 5 ---------- */
+function m6d(){const d=+$("#m6-d").value;$("#m6-d-out").textContent=d;const R=Math.pow(3,d)-Math.pow(2,d+1)+1;$("#m6-d-res").innerHTML=`With ${d} items there are <b>${big(R)}</b> possible rules.${d===5?" Even our small store with five items has 180 rules.":""}`;}
+$("#m6-d").addEventListener("input",m6d);m6d();
+(function(){
+  const I=["Bread","Butter","Milk"];
+  const rows=subsets(I).map(A=>{const B=I.filter(x=>!A.includes(x));return Object.assign({A,B},metrics(LAB,A,B));}).sort((a,b)=>b.conf-a.conf);
+  $("#m6-rules").innerHTML=`<tr><th>Rule</th><th class="num">Support</th><th class="num">Confidence</th><th class="num">Lift</th><th>At minconf 70%</th></tr>`+rows.map(r=>`<tr class="${r.conf>=0.7?"pass":""}"><td>${S(r.A)} &rarr; ${S(r.B)}</td><td class="num">${f(r.sAB)}</td><td class="num">${r.nAB}/${r.nA} = ${f(r.conf)}</td><td class="num">${f(r.lift)}</td><td>${r.conf>=0.7?'<span class="pill pos">keep</span>':'<span class="pill mut">drop</span>'}</td></tr>`).join("");
+  $("#m6-rules").classList.add("rtbl");
+})();
+
+/* ---------- apriori display ---------- */
+function levelHTML(l,N){
+  const pr=l.rows.filter(r=>r.pruned).length,ct=l.rows.length-pr;
+  const title=l.k===1?"Level 1: count every single item":`Level ${l.k}: join, prune, count`;
+  const meta=l.k===1?`${l.rows.length} candidates in C<sub>1</sub>, one scan of the data.`:`The join step gave ${l.rows.length} candidate${l.rows.length!==1?"s":""} in C<sub>${l.k}</sub>. Pruned without counting: ${pr}. Counted in one scan: ${ct}.`;
+  const rows=l.rows.map(r=>{
+    let st;
+    if(r.pruned)st=`<span class="pill neg">pruned: ${S(r.bad)} is not frequent</span>`;
+    else st=r.freq?`<span class="pill pos">frequent</span>`:`<span class="pill mut">below minimum</span>`;
+    return `<tr class="${r.pruned?"pruned":""}"><td>${S(r.set)}</td><td class="num">${r.pruned?"not counted":r.count}</td><td class="num">${r.pruned?"":f(r.count/N)}</td><td>${st}</td></tr>`;
+  }).join("");
+  return `<div class="level"><h4>${title}</h4><div class="meta">${meta}</div><div class="tbl-wrap"><table><tr><th>Candidate</th><th class="num">Count</th><th class="num">Support</th><th>Result</th></tr>${rows}</table></div>
+  <div class="lset"><b>L<sub>${l.k}</sub></b> = ${l.L.length?l.L.map(S).join(", "):"&empty; (no frequent itemsets, so the algorithm stops here)"}</div></div>`;
+}
+function rulesHTML(rules,minConf,title){
+  if(!rules.length)return `<div class="level"><h4>${title||"Rule generation"}</h4><p class="interp">No frequent itemset has two or more items, so no rules can be formed.</p></div>`;
+  const pass=rules.filter(r=>r.pass).length;
+  const rs=rules.slice().sort((a,b)=>b.conf-a.conf||b.lift-a.lift);
+  return `<div class="level"><h4>${title||"Rule generation"}</h4><div class="meta">${rules.length} possible rules from the frequent itemsets. ${pass} of them meet minimum confidence ${pct(minConf)}.</div><div class="tbl-wrap"><table><tr><th>Rule</th><th class="num">Support</th><th class="num">Confidence</th><th class="num">Lift</th><th>Result</th></tr>${rs.map(r=>`<tr class="${r.pass?"pass":""}"><td>${S(r.A)} &rarr; ${S(r.B)}</td><td class="num">${f(r.sAB)}</td><td class="num">${r.nAB}/${r.nA} = ${f(r.conf)}</td><td class="num">${f(r.lift)}</td><td>${r.pass?'<span class="pill pos">strong</span>':'<span class="pill mut">below minconf</span>'}</td></tr>`).join("")}</table></div></div>`;
+}
+
+/* ---------- chapter 6 ---------- */
+(function(){
+  let shown=1;
+  const out=$("#ap-out");
+  function run(){
+    const mc=+$("#ap-min").value,conf=+$("#ap-conf").value/100;
+    $("#ap-min-out").textContent=`${mc} bill${mc>1?"s":""} (${mc*10}%)`;$("#ap-conf-out").textContent=pct(conf);
+    const lv=apriori(LAB,mc),rules=rulesFrom(LAB,lv,conf);
+    const steps=lv.map(l=>levelHTML(l,LAB.length)).concat([rulesHTML(rules,conf)]);
+    shown=Math.min(shown,steps.length);
+    out.innerHTML=steps.slice(0,shown).join("");
+    $("#ap-next").disabled=shown>=steps.length;
+    $("#ap-next").textContent=shown>=steps.length?"All steps shown":"Next step";
+  }
+  $("#ap-next").addEventListener("click",()=>{shown++;run();out.lastElementChild&&out.lastElementChild.scrollIntoView({behavior:"smooth",block:"nearest"});});
+  $("#ap-all").addEventListener("click",()=>{shown=99;run();});
+  $("#ap-reset").addEventListener("click",()=>{shown=1;run();});
+  $("#ap-min").addEventListener("input",run);$("#ap-conf").addEventListener("input",run);
+  run();
+})();
+
+/* ---------- chapter 7: solved problems ---------- */
+const T=(rows)=>`<div class="tbl-wrap"><table><tr><th>Data</th><th class="num">Count</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${IN(r[1])}</td></tr>`).join("")}</table></div>`;
+/* Always shows the support, confidence and lift formulas for a rule */
+function RB(X,Y,nX,nY,nXY,N){
+  const s=nXY/N,c=nXY/nX,sY=nY/N,l=c/sY;
+  return {s,c,l,sY,html:`<div class="rb"><p class="rt">Rule: ${X} &rarr; ${Y} &nbsp;<small style="font-weight:400;color:var(--muted)">(here X = ${X}, Y = ${Y})</small></p>
+  <div class="fl"><span class="fk">Support</span>Support(X &rarr; Y) = ${fr("&sigma;(X &cup; Y)","N")} = ${fr(IN(nXY),IN(N))} = <b>${fx(s)}</b></div>
+  <div class="fl"><span class="fk">Confidence</span>Confidence(X &rarr; Y) = ${fr("&sigma;(X &cup; Y)","&sigma;(X)")} = ${fr(IN(nXY),IN(nX))} = <b>${fx(c)}</b></div>
+  <div class="fl"><span class="fk">Lift</span>Lift(X &rarr; Y) = ${fr("Confidence(X &rarr; Y)","Support(Y)")} = ${fr(fx(c),fx(sY))} = <b>${fx(l)}</b> &nbsp;<small>where Support(Y) = ${IN(nY)}/${IN(N)} = ${fx(sY)}</small></div></div>`};
+}
+const EX=[];
+/* 1 */ (function(){const tx=EXPRESS,m=metrics(tx,["Bread"],["Butter"]),r=RB("{Bread}","{Butter}",m.nA,m.nB,m.nAB,m.N);EX.push({
+  title:"Bread and butter at the billing counter",biz:"Dhanvanshi Super Store",
+  scenario:"Dhanvanshi Super Store has a small rack right next to its express billing counter. The store manager wants to know whether butter should be kept on this rack next to bread. The manager collects the last eight bills from the express counter.",
+  data:`<div class="receipts">${tx.map((t,i)=>receiptHTML(t,i,"",null)).join("")}</div>`,
+  question:"Find the support, confidence and lift of the rule {Bread} &rarr; {Butter}. Should butter be kept next to bread?",
+  check:{label:"Lift of Bread &rarr; Butter",ans:r.l},
+  steps:[
+    ["Write down the counts",`N = ${m.N} bills. Bread appears in ${m.nA} bills, butter in ${m.nB} bills, and both together in ${m.nAB} bills (Bills 01, 02, 04 and 07).<br>So &sigma;(X) = ${m.nA}, &sigma;(Y) = ${m.nB} and &sigma;(X &cup; Y) = ${m.nAB}.`],
+    ["Apply the formulas",r.html]],
+  decision:`A lift of ${fx(r.l)} means customers who buy bread buy butter 1.6 times as often as an average customer. So butter should be kept on the counter rack next to bread. Since this result is based on only eight bills, the manager should check it again after collecting a few weeks of data.`});})();
+/* 2 */ (function(){const N=2000,a=250,b=400,ab=120;const r1=RB("{Instant noodles}","{Tomato ketchup}",a,b,ab,N),r2=RB("{Tomato ketchup}","{Instant noodles}",b,a,ab,N);EX.push({
+  title:"Noodles and ketchup in the evening",biz:"Aman Mart",
+  scenario:"The category manager at Aman Mart feels that evening shoppers who buy instant noodles also pick up tomato ketchup. Before changing the shelf layout, the manager checks 2,000 evening bills.",
+  data:T([["Evening bills (N)",N],["Bills with instant noodles",a],["Bills with tomato ketchup",b],["Bills with both",ab]]),
+  question:"Find the support, confidence and lift for {Instant noodles} &rarr; {Tomato ketchup} and for the reverse rule. Which direction should Aman Mart use when planning the display?",
+  check:{label:"Lift of Noodles &rarr; Ketchup",ans:r1.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Noodles) = ${a}, &nbsp; &sigma;(Ketchup) = ${b}, &nbsp; &sigma;(Noodles, Ketchup) = ${ab}.`],
+    ["Rule 1: Noodles &rarr; Ketchup",r1.html],
+    ["Rule 2: Ketchup &rarr; Noodles",r2.html],
+    ["Compare the two rules",`Both rules have the same support (${fx(r1.s)}) and the same lift (${fx(r1.l)}), because support and lift do not depend on direction. Confidence is different: ${fx(r1.c)} for Noodles &rarr; Ketchup and only ${fx(r2.c)} for Ketchup &rarr; Noodles.`]],
+  decision:"The association is strong (lift 2.4). Since 48% of noodle buyers also buy ketchup, but only 30% of ketchup buyers buy noodles, the display should be planned from the noodles side: keep ketchup bottles at the end of the noodles shelf, not the other way round."});})();
+/* 3 */ (function(){const N=10000,bi=3000,ra=1500,br=1200,gj=800,bg=360;const r1=RB("{Biryani}","{Raita}",bi,ra,br,N),r2=RB("{Biryani}","{Gulab jamun}",bi,gj,bg,N),r3=RB("{Raita}","{Biryani}",ra,bi,br,N);EX.push({
+  title:"Choosing a biryani combo",biz:"FoodJoe",
+  scenario:"FoodJoe, a food delivery app, wants to add a default combo for biryani on its partner restaurant menus. The two options for the add-on are raita and gulab jamun. The team collects data of 10,000 orders from restaurants that serve biryani.",
+  data:T([["Orders (N)",N],["Orders with biryani",bi],["Orders with raita",ra],["Orders with gulab jamun",gj],["Orders with biryani and raita",br],["Orders with biryani and gulab jamun",bg]]),
+  question:"Compare {Biryani} &rarr; {Raita} with {Biryani} &rarr; {Gulab jamun}. Which one should be the default combo? What does the rule {Raita} &rarr; {Biryani} tell us?",
+  check:{label:"Lift of Biryani &rarr; Raita",ans:r1.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Biryani) = ${IN(bi)}, &nbsp; &sigma;(Raita) = ${IN(ra)}, &nbsp; &sigma;(Gulab jamun) = ${gj}, &nbsp; &sigma;(Biryani, Raita) = ${IN(br)}, &nbsp; &sigma;(Biryani, Gulab jamun) = ${bg}.`],
+    ["Rule 1: Biryani &rarr; Raita",r1.html],
+    ["Rule 2: Biryani &rarr; Gulab jamun",r2.html],
+    ["Rule 3: Raita &rarr; Biryani",r3.html+`<p style="margin:6px 0 0">The lift is the same as Rule 1, but the confidence is ${fx(r3.c)}: raita is almost always ordered along with biryani.</p>`]],
+  decision:"Biryani + raita is better on support, confidence and lift, so it should be the default combo. Gulab jamun also has a positive association (lift 1.5), but it is weaker, so it can be shown as a one-tap dessert add-on at checkout instead of being part of the combo. Rule 3 shows that raita rarely sells alone, so there is little benefit in promoting it separately."});})();
+/* 4 */ (function(){const N=20000,ml=1000,py=2500,b=400;const r1=RB("{ML book}","{Python book}",ml,py,b,N),r2=RB("{Python book}","{ML book}",py,ml,b,N);EX.push({
+  title:"Which page should show the suggestion?",biz:"Aman Mart online",
+  scenario:"The online book section of Aman Mart has 20,000 orders in the programming category. The team wants to show an introductory machine learning book and a Python book as a \u201Cfrequently bought together\u201D pair, and must decide on which product page this suggestion should appear.",
+  data:T([["Orders in the category (N)",N],["Orders with the ML book",ml],["Orders with the Python book",py],["Orders with both",b]]),
+  question:"Find the support, confidence and lift for ML book &rarr; Python book and for Python book &rarr; ML book. On which page is the suggestion stronger?",
+  check:{label:"Confidence of Python &rarr; ML",ans:r2.c},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(ML) = ${IN(ml)}, &nbsp; &sigma;(Python) = ${IN(py)}, &nbsp; &sigma;(ML, Python) = ${b}.`],
+    ["Rule 1: ML book &rarr; Python book",r1.html],
+    ["Rule 2: Python book &rarr; ML book",r2.html],
+    ["Compare the two rules",`The lift is ${fx(r1.l)} in both directions because lift is symmetric, so lift alone cannot choose the page. Confidence is ${fx(r1.c)} for ML &rarr; Python and ${fx(r2.c)} for Python &rarr; ML.`]],
+  decision:"40% of customers who buy the ML book also buy the Python book, whereas only 16% of Python book buyers also buy the ML book. So the Python book should appear in the \u201Cfrequently bought together\u201D section on the ML book's page. On the Python book's page, the ML book can be shown as a lighter \u201Cyou may also like\u201D suggestion."});})();
+/* 5 */ (function(){const N=4000,ab=600,pr=500,b=300;const r=RB("{Antibiotic prescription}","{Probiotic}",ab,pr,b,N);EX.push({
+  title:"What goes near the prescription counter?",biz:"Aman Mart pharmacy",
+  scenario:"The in-store pharmacy at Aman Mart wants to decide which over-the-counter products should be displayed near the prescription counter. One option is probiotics, which customers often buy along with a course of antibiotics. The pharmacy checks 4,000 bills.",
+  data:T([["Bills (N)",N],["Bills with an antibiotic prescription",ab],["Bills with a probiotic",pr],["Bills with both",b]]),
+  question:"Find the support, confidence and lift of {Antibiotic prescription} &rarr; {Probiotic}. Should probiotics get space near the prescription counter?",
+  check:{label:"Lift of Antibiotic &rarr; Probiotic",ans:r.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Antibiotic) = ${ab}, &nbsp; &sigma;(Probiotic) = ${pr}, &nbsp; &sigma;(Antibiotic, Probiotic) = ${b}.`],
+    ["Apply the formulas",r.html],
+    ["Interpret",`Half of the bills with an antibiotic prescription also have a probiotic, and the lift is ${fx(r.l)}.`]],
+  decision:"With a lift of 4, probiotics appear in antibiotic bills four times as often as in an average bill. So probiotics deserve a place near the prescription counter. Note that this rule only helps in deciding product placement; what a patient should buy is decided by the doctor's prescription."});})();
+/* 6 */ (function(){const N=1000,vp=200,ch=800,b=140;const r=RB("{Veg puff}","{Masala chai}",vp,ch,b,N);EX.push({
+  title:"The puff and chai combo",biz:"FoodJoe Caf\u00E9",
+  scenario:"The marketing team of FoodJoe Caf\u00E9 notices that 70% of veg puff orders also include a masala chai. They propose a \u201Cpuff + chai\u201D combo at a discount. Before approving it, the analyst checks 1,000 orders.",
+  data:T([["Orders (N)",N],["Orders with a veg puff",vp],["Orders with a masala chai",ch],["Orders with both",b]]),
+  question:"Find the support, confidence and lift for {Veg puff} &rarr; {Masala chai}. Should the caf\u00E9 run the combo discount?",
+  check:{label:"Lift of Veg puff &rarr; Masala chai",ans:r.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Veg puff) = ${vp}, &nbsp; &sigma;(Masala chai) = ${ch}, &nbsp; &sigma;(Veg puff, Masala chai) = ${b}.`],
+    ["Apply the formulas",r.html],
+    ["Interpret",`Confidence is ${fx(r.c)}, which is the 70% the marketing team noticed. But masala chai is present in ${fx(r.sY*100)}% of all orders, so the lift is ${fx(r.l)}, which is below 1.`]],
+  decision:"The combo should not be run. The 70% confidence only shows that masala chai is very popular, being part of 80% of all orders. Customers who buy a veg puff are actually slightly less likely than average to buy masala chai. A discount would mostly reduce the price of chai that customers were going to buy anyway. The better next step is to check what veg puff buyers do buy with it (cold coffee, lassi, juice) using the same analysis."});})();
+/* 7 */ (function(){const N=5000,P=800,C=1000,G=900,PC=560,PG=480,PCG=400;const r1=RB("{Phone}","{Case}",P,C,PC,N),r2=RB("{Case}","{Phone}",C,P,PC,N),r3=RB("{Phone}","{Screen guard}",P,G,PG,N),r4=RB("{Phone, Case}","{Screen guard}",PC,G,PCG,N);EX.push({
+  title:"Designing a phone accessory bundle",biz:"Aman Mart electronics",
+  scenario:"The electronics section of Aman Mart wants to design a smartphone accessory bundle and decide the order in which the sales staff should offer accessories at the billing counter. The team looks at 5,000 invoices.",
+  data:T([["Invoices (N)",N],["With a phone",P],["With a phone case",C],["With a screen guard",G],["Phone and case",PC],["Phone and screen guard",PG],["Phone, case and screen guard",PCG]]),
+  question:"Find the support, confidence and lift for Phone &rarr; Case, Case &rarr; Phone, Phone &rarr; Screen guard and {Phone, Case} &rarr; Screen guard. What bundle and offer sequence should the staff follow?",
+  check:{label:"Confidence of {Phone, Case} &rarr; Screen guard",ans:r4.c},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Phone) = ${P}, &nbsp; &sigma;(Case) = ${IN(C)}, &nbsp; &sigma;(Screen guard) = ${G}, &nbsp; &sigma;(Phone, Case) = ${PC}, &nbsp; &sigma;(Phone, Screen guard) = ${PG}, &nbsp; &sigma;(Phone, Case, Screen guard) = ${PCG}.`],
+    ["Rule 1: Phone &rarr; Case",r1.html],
+    ["Rule 2: Case &rarr; Phone",r2.html+`<p style="margin:6px 0 0">Same support and lift as Rule 1, but lower confidence.</p>`],
+    ["Rule 3: Phone &rarr; Screen guard",r3.html],
+    ["Rule 4: {Phone, Case} &rarr; Screen guard",r4.html+`<p style="margin:6px 0 0">When the case is added to the antecedent, confidence rises from ${fx(r3.c)} to ${fx(r4.c)}.</p>`]],
+  decision:"Aman Mart should offer a three-item bundle of phone, case and screen guard. For the billing counter, staff should first offer the case (70% of phone buyers buy one), and then offer the screen guard once the case is added to the bill, because at that point the chance of a yes goes up from 60% to about 71%."});})();
+/* 8 */ (function(){const N=10000,k=1200,d=600,kd=360,j=3000,t=4000,jt=1500;const r1=RB("{Kurta}","{Dupatta}",k,d,kd,N),r2=RB("{Jeans}","{T-shirt}",j,t,jt,N);EX.push({
+  title:"Precise rule or popular rule?",biz:"Aman Mart fashion",
+  scenario:"The fashion section of Aman Mart's app has budget for one personalised \u201Ccomplete the look\u201D widget and one app-wide promotion. Two rules from 10,000 orders are being considered.",
+  data:T([["Orders (N)",N],["With a kurta",k],["With a dupatta",d],["Kurta and dupatta",kd],["With jeans",j],["With a T-shirt",t],["Jeans and T-shirt",jt]]),
+  question:"Find the support, confidence and lift for {Kurta} &rarr; {Dupatta} and {Jeans} &rarr; {T-shirt}. Which rule suits which use?",
+  check:{label:"Lift of Kurta &rarr; Dupatta",ans:r1.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Kurta) = ${IN(k)}, &nbsp; &sigma;(Dupatta) = ${d}, &nbsp; &sigma;(Kurta, Dupatta) = ${kd}, &nbsp; &sigma;(Jeans) = ${IN(j)}, &nbsp; &sigma;(T-shirt) = ${IN(t)}, &nbsp; &sigma;(Jeans, T-shirt) = ${IN(jt)}.`],
+    ["Rule 1: Kurta &rarr; Dupatta",r1.html],
+    ["Rule 2: Jeans &rarr; T-shirt",r2.html],
+    ["Compare the two rules",`Rule 1 has four times the lift (${fx(r1.l)} against ${fx(r2.l)}), but Rule 2 has about four times the support (${fx(r2.s)} against ${fx(r1.s)}). Rule 1 applies to ${kd} orders and Rule 2 to ${IN(jt)} orders.`]],
+  decision:"Kurta &rarr; Dupatta is a very precise rule (lift 5) but it covers only 3.6% of orders. It is ideal for the personalised widget on kurta pages, where a relevant suggestion matters most. Jeans &rarr; T-shirt covers 15% of orders with a moderate lift, so it suits an app-wide \u201Cjeans + tee\u201D promotion that reaches many shoppers. Neither rule is better in every case; the business use decides."});})();
+/* 9 */ (function(){const N=20000,sa=8000,cc=5000,fd=3000,scc=3200,sfd=1000;const r1=RB("{Salary account}","{Credit card}",sa,cc,scc,N),r2=RB("{Salary account}","{Fixed deposit}",sa,fd,sfd,N);EX.push({
+  title:"Cross-selling to salary account holders",biz:"A retail bank",
+  scenario:"A retail bank has 20,000 customers and a limited budget for phone calls. Relationship managers will call salary account holders with one offer: either a credit card or a fixed deposit. Here the \u201Cbasket\u201D is the set of products each customer holds.",
+  data:T([["Customers (N)",N],["Hold a salary account",sa],["Hold a credit card",cc],["Hold a fixed deposit",fd],["Salary account and credit card",scc],["Salary account and fixed deposit",sfd]]),
+  question:"Find the support, confidence and lift for Salary account &rarr; Credit card and Salary account &rarr; Fixed deposit. Which product should the calling campaign offer?",
+  check:{label:"Lift of Salary account &rarr; FD",ans:r2.l},
+  steps:[
+    ["Write down the counts",`N = ${IN(N)}, &nbsp; &sigma;(Salary) = ${IN(sa)}, &nbsp; &sigma;(Credit card) = ${IN(cc)}, &nbsp; &sigma;(FD) = ${IN(fd)}, &nbsp; &sigma;(Salary, Credit card) = ${IN(scc)}, &nbsp; &sigma;(Salary, FD) = ${IN(sfd)}.`],
+    ["Rule 1: Salary account &rarr; Credit card",r1.html],
+    ["Rule 2: Salary account &rarr; Fixed deposit",r2.html]],
+  decision:"The campaign should offer the credit card. Salary account holders buy credit cards 1.6 times as often as an average customer, while their FD uptake is below average (lift 0.83). The FD campaign should be aimed at a different customer segment. This problem also shows that Market Basket Analysis can be used wherever we can list what goes together, not only in shops."});})();
+/* 10 */ (function(){const lv=apriori(CAP,3),rules=rulesFrom(CAP,lv,0.7),pass=rules.filter(r=>r.pass);const lifts=pass.map(r=>r.lift);
+  const ra=RB("{Rice}","{Dal}",cnt(CAP,["Rice"]),cnt(CAP,["Dal"]),cnt(CAP,["Rice","Dal"]),CAP.length);
+  const rs=RB("{Sugar}","{Oil}",cnt(CAP,["Sugar"]),cnt(CAP,["Oil"]),cnt(CAP,["Sugar","Oil"]),CAP.length);
+  const formulas=`<div class="rb"><p class="rt">Formulas used for every rule</p><div class="fl"><span class="fk">Support</span>Support(X &rarr; Y) = ${fr("&sigma;(X &cup; Y)","N")}</div><div class="fl"><span class="fk">Confidence</span>Confidence(X &rarr; Y) = ${fr("&sigma;(X &cup; Y)","&sigma;(X)")}</div><div class="fl"><span class="fk">Lift</span>Lift(X &rarr; Y) = ${fr("Confidence(X &rarr; Y)","Support(Y)")}</div></div>`;
+  EX.push({
+  title:"Complete Apriori run on the staples aisle",biz:"Dhanvanshi Super Store",
+  scenario:"Dhanvanshi Super Store wants association rules from ten bills of its staples aisle. The manager has fixed minimum support at 30% (3 bills) and minimum confidence at 70%.",
+  data:`<div class="receipts">${CAP.map((t,i)=>receiptHTML(t,i,"",null)).join("")}</div>`,
+  question:"Run the Apriori algorithm completely. Which itemsets are frequent, which candidates are pruned, and which rules are strong? Then check their lift.",
+  check:{label:"Number of rules that meet both thresholds",ans:pass.length,exact:true},
+  steps:lv.map(l=>[`Level ${l.k}`,levelHTML(l,CAP.length)]).concat([
+    ["Generate rules",formulas+rulesHTML(rules,0.7,"All possible rules")],
+    ["Working for two strong rules",ra.html+rs.html],
+    ["Check the lift",`${pass.length} rules meet both thresholds, but their lift values lie only between <b>${f(Math.min(...lifts))}</b> and <b>${f(Math.max(...lifts))}</b>.`]]),
+  decision:"All the strong rules are only slightly above independence. Rice, dal and oil are staples present in 70% of the bills, so they appear together mainly because almost every customer buys them. Meeting the thresholds does not automatically mean the rule is useful. Always filter rules by lift, and consider running the analysis again without staples, or within non-staple categories, to find associations worth acting on."});})();
+
+(function(){
+  const grid=$("#ex-grid"),body=$("#ex-body");let cur=0,shown=0;
+  grid.innerHTML=EX.map((e,i)=>`<button class="exbtn" data-i="${i}" aria-pressed="false"><span class="no">Problem ${i+1}</span><span class="tt">${e.title}</span><span class="biz">${e.biz}</span></button>`).join("");
+  function render(){
+    const e=EX[cur];
+    $$(".exbtn",grid).forEach((b,i)=>b.setAttribute("aria-pressed",i===cur));
+    body.innerHTML=`<p class="modnum">Problem ${cur+1} of 10</p><h2 style="margin-top:0">${e.title}</h2><p class="interp" style="margin-top:0">${e.biz}</p>
+      <p>${e.scenario}</p>${e.data}
+      <div class="q"><b>Question.</b> ${e.question}</div>
+      <div class="check"><label for="ex-ans">${e.check.label}:</label><input id="ex-ans" inputmode="decimal" autocomplete="off"><button class="btn" id="ex-chk">Check</button><span class="fb" id="ex-fb" aria-live="polite"></span></div>
+      <div id="ex-steps"></div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="ex-next">Show step 1</button><button class="btn" id="ex-allb">Show full solution</button></div>`;
+    shown=0;steps();
+    $("#ex-chk").addEventListener("click",check);
+    $("#ex-ans").addEventListener("keydown",ev=>{if(ev.key==="Enter")check();});
+    $("#ex-next").addEventListener("click",()=>{shown++;steps();});
+    $("#ex-allb").addEventListener("click",()=>{shown=99;steps();});
+  }
+  function steps(){
+    const e=EX[cur],n=e.steps.length;shown=Math.min(shown,n+1);
+    let h=e.steps.slice(0,shown).map((s,i)=>`<div class="step"><h4><span class="sn">Step ${i+1}</span>${s[0]}</h4><div>${s[1]}</div></div>`).join("");
+    if(shown>n)h+=`<div class="decision"><b class="t">Business decision</b>${e.decision}</div>`;
+    $("#ex-steps").innerHTML=h;
+    const nb=$("#ex-next");
+    if(shown>n){nb.disabled=true;nb.textContent="Solution complete";$("#ex-allb").disabled=true;}
+    else{nb.disabled=false;nb.textContent=shown===n?"Show the business decision":`Show step ${shown+1}`;$("#ex-allb").disabled=false;}
+  }
+  function check(){
+    const e=EX[cur],raw=$("#ex-ans").value.trim().replace(",","."),v=parseFloat(raw),fb=$("#ex-fb");
+    if(!raw||isNaN(v)){fb.className="fb no";fb.textContent="Please enter a number, for example 1.25";return;}
+    const a=e.check.ans,ok=e.check.exact?v===a:Math.abs(v-a)<=Math.max(0.011,Math.abs(a)*0.02);
+    fb.className="fb "+(ok?"ok":"no");
+    fb.textContent=ok?`Correct: ${e.check.exact?a:fx(a)}`:"Not correct. Go through the steps below and try again.";
+  }
+  grid.addEventListener("click",ev=>{const b=ev.target.closest(".exbtn");if(!b)return;cur=+b.dataset.i;render();body.scrollIntoView({behavior:"smooth",block:"start"});});
+  render();
+})();
+
+/* ---------- chapter 8: rule finder ---------- */
+(function(){
+  const SETS={lab:LAB,cap:CAP,cafe:[["Masala chai","Veg puff"],["Masala chai","Samosa"],["Cold coffee","Sandwich"],["Masala chai","Samosa"],["Masala chai","Lassi"],["Veg puff","Masala chai","Vada pav"],["Cold coffee","Sandwich","Brownie"],["Masala chai","Samosa","Vada pav"],["Veg puff","Lassi"],["Masala chai","Samosa"],["Cold coffee","Brownie"],["Masala chai","Vada pav"]]};
+  const ta=$("#xp-text"),out=$("#xp-out");let sortKey="lift",sortDir=-1,last=null;
+  const load=k=>{ta.value=SETS[k].map(t=>t.join(", ")).join("\n");};
+  load("lab");
+  $$("[data-load]").forEach(b=>b.addEventListener("click",()=>{load(b.dataset.load);run();}));
+  function labels(){$("#xp-sup-out").textContent=$("#xp-sup").value+"%";$("#xp-conf-out").textContent=$("#xp-conf").value+"%";}
+  $("#xp-sup").addEventListener("input",labels);$("#xp-conf").addEventListener("input",labels);labels();
+  function run(){
+    const tx=ta.value.split(/\n/).map(l=>[...new Set(l.split(",").map(s=>s.trim()).filter(Boolean))]).filter(t=>t.length);
+    if(tx.length<2){out.innerHTML=`<p class="err">Enter at least two transactions, one per line, with items separated by commas.</p>`;return;}
+    const N=tx.length,ms=+$("#xp-sup").value/100,mc=+$("#xp-conf").value/100,minCount=Math.max(1,Math.ceil(ms*N-1e-9));
+    let lv;
+    try{lv=apriori(tx,minCount);}catch(e){out.innerHTML=`<p class="err">Too many candidate itemsets at this minimum support. Increase the minimum support and try again.</p>`;return;}
+    let rules=rulesFrom(tx,lv,mc).filter(r=>r.pass);
+    if($("#xp-lift").checked)rules=rules.filter(r=>r.lift>1);
+    const nFreq=lv.reduce((s,l)=>s+l.L.length,0),items=new Set(tx.flat()).size;
+    last={rules,N,minCount,nFreq,items};draw();
+  }
+  function draw(){
+    const {rules,N,minCount,nFreq,items}=last;
+    const key={rule:r=>S(r.A)+S(r.B),sup:r=>r.sAB,conf:r=>r.conf,lift:r=>r.lift};
+    const rs=rules.slice().sort((a,b)=>{const x=key[sortKey](a),y=key[sortKey](b);return (x<y?-1:x>y?1:0)*sortDir;});
+    const hd=(k,t,num)=>`<th class="sortable ${num?"num":""}" data-k="${k}" aria-sort="${sortKey===k?(sortDir>0?"ascending":"descending"):"none"}">${t}${sortKey===k?(sortDir>0?" \u25B2":" \u25BC"):""}</th>`;
+    out.innerHTML=`<p><b>${N}</b> transactions, <b>${items}</b> different items. Minimum support = ${minCount} transaction${minCount>1?"s":""}. <b>${nFreq}</b> frequent itemsets and <b>${rules.length}</b> rules found.</p>
+      ${rules.length?`<div class="tbl-wrap"><table class="rtbl"><tr>${hd("rule","Rule")}${hd("sup","Support",1)}${hd("conf","Confidence",1)}${hd("lift","Lift",1)}</tr>${rs.map(r=>`<tr><td>${esc(S(r.A))} &rarr; ${esc(S(r.B))}</td><td class="num">${f(r.sAB)}</td><td class="num">${f(r.conf)}</td><td class="num" style="color:${r.lift>1.05?"var(--pos)":r.lift<0.95?"var(--neg)":"inherit"}">${f(r.lift)}</td></tr>`).join("")}</table></div><p class="interp">Click a column heading to sort the table.</p>`:`<p class="interp">No rules meet these thresholds. Reduce the minimum support or confidence and try again.</p>`}`;
+    $$("th.sortable",out).forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.k;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=k==="rule"?1:-1;}draw();}));
+  }
+  $("#xp-run").addEventListener("click",run);
+  run();
+})();
+
+/* ---------- chapter 9: quiz ---------- */
+(function(){
+  const Q=[
+    {p:"Store data: what is the support of {Bread, Butter}?",o:["0.30","0.50","0.71","1.00"],a:1,w:"Five of the ten bills (01, 02, 04, 07, 08) contain both items, so Support = 5/10 = 0.50."},
+    {p:"Store data: what is Confidence(Butter \u2192 Bread)?",o:["0.50","0.71","1.00","1.43"],a:2,w:"All five bills with butter also contain bread: 5/5 = 1.00. In the reverse direction, Confidence(Bread \u2192 Butter) is only 5/7 = 0.71."},
+    {p:"Store data: what is the lift of Tea \u2192 Bread?",o:["0.33","0.48","0.70","1.43"],a:1,w:"Confidence = 1/3 = 0.33 and Support(Bread) = 0.70, so Lift = 0.33 / 0.70 = 0.48. Tea buyers are less likely than average to buy bread."},
+    {p:"A rule has confidence 0.80, and its consequent appears in 80% of all bills. What is the lift, and what does it mean?",o:["1.6: strong positive association","1.0: the items are independent","0.8: negative association","It cannot be found without the support"],a:1,w:"Lift = 0.80 / 0.80 = 1. The high confidence only shows that the consequent is a popular item."},
+    {p:"Which measure gives the same value for X \u2192 Y and Y \u2192 X?",o:["Confidence","Lift","Both confidence and lift","Neither"],a:1,w:"Lift = Support(X \u222A Y) / (Support(X) \u00D7 Support(Y)), which does not depend on the direction. Confidence changes because its denominator changes."},
+    {p:"The Apriori property states that:",o:["If an itemset is frequent, all its supersets are frequent","If an itemset is infrequent, all its supersets are infrequent","Confidence always increases as itemsets grow","Lift is always above 1 for frequent itemsets"],a:1,w:"Support can only decrease as items are added, so every superset of an infrequent itemset is also infrequent. This is what makes pruning possible."},
+    {p:"Store data with minimum support = 3 bills: why is {Bread, Eggs, Milk} pruned without being counted?",o:["Eggs appears in fewer than 3 bills","{Bread, Eggs} appears in only 2 bills","{Eggs, Milk} is not frequent","Its confidence is below 70%"],a:1,w:"{Bread, Eggs} has a count of 2, which is below the minimum, so no superset of it can be frequent. Eggs alone (count 4) and {Eggs, Milk} (count 3) are both frequent."},
+    {p:"How many association rules are possible with 6 items?",o:["62","364","602","729"],a:2,w:"R = 3\u2076 \u2212 2\u2077 + 1 = 729 \u2212 128 + 1 = 602."},
+    {p:"For rules made from the same frequent itemset {A, B, C}, which statement is always true?",o:["Confidence(A \u2192 B, C) \u2265 Confidence(A, B \u2192 C)","Confidence(A, B \u2192 C) \u2265 Confidence(A \u2192 B, C)","Both confidences are always equal","Their supports are different"],a:1,w:"Both rules have the same numerator, Support(A, B, C). The denominator Support(A, B) is at most Support(A), so Confidence(A, B \u2192 C) is at least Confidence(A \u2192 B, C)."},
+    {p:"A rule has support 0.002 and lift 12. What should the analyst do?",o:["Act on it immediately because the lift is very high","Treat it with caution because very few bills support it","Increase minimum confidence to 100%","Reject every rule whose lift is above 10"],a:1,w:"A very high lift on a very small support usually comes from a handful of bills. The rule should be checked on more data before any action is taken."}
+  ];
+  let ans=store.get("mba-module-quiz")||{};
+  const box=$("#qz");
+  function score(){const n=Object.keys(ans).length,c=Object.keys(ans).filter(k=>ans[k]===Q[k].a).length;$("#qz-score").textContent=`Score: ${c} out of ${n} attempted (${Q.length} questions)`;}
+  function render(){
+    box.innerHTML=Q.map((q,i)=>{const done=i in ans;return `<div class="qz"><div class="qp">${i+1}. ${q.p}</div><div class="opts">${q.o.map((o,j)=>{let cls="";if(done){if(j===q.a)cls="right";else if(j===ans[i])cls="wrong";}return `<button class="opt ${cls}" data-q="${i}" data-o="${j}" ${done?"disabled":""}>${o}</button>`;}).join("")}</div>${done?`<p class="why"><b style="color:${ans[i]===q.a?"var(--pos)":"var(--neg)"}">${ans[i]===q.a?"Correct.":"Incorrect."}</b> ${q.w}</p>`:""}</div>`;}).join("");
+    score();
+  }
+  box.addEventListener("click",e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;ans[b.dataset.q]=+b.dataset.o;store.set("mba-module-quiz",ans);render();});
+  $("#qz-reset").addEventListener("click",()=>{ans={};store.set("mba-module-quiz",ans);render();});
+  render();
+})();
+})();
+</script>
+</body>
+</html>

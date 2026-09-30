@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Mode = "Dark" | "Light";
-type Institution = { id: "vnit" | "mica" | "jit"; name: string; logo: string; w: number; h: number };
+type Institution = { id: "vnit" | "mica" | "jit"; name: string; logo: string; w: number; h: number; href: string };
 
 const MODE_KEY = "kv-home-mode";
 const EMAIL = "kartikgvyas@outlook.com";
 
 const INSTITUTIONS: Institution[] = [
-  { id: "vnit", name: "VNIT Nagpur", logo: "/home/vnit.png", w: 471, h: 522 },
-  { id: "mica", name: "MICA", logo: "/home/mica.png", w: 185, h: 148 },
-  { id: "jit", name: "JIT", logo: "/home/jit.png", w: 176, h: 148 },
+  { id: "vnit", name: "VNIT Nagpur", logo: "/home/vnit.png", w: 471, h: 522, href: "/vnit" },
+  { id: "mica", name: "MICA", logo: "/home/mica.png", w: 185, h: 148, href: "/login" },
+  { id: "jit", name: "JIT", logo: "/home/jit.png", w: 176, h: 148, href: "/jit" },
 ];
 
 const ORGS = ["HSBC", "Persistent Systems", "Reckitt Benckiser", "Maersk", "Accelerite", "InfoCepts", "Konverge.AI", "Foldax", "STS Tech LLC", "Swasen", "Logicology"];
@@ -35,7 +35,6 @@ const COMMUNITY = [
 
 export default function HomeClient({ fontClass }: { fontClass: string }) {
   const [mode, setMode] = useState<Mode>("Dark");
-  const [notice, setNotice] = useState<Institution | null>(null);
   const [formMsg, setFormMsg] = useState<string | null>(null);
   const nextMode: Mode = mode === "Dark" ? "Light" : "Dark";
 
@@ -45,13 +44,6 @@ export default function HomeClient({ fontClass }: { fontClass: string }) {
       if (saved === "Dark" || saved === "Light") setMode(saved);
     } catch {}
   }, []);
-
-  useEffect(() => {
-    if (!notice) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setNotice(null);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [notice]);
 
   function toggleMode() {
     setMode(nextMode);
@@ -153,17 +145,11 @@ export default function HomeClient({ fontClass }: { fontClass: string }) {
             <p>Select your college’s logo to enter.</p>
           </div>
           <div className="kv-inst-grid">
-            {INSTITUTIONS.map((inst) =>
-              inst.id === "mica" ? (
-                <Link key={inst.id} href="/login" className="kv-inst-card" aria-label={`${inst.name} — enter your course`}>
-                  <Image src={inst.logo} alt={`${inst.name} logo`} width={inst.w} height={inst.h} />
-                </Link>
-              ) : (
-                <button key={inst.id} type="button" className="kv-inst-card" aria-label={`${inst.name} — enter your course`} onClick={() => setNotice(inst)}>
-                  <Image src={inst.logo} alt={`${inst.name} logo`} width={inst.w} height={inst.h} />
-                </button>
-              ),
-            )}
+            {INSTITUTIONS.map((inst) => (
+              <Link key={inst.id} href={inst.href} className="kv-inst-card" aria-label={`${inst.name} — enter your course`}>
+                <Image src={inst.logo} alt={`${inst.name} logo`} width={inst.w} height={inst.h} />
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -332,19 +318,6 @@ export default function HomeClient({ fontClass }: { fontClass: string }) {
           Co-founder, <a href="https://www.logicology.in">Logicology</a>
         </div>
       </footer>
-
-      {notice && (
-        <div className="kv-modal-backdrop" onClick={() => setNotice(null)}>
-          <div className="kv-modal" role="dialog" aria-modal="true" aria-labelledby="kv-modal-title" onClick={(e) => e.stopPropagation()}>
-            <Image src={notice.logo} alt="" width={notice.w} height={notice.h} className="kv-modal-logo" />
-            <h3 id="kv-modal-title">{notice.name}</h3>
-            <p>This page will be available on 1st October 2026.</p>
-            <button type="button" className="kv-btn" onClick={() => setNotice(null)} autoFocus>
-              OK
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

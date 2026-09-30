@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Engineering | Interactive Learning Module</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#ECEFF3; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#15223A; --muted:#556277; --line:#D2D9E2; --frame:#9FAABA;
+  --accent:#F5C400; --accent-ink:#2B2300; --pos:#127A58; --neg:#B83A30; --info:#2D5DA6;
+  --pos-bg:rgba(18,122,88,.1); --neg-bg:rgba(184,58,48,.09);
+  --paper:#FFFFFF; --paper-ink:#1B2130; --paper-muted:#6A7282; --a-tint:#D8E5F7; --ab-tint:#FFE36E;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+    --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+    --paper:#F3F1EB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E141D; --surface:#161F2B; --surface-2:#1C2634; --ink:#E5EAF1; --muted:#9AA6B6; --line:#2A3647; --frame:#465569;
+  --pos:#3FC697; --neg:#F07B70; --info:#8AB0EC; --pos-bg:rgba(63,198,151,.12); --neg-bg:rgba(240,123,112,.12);
+  --paper:#F3F1EB;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0 0 .5em;font-weight:700;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,4.2vw,2.9rem)}
+h2{font-size:1.55rem;margin-top:2.2rem}
+h3{font-size:1.15rem;margin-top:1.6rem}
+p{margin:0 0 1em;max-width:72ch}
+a{color:var(--info)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+:focus-visible{outline:3px solid var(--info);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.app{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:100dvh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);padding:26px 18px 30px}
+.brand{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.2;margin:0 0 4px}
+.brand-sub{color:var(--muted);font-size:.9rem;margin:0 0 20px}
+.btn.navtoggle{display:none}
+.nav{list-style:none;margin:0;padding:0}
+.nav a{display:grid;grid-template-columns:28px 1fr 16px;align-items:baseline;gap:4px;padding:7px 8px;border-radius:7px;color:var(--ink);text-decoration:none;font-size:.97rem;line-height:1.3}
+.nav a:hover{background:var(--surface-2)}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.nav .n{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.nav a[aria-current="page"] .n{color:var(--accent-ink)}
+.nav .seen{font-size:.8rem;color:var(--pos)}
+.nav a[aria-current="page"] .seen{color:var(--accent-ink)}
+.navgroup{margin:16px 8px 6px;color:var(--muted);font-size:.85rem;font-weight:600}
+main{padding:44px clamp(18px,4.5vw,64px) 90px;max-width:960px;width:100%}
+.mod{display:none}
+.mod.on{display:block}
+.lede{font-size:1.15rem;color:var(--muted);max-width:66ch}
+.modnum{font-family:var(--mono);color:var(--muted);font-size:.9rem;margin:0 0 6px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:18px 0}
+.formula{overflow-x:auto;border:1.5px solid var(--frame);background:var(--surface);padding:14px 20px;margin:18px 0;border-radius:10px;font-size:1.12rem}
+.formula .fname{display:block;color:var(--muted);font-size:.9rem;margin-bottom:4px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .2em;line-height:1.25}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .3em 1px}
+.fr>span:last-child{padding:1px .3em 0}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;background:var(--surface-2);border:1px solid var(--line)}
+.callout.trap{background:var(--neg-bg);border-color:rgba(184,58,48,.35)}
+.callout.good{background:var(--pos-bg);border-color:rgba(18,122,88,.35)}
+.callout b.t{display:block;margin-bottom:4px;font-family:var(--display)}
+.callout p:last-child{margin-bottom:0}
+details.ex{background:var(--surface);border:1px dashed var(--muted);border-radius:10px;padding:12px 18px;margin:18px 0}
+details.ex summary{cursor:pointer;font-weight:600}
+details.ex[open] summary{margin-bottom:8px}
+.tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+td.num,th.num,.level td,.level th,.rtbl td,.rtbl th{white-space:nowrap}
+th{font-weight:600;background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.btn{font:600 .97rem var(--body);border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line)}
+.pager a{text-decoration:none;color:var(--ink);max-width:48%}
+.pager small{display:block;color:var(--muted)}
+.pager .nx{text-align:right;margin-left:auto}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13.5px/1.55 var(--mono)}
+ul.clean,ol.clean{padding-left:1.2em;max-width:72ch}
+ul.clean li,ol.clean li{margin:.3em 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+.receipts{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:14px 12px;margin:16px 0}
+.receipt{position:relative;background:var(--paper);color:var(--paper-ink);font:12.5px/1.5 var(--mono);padding:10px 11px 20px;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;
+  mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;transition:background .15s}
+.receipt .shop{text-align:center;font-weight:600;border-bottom:1px dashed #b9bec8;padding-bottom:5px;margin-bottom:5px}
+.receipt .rh{display:flex;justify-content:space-between;color:var(--paper-muted);border-bottom:1px dashed #b9bec8;padding-bottom:4px;margin-bottom:5px;font-size:11.5px}
+.receipt ul{list-style:none;margin:0;padding:0}
+.receipt li{display:flex;justify-content:space-between;gap:6px}
+.receipt li.m{font-weight:600}
+.receipt li.m span:first-child::before{content:"\25B8 "}
+.receipt .tot{border-top:1px dashed #b9bec8;margin-top:5px;padding-top:4px;display:flex;justify-content:space-between;color:var(--paper-muted)}
+.receipt.a{background:var(--a-tint)}
+.receipt.ab,.receipt.hot{background:var(--ab-tint)}
+.receipt.big{font-size:14px;padding:16px 18px 26px;max-width:280px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.9rem;color:var(--muted);margin:6px 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+
+
+/* ---- shared widgets ---- */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+.lab h3{margin-top:0}
+.pill{white-space:nowrap;display:inline-block;font-size:.82rem;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.pill.pos{background:var(--pos-bg);color:var(--pos);border-color:transparent}
+.pill.neg{background:var(--neg-bg);color:var(--neg);border-color:transparent}
+.pill.inf{background:rgba(45,93,166,.12);color:var(--info);border-color:transparent}
+.pill.mut{color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg .btn{padding:6px 14px;font-size:.92rem}
+.seg .btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.ctrl{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr) auto;gap:12px;align-items:center;margin:10px 0}
+.ctrl label{font-weight:600;font-size:.95rem}
+.ctrl input[type=range]{width:100%;accent-color:var(--info)}
+.ctrl output{font-weight:600;min-width:9ch;text-align:right;font-variant-numeric:tabular-nums}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;margin:12px 0}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.kpi .kl{font-size:.84rem;color:var(--muted);line-height:1.25}
+.kpi .kv{font-family:var(--display);font-weight:700;font-size:1.35rem;line-height:1.2;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi.bad .kv{color:var(--neg)} .kpi.good .kv{color:var(--pos)}
+.chart{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px 10px 4px}
+.chart svg{display:block;width:100%;height:auto}
+.g-grid{stroke:var(--line);stroke-width:1}
+.g-t{fill:var(--muted);font:11.5px var(--body)}
+.g-tl{fill:var(--ink);font:600 12px var(--body)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.86rem;color:var(--muted);padding:2px 6px 8px}
+.lg i{display:inline-block;width:18px;height:0;border-top:2.5px solid;vertical-align:4px;margin-right:6px}
+.lg i.d{border-top-style:dashed}
+.lg b.sq{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+.small{font-size:.9rem;color:var(--muted)}
+.qz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:14px 0}
+.qz .qp{font-weight:600;margin-bottom:10px}
+.qz .opts{display:grid;gap:8px}
+.qz button.opt{text-align:left;font:inherit;padding:9px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.qz button.opt:hover:not(:disabled){border-color:var(--ink)}
+.qz button.opt.right{border-color:var(--pos);background:var(--pos-bg)}
+.qz button.opt.wrong{border-color:var(--neg);background:var(--neg-bg)}
+.qz button.opt:disabled{cursor:default}
+.qz .why{margin:10px 0 0;color:var(--muted)}
+.qz .again{margin-left:8px;font:600 .88rem var(--body);background:none;border:0;color:var(--info);cursor:pointer;text-decoration:underline;padding:0}
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding:10px 0;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.detail{background:var(--surface);border:1.5px solid var(--frame);border-radius:12px;padding:16px 20px;margin:14px 0}
+.detail h3{margin:0 0 6px}
+.detail dl{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr);gap:8px 16px;margin:10px 0 0}
+.detail dt{font-weight:600}
+.detail dd{margin:0;color:var(--muted)}
+.detail .who{margin:0 0 6px}
+td.st{white-space:nowrap}
+
+/* ---- lifecycle stage colours ---- */
+:root{
+  --gen:#B4474F; --gen-bg:#F8E3E4;
+  --ing:#1F7F5C; --ing-bg:#DDF1E8;
+  --trf:#7043A6; --trf-bg:#ECE2F7;
+  --srv:#1E5FA8; --srv-bg:#DDE9F8;
+  --sto:#5A6576; --sto-bg:#E7EBF0;
+  --use:#8A6A00; --use-bg:#FFF1B8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --gen:#F29AA0; --gen-bg:#3A2226; --ing:#6FD3A9; --ing-bg:#17332A; --trf:#C4A2F0; --trf-bg:#2C2240;
+    --srv:#8DB8F0; --srv-bg:#1C2D45; --sto:#B3BDCB; --sto-bg:#232E3D; --use:#F2CF55; --use-bg:#3A3212;
+  }
+}
+:root[data-theme="dark"]{
+  --gen:#F29AA0; --gen-bg:#3A2226; --ing:#6FD3A9; --ing-bg:#17332A; --trf:#C4A2F0; --trf-bg:#2C2240;
+  --srv:#8DB8F0; --srv-bg:#1C2D45; --sto:#B3BDCB; --sto-bg:#232E3D; --use:#F2CF55; --use-bg:#3A3212;
+}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:1px 9px;border-radius:6px;border:1.5px solid;white-space:nowrap}
+.tag.gen{color:var(--gen);background:var(--gen-bg)} .tag.ing{color:var(--ing);background:var(--ing-bg)}
+.tag.trf{color:var(--trf);background:var(--trf-bg)} .tag.srv{color:var(--srv);background:var(--srv-bg)}
+.tag.sto{color:var(--sto);background:var(--sto-bg)} .tag.use{color:var(--use);background:var(--use-bg)}
+
+/* ---- hero: journey of one bill ---- */
+.hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:34px;align-items:start;margin:26px 0 10px}
+.hero-rule{font-family:var(--display);font-size:1.45rem;font-weight:700;margin:0 0 12px;line-height:1.2}
+.journey{list-style:none;margin:0;padding:0;position:relative}
+.journey::before{content:"";position:absolute;left:calc(6.3em - 1px);top:10px;bottom:10px;border-left:2px dotted var(--frame)}
+.journey li{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:0 1.4em;padding:5px 0;position:relative}
+.journey li::before{content:"";position:absolute;left:calc(6.3em - 6px);top:13px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2.5px solid var(--frame)}
+.journey li.fast::before{border-color:var(--ing);background:var(--ing)}
+.journey .tm{font-family:var(--mono);font-size:.84rem;color:var(--muted);padding-top:3px;text-align:right;white-space:nowrap}
+.journey .tx{line-height:1.4}
+.journey .tx .tag{margin-right:6px}
+.journey .gap{grid-column:2;color:var(--muted);font-size:.86rem;font-style:italic;padding:2px 0}
+.receipt{position:relative;background:var(--paper);color:var(--paper-ink);font:12.5px/1.5 var(--mono);padding:12px 14px 22px;width:250px;max-width:100%;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;
+  mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/12px 100%;border:1px solid #c9cfd8}
+.receipt .shop{text-align:center;font-weight:600;border-bottom:1px dashed #b9bec8;padding-bottom:5px;margin-bottom:5px}
+.receipt .rh{display:flex;justify-content:space-between;color:var(--paper-muted);font-size:11.5px}
+.receipt ul{list-style:none;margin:6px 0 0;padding:6px 0 0;border-top:1px dashed #b9bec8}
+.receipt li{display:flex;justify-content:space-between;gap:6px}
+.receipt .tot{border-top:1px dashed #b9bec8;margin-top:5px;padding-top:4px;display:flex;justify-content:space-between;font-weight:600}
+.receipt .pay{color:var(--paper-muted);display:flex;justify-content:space-between}
+
+/* ---- chapter 1: upstream / downstream and pyramid ---- */
+.stream{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.1fr) auto minmax(0,1.1fr) auto minmax(0,1fr);align-items:stretch;gap:8px;margin:18px 0}
+.stream .bx{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);font-size:.92rem;line-height:1.35}
+.stream .bx b{display:block;font-family:var(--display);font-size:1rem;margin-bottom:3px}
+.stream .bx.de{border-color:var(--ing);background:var(--ing-bg)}
+.stream .bx.ds{border-color:var(--srv);background:var(--srv-bg)}
+.stream .bx small{color:var(--muted)}
+.stream .ar{align-self:center;color:var(--muted);font-weight:700;font-size:1.2rem}
+.stream .lbl{grid-column:1 / -1;display:grid;grid-template-columns:subgrid;font-size:.84rem;color:var(--muted)}
+.pyr{display:flex;flex-direction:column;align-items:center;gap:5px;margin:18px auto 8px;max-width:620px}
+.pyr button{font:600 .95rem var(--body);border:1.5px solid;border-radius:6px;padding:9px 10px;cursor:pointer;line-height:1.2;color:var(--ink);text-align:center}
+.pyr button.de{background:var(--ing-bg);border-color:var(--ing)}
+.pyr button.sh{background:var(--trf-bg);border-color:var(--trf)}
+.pyr button.ds{background:var(--srv-bg);border-color:var(--srv)}
+.pyr button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.pyr button small{display:block;font-weight:400;font-size:.78rem;color:var(--muted);margin-top:2px}
+.pyr-lg{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font-size:.86rem;color:var(--muted)}
+.pyr-lg b{display:inline-block;width:12px;height:12px;border-radius:3px;border:1.5px solid;vertical-align:-1px;margin-right:6px}
+
+/* ---- chapter 2: lifecycle diagram ---- */
+.lc{display:grid;grid-template-columns:minmax(0,.9fr) 24px minmax(0,3fr) 24px minmax(0,1fr);gap:8px;align-items:center;margin:18px 0 10px}
+.lc button{font:600 .95rem var(--body);border:1.5px solid;border-radius:9px;padding:10px 8px;cursor:pointer;color:var(--ink);line-height:1.2;width:100%}
+.lc button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.lc .b-gen{background:var(--gen-bg);border-color:var(--gen)}
+.lc .b-ing{background:var(--ing-bg);border-color:var(--ing)}
+.lc .b-trf{background:var(--trf-bg);border-color:var(--trf)}
+.lc .b-srv{background:var(--srv-bg);border-color:var(--srv)}
+.lc .b-sto{background:var(--sto-bg);border-color:var(--sto)}
+.lc .b-use{background:var(--use-bg);border-color:var(--use)}
+.lc .core{border:3px solid var(--ink);border-radius:14px;padding:10px;display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;gap:8px 4px;align-items:center}
+.lc .core .sto{grid-column:1 / -1}
+.lc .ar{text-align:center;color:var(--muted);font-weight:700}
+.lc .uses{display:grid;gap:8px}
+.lc .dn{display:none}
+.uc{border-top:2px solid var(--ink);padding-top:10px;margin-top:6px}
+.uc p{margin:0 0 8px;font-weight:600;font-family:var(--display);text-align:center}
+.uc .ucg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.uc button{font:600 .86rem var(--body);border:1.5px solid var(--line);border-radius:8px;padding:8px 6px;background:var(--surface-2);color:var(--ink);cursor:pointer;line-height:1.2}
+.uc button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.match{display:grid;grid-template-columns:minmax(0,1fr) 200px auto;gap:10px 16px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.match:last-of-type{border-bottom:0}
+.match select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.match select.right{border-color:var(--pos);background:var(--pos-bg)}
+.match select.wrong{border-color:var(--neg);background:var(--neg-bg)}
+.match .mk{font-weight:700;width:1.2em}
+
+/* ---- tables that change ---- */
+tr.t-new td{background:var(--pos-bg)}
+tr.t-upd td{background:rgba(45,93,166,.10)}
+tr.t-bad td{background:var(--neg-bg)}
+tr.t-gone td{color:var(--muted);text-decoration:line-through}
+td.chg{font-weight:700}
+.cellgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;font:12px/1.3 var(--mono);margin:12px 0;overflow-x:auto}
+.cellgrid div{padding:6px 5px;border:1px solid var(--line);background:var(--surface-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:3px}
+.cellgrid div.h{font-family:var(--body);font-weight:700;background:transparent;border-color:transparent}
+.cellgrid div.rd{background:var(--use-bg);border-color:var(--use)}
+.star{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0;align-items:center}
+.star .t{border:1.5px solid var(--frame);border-radius:10px;padding:8px 10px;background:var(--surface);font-size:.86rem;line-height:1.4}
+.star .t b{display:block;font-family:var(--mono);font-size:.9rem;margin-bottom:3px}
+.star .t.f{border:2.5px solid var(--ink);background:var(--use-bg)}
+.star .t span{color:var(--muted);display:block}
+.star .e{visibility:hidden}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.layers div{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);font-size:.94rem}
+.layers b{display:block;font-family:var(--display)}
+.toggles{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0 12px}
+.toggles label{display:flex;gap:8px;align-items:center;font-weight:600;font-size:.95rem;cursor:pointer}
+.toggles input{width:18px;height:18px;accent-color:var(--info)}
+
+/* ---- chapter 5: ETL vs ELT ---- */
+.pipe{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.pipe .s{border:1.5px solid;border-radius:9px;padding:8px 14px;font-weight:600;line-height:1.25}
+.pipe .s small{display:block;font-weight:400;font-size:.8rem;color:var(--muted)}
+.pipe .ar{color:var(--muted);font-weight:700}
+.pipe .s.x{border-color:var(--gen);background:var(--gen-bg)}
+.pipe .s.t{border-color:var(--trf);background:var(--trf-bg)}
+.pipe .s.l{border-color:var(--ing);background:var(--ing-bg)}
+.pipe .s.w{border-color:var(--srv);background:var(--srv-bg)}
+.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.cmp2>div{border:1.5px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--surface)}
+.cmp2>div.win{border-color:var(--pos);background:var(--pos-bg)}
+.cmp2>div.lose{border-color:var(--neg)}
+.cmp2 h4{margin:0 0 6px;font-family:var(--display);font-size:1.02rem;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cmp2 p{margin:0}
+.verdict{border:1.5px solid var(--frame);border-radius:10px;padding:10px 16px;margin:10px 0;background:var(--surface-2)}
+
+/* ---- chapter 7: reverse ETL ---- */
+.rev{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,.9fr) auto minmax(0,1fr);gap:10px;align-items:center;margin:18px 0}
+.rev .col{display:grid;gap:6px}
+.rev .col div{border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface);font-size:.9rem}
+.rev .wh{border:2.5px solid var(--ink);border-radius:12px;padding:14px 12px;text-align:center;background:var(--use-bg);font-weight:700;font-family:var(--display)}
+.rev .wh small{display:block;font-family:var(--body);font-weight:400;color:var(--muted);font-size:.82rem}
+.rev .ar{font-weight:700;text-align:center;line-height:1.2;font-size:.82rem}
+.rev .ar b{display:block;font-size:1.3rem}
+.rev .ar.f{color:var(--ing)} .rev .ar.r{color:var(--gen)}
+.rev .h{font-size:.82rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+.msg{border:1.5px solid var(--ing);background:var(--ing-bg);border-radius:12px 12px 12px 3px;padding:10px 14px;max-width:420px;margin:10px 0;font-size:.95rem}
+.msg small{display:block;color:var(--muted);margin-top:4px;font-size:.8rem}
+.warnbox{border:1.5px solid var(--neg);background:var(--neg-bg);border-radius:10px;padding:10px 14px;margin:10px 0}
+
+/* ---- chapter 8: DAG ---- */
+.dag svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
+.dag .nd rect{stroke-width:2;rx:9;cursor:pointer}
+.dag .nd text{pointer-events:none}
+.dag .nd .l1{font:700 13px var(--body);fill:var(--ink)}
+.dag .nd .l2{font:11px var(--body);fill:var(--muted)}
+.dag .nd.idle rect{fill:var(--surface);stroke:var(--frame)}
+.dag .nd.ok rect{fill:var(--pos-bg);stroke:var(--pos)}
+.dag .nd.fail rect{fill:var(--neg-bg);stroke:var(--neg)}
+.dag .nd.held rect{fill:var(--surface-2);stroke:var(--frame);stroke-dasharray:5 4}
+.dag .nd.held .l1{fill:var(--muted)}
+.dag .nd.run rect{fill:var(--use-bg);stroke:var(--use)}
+.dag .nd:focus-visible rect{stroke:var(--info);stroke-width:3.5}
+.dag .ed{fill:none;stroke:var(--frame);stroke-width:1.6}
+.dag .ed.held{stroke-dasharray:4 4;opacity:.6}
+
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:0;height:auto;z-index:5;padding:12px 16px;border-right:0;border-bottom:1px solid var(--line);padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .side-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand-sub{display:none}
+  .brand{margin:0}
+  .btn.navtoggle{display:inline-block}
+  .navwrap{display:none;max-height:70vh;overflow:auto;margin-top:10px}
+  .side.open .navwrap{display:block}
+  main{padding-top:28px}
+  .hero{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .match{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}
+  .match .mt{grid-column:1 / -1}
+  .lc{grid-template-columns:1fr}
+  .lc .ar{transform:rotate(90deg);height:18px}
+  .uc .ucg{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rev{grid-template-columns:1fr}
+  .rev .ar b{transform:rotate(90deg)}
+  .cmp2{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .stream{grid-template-columns:1fr}
+  .stream .ar{transform:rotate(90deg);text-align:center}
+  .stream .lbl{display:none}
+  .layers{grid-template-columns:1fr}
+  .detail dl{grid-template-columns:1fr;gap:2px}
+  .detail dd{margin-bottom:8px}
+}
+@media (max-width:520px){
+  .lc .core{grid-template-columns:1fr;}
+  .lc .core .ar{transform:rotate(90deg);height:18px}
+  .star{gap:6px}
+  .star .t{padding:6px 7px;font-size:.78rem}
+  .star .t b{font-size:.78rem}
+  .ctrl{grid-template-columns:1fr auto}
+  .ctrl label{grid-column:1 / -1}
+  .pyr button{font-size:.86rem;padding:8px 6px}
+  .pyr button small{display:none}
+  .journey::before{left:calc(5.25em - 1px)}
+  .journey li{grid-template-columns:4.6em minmax(0,1fr);gap:0 1.3em}
+  .journey li::before{left:calc(5.25em - 6px)}
+  .journey .tm{font-size:.72rem;padding-top:4px}
+  .uc .ucg{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.fb{font-weight:600}
+.fb.ok{color:var(--pos)} .fb.no{color:var(--neg)}
+.err{color:var(--neg);font-weight:600}
+
+.wide table{min-width:620px}
+@media (max-width:640px){
+  table.stack tr:first-child{display:none}
+  table.stack tr{display:block;border-bottom:1px solid var(--line);padding:8px 0}
+  table.stack tr:last-child{border-bottom:0}
+  table.stack td{display:block;border:0;padding:3px 14px}
+  table.stack td:first-child{font-family:var(--display);font-size:1.02rem}
+  table.stack td:nth-child(3){color:var(--muted)}
+  table.stack td:nth-child(3)::before{content:"At Dhanvanshi: ";font-weight:600;color:var(--ink)}
+}
+@media (max-width:520px){
+  table{font-size:.88rem}
+  th,td{padding:7px 9px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="side-top">
+      <div>
+        <p class="brand">Data Engineering</p>
+        <p class="brand-sub">Interactive learning module</p>
+      </div>
+      <button class="btn navtoggle" id="navtoggle" aria-expanded="false" aria-controls="navwrap">Chapters</button>
+    </div>
+    <nav class="navwrap" id="navwrap" aria-label="Chapters"><ul class="nav" id="nav"></ul></nav>
+  </aside>
+
+  <main id="main">
+
+<!-- ============ INTRO ============ -->
+<section class="mod" id="start" data-nav="Introduction" data-group="Foundations">
+  <h1>Data Engineering</h1>
+  <p class="lede">Every time a customer pays at a Dhanvanshi Super Store counter, a bill gets created. That one bill is useful to many people: the branch manager checking today's sales, the buyer planning next week's order, the marketing team sending offers, and the data scientist building a demand forecast. None of them looks at the billing counter. They all look at data that someone has collected, moved, cleaned, stored and delivered to them. That someone is the data engineer.</p>
+
+  <div class="hero">
+    <div class="receipt" aria-label="Sample bill">
+      <div class="shop">Dhanvanshi Super Store<br>Dharampeth, Nagpur</div>
+      <div class="rh"><span>Bill 4471</span><span>Counter 3</span></div>
+      <div class="rh"><span>24-09-2026</span><span>7:42 PM</span></div>
+      <ul>
+        <li><span>Toor Dal 1 kg &times;2</span><span>290</span></li>
+        <li><span>Atta 10 kg</span><span>480</span></li>
+        <li><span>Tea 250 g</span><span>145</span></li>
+        <li><span>Butter 500 g</span><span>285</span></li>
+      </ul>
+      <div class="tot"><span>Total &#8377;</span><span>1,200</span></div>
+      <div class="pay"><span>Paid by UPI</span><span>Ref 6124</span></div>
+    </div>
+    <div>
+      <p class="hero-rule">Where this one bill goes next</p>
+      <ol class="journey">
+        <li><span class="tm">7:42:10 PM</span><span class="tx"><span class="tag gen">Generation</span>The billing software saves the bill in the counter's database.</span></li>
+        <li class="fast"><span class="tm">7:42:11 PM</span><span class="tx"><span class="tag ing">Ingestion</span>A copy of the bill goes out as an event on the live data stream.</span></li>
+        <li class="fast"><span class="tm">7:42:14 PM</span><span class="tx"><span class="tag srv">Serving</span>The live sales screen at head office goes up by &#8377;1,200, and the app's stock of Atta 10 kg drops by one.</span></li>
+        <li><span class="gap">&hellip; the store closes, the night batch starts &hellip;</span></li>
+        <li><span class="tm">2:00 AM</span><span class="tx"><span class="tag ing">Ingestion</span>The nightly job copies all of the day's bills from every branch into the data warehouse.</span></li>
+        <li><span class="tm">2:40 AM</span><span class="tx"><span class="tag trf">Transformation</span>Duplicates are removed and the bill is joined with the product, branch and customer tables.</span></li>
+        <li><span class="tm">8:00 AM</span><span class="tx"><span class="tag use">Analytics</span>The branch sales dashboard is ready for the morning meeting.</span></li>
+        <li><span class="tm">8:15 AM</span><span class="tx"><span class="tag use">Machine learning</span>The atta demand forecast for next week is refreshed.</span></li>
+        <li><span class="tm">9:00 AM</span><span class="tx"><span class="tag use">Reverse ETL</span>The customer's loyalty tier is updated inside the WhatsApp campaign tool.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>What this module covers</h2>
+  <p>Data engineering is the base on which analytics, BI and machine learning stand. In eight chapters we will see where data engineering fits, the stages every piece of data passes through, how data is ingested, stored and transformed, how data engineering is different from ETL, why data in motion (streaming) has become so important, how data is served and sent back into business tools through Reverse ETL, and the practices that keep all of this running every day.</p>
+  <p>Most examples use <b>Dhanvanshi Super Store</b>, a supermarket chain with branches in Nagpur, Pune, Nashik and Aurangabad. Its suppliers and partners also appear: <b>Kavya Distributors</b> supplies the stores, <b>Madavi Warehouse</b> holds the stock and <b>Niharika Logistics</b> runs the trucks. <b>FoodJoe</b>, a food delivery app, and <b>Aman Mart</b>, a smaller grocery chain, come in wherever they make a point clearer.</p>
+  <p>Each chapter has something to try out and ends with a two-question Quick Check. A Final Quiz at the end covers the whole module.</p>
+  <div class="callout">
+    <b class="t">Sources used in this module</b>
+    <p>The lifecycle, the undercurrents and the upstream and downstream view follow Joe Reis and Matt Housley, <i>Fundamentals of Data Engineering</i> (O'Reilly, 2022). The Data Science Hierarchy of Needs was proposed by Monica Rogati.</p>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 1 ============ -->
+<section class="mod" id="c1" data-nav="Where data engineering fits" data-n="1">
+  <p class="modnum">Chapter 1</p>
+  <h1>Where data engineering fits</h1>
+  <p class="lede">Data engineering is the work of building and running the systems that take raw data from where it is created and turn it into reliable, well-organised data that others can use for reports, analysis and machine learning.</p>
+
+  <h2>Upstream and downstream</h2>
+  <p>Think of a river. The water that reaches a city has come a long way from its source. If the water is dirty upstream, no filter in the city can fully clean it. Data works the same way. Data engineers work <b>upstream</b>: they bring data out of the source systems and make it clean and dependable. Data scientists and analysts work <b>downstream</b>: they take that data and turn it into forecasts, insights and decisions.</p>
+  <div class="stream" aria-label="Data flows from source systems through data engineering to data science and analytics, and then to decisions">
+    <div class="bx"><b>Source systems</b><small>Billing counters, Dhanvanshi app, Kavya Distributors' invoices, truck GPS</small></div>
+    <span class="ar" aria-hidden="true">&rarr;</span>
+    <div class="bx de"><b>Data engineering</b><small>Upstream. Collect, move, store, clean, model, serve</small></div>
+    <span class="ar" aria-hidden="true">&rarr;</span>
+    <div class="bx ds"><b>Data science and analytics</b><small>Downstream. Dashboards, forecasts, experiments, models</small></div>
+    <span class="ar" aria-hidden="true">&rarr;</span>
+    <div class="bx"><b>Decisions</b><small>What to order, which offer to send, which branch needs help</small></div>
+  </div>
+  <p>Some people treat data engineering as a part of data science. Reis and Housley take a different view: the two are separate fields that support each other. Data engineers provide the inputs; data scientists and analysts convert those inputs into something useful. In small companies one person often does both. As a company grows, the two jobs separate, because each needs deep skills of its own.</p>
+
+  <h2>The data science hierarchy of needs</h2>
+  <p>Monica Rogati drew data work as a pyramid. Like Maslow's hierarchy of needs, each layer needs the layers below it. Many companies want to start at the top with AI. Rogati's point is that the top is only as good as the base, and the base is mostly data engineering. Tap a layer to see what it means at Dhanvanshi.</p>
+  <div class="pyr" id="pyr" role="group" aria-label="Data science hierarchy of needs"></div>
+  <div class="pyr-lg"><span><b style="background:var(--ing-bg);border-color:var(--ing)"></b>Mostly data engineering</span><span><b style="background:var(--trf-bg);border-color:var(--trf)"></b>Shared work</span><span><b style="background:var(--srv-bg);border-color:var(--srv)"></b>Mostly data science</span></div>
+  <div class="detail" id="pyr-detail" aria-live="polite"></div>
+
+  <h2>Who does what</h2>
+  <p>Job titles differ from company to company, but these are the common roles around data and the question each one tries to answer.</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>Role</th><th>Main question</th><th>Typical output</th></tr>
+    <tr><td><b>Data engineer</b></td><td>Is the right data available, correct and on time?</td><td>Pipelines, data warehouse tables, the data platform</td></tr>
+    <tr><td><b>Analytics engineer</b></td><td>Are the business tables and metrics defined properly?</td><td>Clean data models, one agreed definition of "net sales"</td></tr>
+    <tr><td><b>Data analyst</b></td><td>What happened, and why?</td><td>Reports, dashboards, analysis</td></tr>
+    <tr><td><b>Data scientist</b></td><td>What will happen, and what should we do about it?</td><td>Forecasts, experiments, models</td></tr>
+    <tr><td><b>ML engineer</b></td><td>How do we run the model reliably inside the product?</td><td>Deployed models and prediction services</td></tr>
+  </table></div>
+
+  <div class="callout trap">
+    <b class="t">Aman Mart's AI plan</b>
+    <p>Aman Mart's owner has read about AI and wants a model that predicts which customers will stop coming. But Aman Mart's five stores use three different billing software, bills from two stores are shared on email as Excel files, and the customer's phone number is missing on a large share of bills. A data scientist hired today would spend most of the first months just finding and joining data. The first need is at the bottom of the pyramid.</p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c1"></div>
+</section>
+
+<!-- ============ CHAPTER 2 ============ -->
+<section class="mod" id="c2" data-nav="The data engineering lifecycle" data-n="2">
+  <p class="modnum">Chapter 2</p>
+  <h1>The data engineering lifecycle</h1>
+  <p class="lede">Tools in data engineering change every few years. The stages that data passes through do not. Reis and Housley call these stages the data engineering lifecycle, and they suggest learning the lifecycle first and the tools later.</p>
+
+  <p>The lifecycle has five stages. <b>Generation</b> happens in the source systems. Then data is <b>ingested</b>, <b>transformed</b> and <b>served</b>, and it is <b>stored</b> at every one of these steps. Served data is used for <b>analytics</b>, for <b>machine learning</b> and, through <b>Reverse ETL</b>, it goes back into business tools. Below the lifecycle run six <b>undercurrents</b>: practices that apply to every stage. Tap any box to open it.</p>
+
+  <div class="lab" style="padding-bottom:14px">
+    <div class="lc" id="lc">
+      <button class="b-gen" data-k="gen">Generation</button>
+      <span class="ar" aria-hidden="true">&rarr;</span>
+      <div class="core">
+        <button class="b-ing" data-k="ing">Ingestion</button><span class="ar" aria-hidden="true">&rarr;</span>
+        <button class="b-trf" data-k="trf">Transformation</button><span class="ar" aria-hidden="true">&rarr;</span>
+        <button class="b-srv" data-k="srv">Serving</button>
+        <button class="b-sto sto" data-k="sto">Storage</button>
+      </div>
+      <span class="ar" aria-hidden="true">&rarr;</span>
+      <div class="uses">
+        <button class="b-use" data-k="ana">Analytics</button>
+        <button class="b-use" data-k="ml">Machine learning</button>
+        <button class="b-use" data-k="retl">Reverse ETL</button>
+      </div>
+    </div>
+    <div class="uc">
+      <p>Undercurrents</p>
+      <div class="ucg" id="ucg">
+        <button data-k="u-sec">Security</button>
+        <button data-k="u-dm">Data management</button>
+        <button data-k="u-ops">DataOps</button>
+        <button data-k="u-arch">Data architecture</button>
+        <button data-k="u-orch">Orchestration</button>
+        <button data-k="u-se">Software engineering</button>
+      </div>
+    </div>
+  </div>
+  <div class="detail" id="lc-detail" aria-live="polite"></div>
+
+  <div class="callout">
+    <b class="t">Why storage sits under the other stages</b>
+    <p>Storage is not a single step at the end. Raw bills are stored as soon as they are ingested, cleaned tables are stored after transformation, and ready-to-use tables are stored for serving. That is why the diagram shows storage as a base running under ingestion, transformation and serving.</p>
+  </div>
+
+  <h2>Place the task in its stage</h2>
+  <p>Here are eight real tasks from Dhanvanshi's data team. Pick the lifecycle stage each one belongs to, then check your answers.</p>
+  <div class="lab" id="place">
+    <div id="place-rows"></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="place-check">Check answers</button><button class="btn" id="place-reset">Clear</button><span id="place-score" class="fb" aria-live="polite"></span></div>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c2"></div>
+</section>
+
+<!-- ============ CHAPTER 3 ============ -->
+<section class="mod" id="c3" data-nav="Source systems and ingestion" data-n="3" data-group="Building blocks">
+  <p class="modnum">Chapter 3</p>
+  <h1>Source systems and ingestion</h1>
+  <p class="lede">A data engineer rarely owns the systems where data is born, but has to understand them well. Ingestion is the step where data is taken out of those systems and brought into the data platform.</p>
+
+  <h2>Where Dhanvanshi's data comes from</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Type of source</th><th>Example at Dhanvanshi</th><th>Usual way to ingest</th></tr>
+    <tr><td><b>Application database</b></td><td>Billing software at every counter; the orders database of the Dhanvanshi app</td><td>Batch copy or change data capture</td></tr>
+    <tr><td><b>API</b></td><td>Truck locations from Niharika Logistics; settlement reports from the payment gateway</td><td>Scheduled pull</td></tr>
+    <tr><td><b>Files</b></td><td>Daily Excel invoice from Kavya Distributors, sent by email or SFTP</td><td>Batch file load</td></tr>
+    <tr><td><b>Events and logs</b></td><td>App clicks: searches, add to cart, payment started</td><td>Streaming</td></tr>
+    <tr><td><b>Sensors</b></td><td>Cold room temperature at Madavi Warehouse, every minute</td><td>Streaming</td></tr>
+    <tr><td><b>Third-party data</b></td><td>Weather forecast, festival calendar, pincode master</td><td>Batch pull</td></tr>
+  </table></div>
+
+  <h3>Why not run reports on the billing database itself?</h3>
+  <p>The billing database is an <b>OLTP</b> system (online transaction processing). It is built to save thousands of small bills quickly and correctly. A report such as "sales by product for the last two years" is an <b>OLAP</b> query (online analytical processing): it reads crores of rows at once. Running such queries on the billing database can slow down billing at the counter, and a queue at the counter on a Sunday evening is the last thing a store manager wants. So the data is copied into a separate system built for analysis.</p>
+  <div class="two">
+    <div class="panel"><b>OLTP: billing database</b><ul class="clean"><li>Many small reads and writes</li><li>Current state: today's stock, this bill</li><li>Must respond in milliseconds</li></ul></div>
+    <div class="panel"><b>OLAP: data warehouse</b><ul class="clean"><li>Few large reads, scanning many rows</li><li>History: every bill for years</li><li>A query can take seconds</li></ul></div>
+  </div>
+
+  <h2>The ingestion choices</h2>
+  <p>Every ingestion pipeline answers four questions.</p>
+  <ul class="clean">
+    <li><b>Batch or streaming?</b> Batch collects data and moves it at intervals, for example every night at 2 AM. Streaming moves each record as soon as it is created. Chapter 6 covers streaming in detail.</li>
+    <li><b>Push or pull?</b> In push, the source sends data out (Kavya Distributors emails its invoice). In pull, the data platform goes and fetches it (a job calls Niharika Logistics' API every 30 seconds).</li>
+    <li><b>Full or incremental?</b> A full load copies the whole table every time. An incremental load copies only what has changed since the last run.</li>
+    <li><b>How do we find what changed?</b> Either by a timestamp column such as <code>updated_at</code>, or by reading the database's own change log. The second method is called <b>change data capture (CDC)</b>.</li>
+  </ul>
+
+  <div class="lab" id="load">
+    <h3>Try it: three ways to load the app's orders</h3>
+    <p class="small">The warehouse was last loaded at 1:00 AM. Since then four things happened in the app's orders table: two new orders (O1007, O1008), one order whose amount changed because an item was returned (O1003), and one order that was cancelled and deleted (O1005). Pick a loading method and see what the warehouse ends up with.</p>
+    <div class="seg" id="load-m" role="group" aria-label="Loading method">
+      <button class="btn" data-m="full" aria-pressed="true">Full load</button>
+      <button class="btn" data-m="ts" aria-pressed="false">Incremental by timestamp</button>
+      <button class="btn" data-m="cdc" aria-pressed="false">Change data capture</button>
+    </div>
+    <div class="kpis" id="load-k"></div>
+    <div class="tbl-wrap"><table id="load-t"></table></div>
+    <p id="load-note"></p>
+    <h3>At Dhanvanshi's real size</h3>
+    <p class="small">Suppose about 2 lakh orders are added, changed or deleted every day. Move the slider to change the size of the full orders table.</p>
+    <div class="ctrl"><label for="load-n">Rows in the orders table</label><input type="range" id="load-n" min="0" max="4" step="1" value="2"><output id="load-no"></output></div>
+    <div class="kpis" id="load-scale"></div>
+  </div>
+
+  <div class="callout trap">
+    <b class="t">When the source changes without telling you</b>
+    <p>One morning the Kavya Distributors invoice load fails. Someone at Kavya renamed the column <code>Qty</code> to <code>Quantity</code> in their Excel template. This is called <b>schema drift</b>. Good data engineers talk to the owners of source systems, agree on what the data will look like (sometimes written down as a <b>data contract</b>), and build checks that catch such changes before the reports go wrong.</p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c3"></div>
+</section>
+
+<!-- ============ CHAPTER 4 ============ -->
+<section class="mod" id="c4" data-nav="Storage, modelling and transformation" data-n="4">
+  <p class="modnum">Chapter 4</p>
+  <h1>Storage, modelling and transformation</h1>
+  <p class="lede">Once data is ingested, it has to be kept somewhere sensible, arranged in a shape that makes questions easy to answer, and cleaned so that the answers are right.</p>
+
+  <h2>Where analytical data is stored</h2>
+  <div class="tbl-wrap wide"><table>
+    <tr><th></th><th>Data warehouse</th><th>Data lake</th><th>Lakehouse</th></tr>
+    <tr><td><b>What it holds</b></td><td>Cleaned, structured tables for analysis</td><td>Any data in any format: tables, JSON, images, logs</td><td>Lake storage with warehouse-style tables on top</td></tr>
+    <tr><td><b>Schema</b></td><td>Schema on write: data must fit the table before it is loaded</td><td>Schema on read: structure is applied when the data is read</td><td>Tables have a schema; files underneath are in open formats</td></tr>
+    <tr><td><b>Good for</b></td><td>Reports, dashboards, SQL analysis</td><td>Cheap storage of everything, data science work</td><td>BI and ML on one copy of the data</td></tr>
+    <tr><td><b>Examples</b></td><td>BigQuery, Snowflake, Amazon Redshift</td><td>Amazon S3, Azure Data Lake Storage, Google Cloud Storage</td><td>Databricks, tables in Apache Iceberg or Delta Lake format</td></tr>
+  </table></div>
+  <p>A lake without rules soon becomes a "data swamp": files nobody can find or trust. The lakehouse idea grew out of this problem. Many companies, Dhanvanshi included, keep data in three layers:</p>
+  <div class="layers">
+    <div><b>Raw</b>Exactly as it came from the source. Never edited. Sometimes called bronze.</div>
+    <div><b>Clean</b>Correct types, no duplicates, standard names. Sometimes called silver.</div>
+    <div><b>Business-ready</b>Joined and summarised for a use: daily sales, customer segments. Sometimes called gold.</div>
+  </div>
+
+  <h3>Row storage and column storage</h3>
+  <p>A billing database stores data row by row, because it usually needs a whole bill at a time. Analytical systems mostly store data column by column (for example in the Parquet file format), because most analytical questions need only a few columns from a very large number of rows. Compare what each one reads for this question: <i>total sales of Toor Dal 1 kg</i>.</p>
+  <div class="lab" id="colstore">
+    <div class="seg" role="group" aria-label="Storage layout">
+      <button class="btn" data-s="row" aria-pressed="true">Row storage</button>
+      <button class="btn" data-s="col" aria-pressed="false">Column storage</button>
+    </div>
+    <div class="cellgrid" id="cs-grid"></div>
+    <p id="cs-note" class="small" aria-live="polite"></p>
+  </div>
+
+  <h2>Data modelling: the star schema</h2>
+  <p>Data modelling means deciding how tables are arranged. The most common design for analytics is the <b>star schema</b>, from Ralph Kimball's dimensional modelling. A <b>fact table</b> in the centre holds the measurements, one row per event. <b>Dimension tables</b> around it hold the descriptions used to filter and group those measurements.</p>
+  <div class="star" aria-label="Star schema with fact_sales in the centre">
+    <div class="t e"></div>
+    <div class="t"><b>dim_product</b><span>product, brand, category, pack size</span></div>
+    <div class="t e"></div>
+    <div class="t"><b>dim_branch</b><span>branch, city, region, manager</span></div>
+    <div class="t f"><b>fact_sales</b>one row per item on each bill: quantity, amount, discount</div>
+    <div class="t"><b>dim_date</b><span>date, week, month, festival flag</span></div>
+    <div class="t e"></div>
+    <div class="t"><b>dim_customer</b><span>loyalty tier, city, joining date</span></div>
+    <div class="t e"></div>
+  </div>
+  <p>With this design, "sales of pulses in Pune branches during Diwali week" becomes one fact table joined with three small dimension tables. Bill Inmon's approach is the other classic one: first build one central, fully normalised warehouse for the whole company, then create smaller data marts from it. Most modern teams use a mix of both ideas.</p>
+
+  <h2>Transformation and data quality</h2>
+  <p>Transformation turns raw data into useful data. The common steps are fixing data types, removing duplicates, standardising names and codes, filling or flagging missing values, joining tables and applying business rules such as "net sales = gross sales &minus; returns &minus; discounts". Data quality is usually judged on six dimensions: <b>accuracy</b>, <b>completeness</b>, <b>consistency</b>, <b>timeliness</b>, <b>uniqueness</b> and <b>validity</b>.</p>
+
+  <div class="lab" id="clean">
+    <h3>Try it: clean one evening's raw bills</h3>
+    <p class="small">These are raw bill lines from two Nagpur branches, exactly as they reached the raw layer. Turn on the cleaning steps one by one and watch the sales figures change.</p>
+    <div class="toggles" id="cl-t">
+      <label><input type="checkbox" data-s="dup"> Remove duplicates</label>
+      <label><input type="checkbox" data-s="test"> Remove test bills</label>
+      <label><input type="checkbox" data-s="unit"> Convert paise to rupees</label>
+      <label><input type="checkbox" data-s="fill"> Fill missing prices</label>
+      <label><input type="checkbox" data-s="name"> Standardise branch names</label>
+    </div>
+    <div class="tbl-wrap"><table id="cl-raw"></table></div>
+    <div class="kpis" id="cl-k"></div>
+    <div class="tbl-wrap"><table id="cl-out"></table></div>
+    <p id="cl-note" aria-live="polite"></p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c4"></div>
+</section>
+
+<!-- ============ CHAPTER 5 ============ -->
+<section class="mod" id="c5" data-nav="ETL, ELT and data engineering" data-n="5">
+  <p class="modnum">Chapter 5</p>
+  <h1>ETL, ELT and data engineering</h1>
+  <p class="lede">Many people still think data engineering means ETL. ETL is an important pattern, and a lot of data engineering grew out of it. But today it is one tool in a much larger kit.</p>
+
+  <h2>ETL: extract, transform, load</h2>
+  <p>ETL became common with data warehouses in the 1980s and 1990s. Storage and computing power inside a warehouse were costly, so data was first <b>extracted</b> from the sources, <b>transformed</b> on a separate ETL server, and only the finished, summarised result was <b>loaded</b> into the warehouse. Tools such as Informatica PowerCenter, IBM DataStage and Microsoft SSIS were built for this. The people who ran them were often called ETL developers.</p>
+  <div class="pipe" aria-label="ETL order"><div class="s x">Extract<small>from sources</small></div><span class="ar">&rarr;</span><div class="s t">Transform<small>on an ETL server</small></div><span class="ar">&rarr;</span><div class="s l">Load<small>only finished tables</small></div><span class="ar">&rarr;</span><div class="s w">Warehouse</div></div>
+
+  <h2>ELT: extract, load, transform</h2>
+  <p>Cloud warehouses such as BigQuery, Snowflake and Redshift changed the costs. Storage became cheap and computing power could be scaled up for a few minutes and then switched off. So teams started loading raw data first and transforming it later, inside the warehouse, mostly with SQL. Tools such as Fivetran or Airbyte handle the extract and load, and dbt is widely used for the SQL transformations.</p>
+  <div class="pipe" aria-label="ELT order"><div class="s x">Extract<small>from sources</small></div><span class="ar">&rarr;</span><div class="s l">Load<small>raw data as it is</small></div><span class="ar">&rarr;</span><div class="s w">Warehouse</div><span class="ar">&rarr;</span><div class="s t">Transform<small>inside the warehouse</small></div></div>
+  <p>The biggest practical difference is that <b>ELT keeps the raw data</b>. When a new question comes up, the team writes a new transformation on data that is already there. With classic ETL, anything dropped during transformation is gone from the warehouse.</p>
+
+  <div class="lab" id="etl">
+    <h3>Try it: a new request arrives</h3>
+    <p class="small">Dhanvanshi's billing counters keep bills for only 90 days before clearing them. It is now November. Pick a request and compare how each pattern copes.</p>
+    <div class="seg" id="etl-s" role="group" aria-label="Business request"></div>
+    <div id="etl-out" aria-live="polite"></div>
+  </div>
+
+  <h2>So how is data engineering different from ETL?</h2>
+  <p>ETL and ELT describe how data moves from sources into a warehouse, in batches. That covers parts of two lifecycle stages: ingestion and transformation. Data engineering is the whole discipline. It also covers understanding source systems, streaming data, choosing and designing storage, data modelling, serving data to analysts and models, Reverse ETL, and the undercurrents: security, data management, DataOps, architecture, orchestration and software engineering practice. Job titles show this change: from ETL developer, to BI engineer, to data engineer around the early 2010s when big data tools like Hadoop arrived, and now to platform and analytics engineers as well.</p>
+  <div class="tbl-wrap wide"><table>
+    <tr><th></th><th>Classic ETL</th><th>ELT</th><th>Data engineering (the discipline)</th></tr>
+    <tr><td><b>Scope</b></td><td>Move and reshape data into a warehouse</td><td>Move raw data in, reshape it inside</td><td>The full lifecycle, from generation to serving, plus the undercurrents</td></tr>
+    <tr><td><b>Where transformation runs</b></td><td>A separate ETL server</td><td>Inside the warehouse or lakehouse</td><td>Wherever it suits the need: warehouse SQL, Spark, stream processors</td></tr>
+    <tr><td><b>Raw data kept?</b></td><td>Usually not</td><td>Yes</td><td>Decided on purpose, usually in raw, clean and business-ready layers</td></tr>
+    <tr><td><b>New questions</b></td><td>Slow: change the job, extract again</td><td>Fast: new SQL on stored raw data</td><td>Depends on how well the platform was designed</td></tr>
+    <tr><td><b>Streaming data</b></td><td>No, runs in batch windows</td><td>Mostly batch</td><td>Yes: event streams, CDC, stream processing</td></tr>
+    <tr><td><b>Data leaving the warehouse</b></td><td>Not covered</td><td>Not covered</td><td>Covered through serving and Reverse ETL</td></tr>
+    <tr><td><b>Typical tools</b></td><td>Informatica, SSIS, DataStage</td><td>Fivetran or Airbyte, dbt, cloud warehouses</td><td>All of these, plus Kafka, Spark, Airflow, cloud platforms</td></tr>
+    <tr><td><b>Main skill</b></td><td>Configuring an ETL tool</td><td>SQL and data modelling</td><td>Systems thinking, software engineering, modelling and operations</td></tr>
+  </table></div>
+
+  <div class="callout good">
+    <b class="t">ETL has not disappeared</b>
+    <p>Transforming before loading is still the right choice when data must be changed before it leaves a secure place, for example masking phone numbers or dropping Aadhaar numbers before data goes to the cloud. Many teams now do a small cleaning step before the load and the main transformation after it. This is sometimes written as <b>EtLT</b>.</p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c5"></div>
+</section>
+
+<!-- ============ CHAPTER 6 ============ -->
+<section class="mod" id="c6" data-nav="Data in motion" data-n="6" data-group="Delivering data">
+  <p class="modnum">Chapter 6</p>
+  <h1>Data in motion</h1>
+  <p class="lede">Data at rest sits in a table until someone runs a query or a batch job. Data in motion is processed while it is flowing, one event at a time, seconds after it is created. More and more business decisions now depend on the second kind.</p>
+
+  <h2>Why data in motion matters more today</h2>
+  <p><b>Payments happen in real time.</b> India's UPI handled a record 24.51 billion transactions in August 2026, worth &#8377;29.82 lakh crore, which is about 79 crore transactions a day on average. That is roughly 9,000 payments every second, round the clock. A fraud check on a UPI payment has to finish before the payment does. A report the next morning is of no use.</p>
+  <p><b>Customers expect things instantly.</b> Quick commerce delivers groceries in ten minutes, FoodJoe shows the rider moving on a map, and a customer expects the Dhanvanshi app to know that the last bag of atta was sold at the counter a minute ago.</p>
+  <p><b>Many decisions are now made by software.</b> Fraud blocking, surge pricing, stock reservation and delivery routing are automatic. Software can act on an event within milliseconds, so the data has to arrive that fast.</p>
+  <p><b>Devices send data all the time.</b> GPS units on Niharika Logistics trucks, temperature sensors in Madavi Warehouse and every smartphone running an app produce a continuous flow of events.</p>
+  <p><b>The value of some data falls quickly.</b> Knowing that a truck carrying frozen goods has a failing cooler is valuable in the first five minutes. Knowing it tomorrow only helps you write the insurance claim.</p>
+  <p><b>The tools have become easier to use.</b> Event streaming used to need a large specialist team. Managed services from cloud providers now make it possible for a mid-size company like Dhanvanshi.</p>
+
+  <h3>How fresh does the data need to be?</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>Use case</th><th>Acceptable delay</th><th>Pattern</th></tr>
+    <tr><td>UPI fraud check before a payment completes</td><td>Under one second</td><td><span class="pill inf">Streaming</span></td></tr>
+    <tr><td>FoodJoe rider location and delivery time</td><td>A few seconds</td><td><span class="pill inf">Streaming</span></td></tr>
+    <tr><td>Stock shown on the Dhanvanshi app</td><td>Under a minute</td><td><span class="pill inf">Streaming</span></td></tr>
+    <tr><td>Sales screen at head office</td><td>About 15 minutes</td><td><span class="pill">Micro-batch</span></td></tr>
+    <tr><td>Next week's order to Kavya Distributors</td><td>A day</td><td><span class="pill">Daily batch</span></td></tr>
+    <tr><td>Monthly GST return</td><td>Several days</td><td><span class="pill">Batch</span></td></tr>
+  </table></div>
+  <p>Streaming is not always better. It costs more and is harder to build and fix. The right question is not "batch or streaming?" but "how fresh does this decision need the data to be?"</p>
+
+  <div class="lab" id="fresh">
+    <h3>Try it: the last bags of atta at the Pune branch</h3>
+    <p class="small">The Pune branch opens at 8 AM with 40 bags of Atta 10 kg. Customers buy at the counter all day, and orders also come in on the Dhanvanshi app, more of them in the evening. The app shows the stock from the last time data was loaded. Choose how often stock data reaches the app, then move the time slider.</p>
+    <div class="seg" id="fr-m" role="group" aria-label="How often stock reaches the app">
+      <button class="btn" data-m="day" aria-pressed="true">Daily at 2 AM</button>
+      <button class="btn" data-m="hour" aria-pressed="false">Every hour</button>
+      <button class="btn" data-m="q" aria-pressed="false">Every 15 minutes</button>
+      <button class="btn" data-m="live" aria-pressed="false">Streaming</button>
+    </div>
+    <div class="ctrl"><label for="fr-t">Time of day</label><input type="range" id="fr-t" min="480" max="1320" step="5" value="1080"><output id="fr-to"></output></div>
+    <div class="kpis" id="fr-k"></div>
+    <div class="chart"><div id="fr-c"></div>
+      <div class="lg"><span><i style="border-color:var(--ink)"></i>Real stock on the shelf</span><span><i class="d" style="border-color:var(--info)"></i>Stock shown on the app</span><span><b class="sq" style="background:var(--neg)"></b>App order accepted with no stock</span></div>
+    </div>
+    <div class="tbl-wrap"><table id="fr-sum"></table></div>
+  </div>
+
+  <h2>The building blocks of streaming</h2>
+  <div class="pipe" aria-label="Streaming pipeline">
+    <div class="s x">Producers<small>app, counters, trucks, sensors</small></div><span class="ar">&rarr;</span>
+    <div class="s l">Event broker<small>Kafka, Kinesis, Pub/Sub</small></div><span class="ar">&rarr;</span>
+    <div class="s t">Stream processor<small>Flink, Spark Structured Streaming</small></div><span class="ar">&rarr;</span>
+    <div class="s w">Sinks<small>live dashboard, app, alerts, lake</small></div>
+  </div>
+  <ul class="clean">
+    <li>An <b>event</b> is a small record of something that happened, with the time it happened: "order O5521 placed at 12:58:03".</li>
+    <li>An <b>event broker</b> keeps events in order in a log and lets many consumers read them, each at its own pace. Apache Kafka is the best-known example.</li>
+    <li>A <b>stream processor</b> reads events as they come and filters, joins or counts them.</li>
+    <li><b>Change data capture</b> turns every insert, update and delete in a database into an event, which links the batch world and the streaming world. Debezium is a popular open-source CDC tool.</li>
+  </ul>
+  <p>Two well-known designs combine batch and streaming. The <b>Lambda architecture</b> runs a batch pipeline and a streaming pipeline side by side and merges their results. The <b>Kappa architecture</b> uses only the streaming pipeline, and when history has to be recomputed it replays old events from the log.</p>
+
+  <h2>Counting a stream: windows and late events</h2>
+  <p>A stream never ends, so "total orders" has no final answer. Instead we count within <b>windows</b> of time. A <b>tumbling window</b> cuts time into fixed blocks that do not overlap, such as 12:00 to 12:05, 12:05 to 12:10. A <b>sliding window</b> has a fixed length but moves forward in smaller steps, so windows overlap: "orders in the last 10 minutes, updated every minute". A <b>session window</b> closes after a gap with no activity, which suits user sessions on an app.</p>
+  <p>Events can also arrive late. A FoodJoe rider's phone may lose network, so an order placed at 12:58 reaches the server at 13:03. <b>Event time</b> is when it happened; <b>processing time</b> is when the system received it. Stream processors use a <b>watermark</b>, a rule for how long to wait for late events, before closing a window.</p>
+  <div class="lab" id="win">
+    <h3>Try it: FoodJoe orders during the lunch hour</h3>
+    <div class="row" style="gap:18px">
+      <div><span class="small" style="display:block;margin-bottom:4px">Window size</span><div class="seg" id="win-w" role="group" aria-label="Window size"></div></div>
+      <div><span class="small" style="display:block;margin-bottom:4px">Count by</span><div class="seg" id="win-m" role="group" aria-label="Time used for counting"><button class="btn" data-m="ev" aria-pressed="true">Event time</button><button class="btn" data-m="pr" aria-pressed="false">Processing time</button></div></div>
+    </div>
+    <div class="chart"><div id="win-c"></div>
+      <div class="lg"><span><b class="sq" style="background:var(--info)"></b>Order</span><span><b class="sq" style="background:var(--neg)"></b>Late order: placed 12:58, received 13:03</span></div>
+    </div>
+    <p id="win-note" aria-live="polite"></p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c6"></div>
+</section>
+
+<!-- ============ CHAPTER 7 ============ -->
+<section class="mod" id="c7" data-nav="Serving and Reverse ETL" data-n="7">
+  <p class="modnum">Chapter 7</p>
+  <h1>Serving and Reverse ETL</h1>
+  <p class="lede">Serving is the last stage of the lifecycle and the one users actually see. If people do not trust or use the served data, the work in all the earlier stages is wasted.</p>
+
+  <h2>Serving data for analytics</h2>
+  <p>Most served data goes to <b>business intelligence</b>: dashboards and reports in tools such as Power BI, Tableau or Looker, and direct SQL queries by analysts. FoodJoe also does <b>embedded analytics</b>: each restaurant partner sees its own sales and ratings inside the FoodJoe partner app. For all of this, one thing matters more than speed: everyone must get the same answer. If the finance team's "net sales" and the store team's "net sales" differ, meetings turn into arguments about whose number is right. Many teams keep agreed metric definitions in one place, called a <b>semantic layer</b>.</p>
+
+  <h2>Serving data for machine learning</h2>
+  <p>Data scientists need training data and <b>features</b>: well-defined inputs such as "average weekly sales of this product at this branch over the last eight weeks". The same feature must be calculated the same way when the model is trained and when it makes live predictions. A <b>feature store</b> is a system that keeps features consistent for both uses.</p>
+
+  <h2>Reverse ETL: sending data back</h2>
+  <p>ETL and ELT move data <i>from</i> business systems <i>into</i> the warehouse. Reverse ETL moves data the other way: from the warehouse <i>back into</i> the tools people use every day, such as a CRM, a WhatsApp campaign tool, the billing counter screen or an advertising platform.</p>
+  <div class="rev" aria-label="Forward and reverse flow of data around the warehouse">
+    <div class="col"><div class="h">Business systems</div><div>Billing counters</div><div>Dhanvanshi app</div><div>Kavya Distributors' invoices</div></div>
+    <div class="ar f"><b>&rarr;</b>ETL / ELT</div>
+    <div class="wh">Data warehouse<small>joined, cleaned and modelled data</small></div>
+    <div class="ar r"><b>&rarr;</b>Reverse ETL</div>
+    <div class="col"><div class="h">Tools people work in</div><div>WhatsApp campaign tool</div><div>Cashier's screen at the counter</div><div>Kavya Distributors' order portal</div></div>
+  </div>
+  <p>Why is this needed? The warehouse is the only place where data from all sources comes together. It knows that a customer has spent &#8377;48,000 in two years but has not visited in two months. The billing counter does not know that, and neither does the WhatsApp tool. Staff will not open a dashboard before every customer interaction. Reverse ETL puts the insight where the work happens. This is also called <b>data activation</b> or <b>operational analytics</b>. Reis and Housley note that Reverse ETL was once seen as a bad practice, but it has become a normal part of the serving stage. Tools such as Hightouch and Census are built for it; teams can also write their own jobs that call each tool's API.</p>
+  <ul class="clean">
+    <li>Dhanvanshi sends its "at risk" customers to the WhatsApp tool every morning for a win-back offer.</li>
+    <li>The cashier's screen shows "Gold member: offer &#8377;100 off above &#8377;1,500" when a loyalty number is entered.</li>
+    <li>Dhanvanshi pushes suggested reorder quantities into Kavya Distributors' order portal.</li>
+    <li>FoodJoe pushes a "kitchen delay score" back into each restaurant's partner app.</li>
+  </ul>
+
+  <div class="lab" id="retl">
+    <h3>Try it: set up a Reverse ETL sync</h3>
+    <p class="small">The warehouse table <code>customer_segments</code> is refreshed every night. A customer is <b>New</b> if the first visit was within 60 days, <b>At risk</b> if the last visit was more than 45 days ago, and <b>Loyal</b> otherwise. Last week an "At risk" list was already sent to the WhatsApp tool.</p>
+    <div class="tbl-wrap"><table id="rt-src"></table></div>
+    <div class="row" style="gap:18px;align-items:flex-start">
+      <div><span class="small" style="display:block;margin-bottom:4px">1. Segment</span><div class="seg" id="rt-seg" role="group" aria-label="Segment"></div></div>
+      <div><span class="small" style="display:block;margin-bottom:4px">2. Sync mode</span><div class="seg" id="rt-mode" role="group" aria-label="Sync mode"></div></div>
+    </div>
+    <div class="toggles" style="margin-top:12px"><label><input type="checkbox" id="rt-consent" checked> 3. Only customers who have agreed to receive WhatsApp messages</label></div>
+    <p class="small" id="rt-modehelp"></p>
+    <div class="row"><button class="btn primary" id="rt-run">Run sync</button></div>
+    <div id="rt-out" aria-live="polite"></div>
+  </div>
+
+  <h3>ETL and Reverse ETL side by side</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th></th><th>ETL / ELT</th><th>Reverse ETL</th></tr>
+    <tr><td><b>Direction</b></td><td>Business systems &rarr; warehouse</td><td>Warehouse &rarr; business systems</td></tr>
+    <tr><td><b>Main users</b></td><td>Analysts, data scientists</td><td>Marketing, sales, store staff, partners</td></tr>
+    <tr><td><b>What they receive</b></td><td>Tables and dashboards</td><td>Fields, lists and tasks inside tools they already use</td></tr>
+    <tr><td><b>When it goes wrong</b></td><td>A report is late or wrong</td><td>A real customer gets the wrong message, or data typed by staff in the CRM gets overwritten</td></tr>
+    <tr><td><b>Special care needed</b></td><td>Source load, schema drift</td><td>API limits of the target tool, matching IDs correctly, customer consent under the Digital Personal Data Protection Act, 2023</td></tr>
+  </table></div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c7"></div>
+</section>
+
+<!-- ============ CHAPTER 8 ============ -->
+<section class="mod" id="c8" data-nav="The undercurrents" data-n="8" data-group="Running it well">
+  <p class="modnum">Chapter 8</p>
+  <h1>The undercurrents</h1>
+  <p class="lede">Building a pipeline once is the easy part. Keeping it correct, secure and on time every single day, for years, is where most of a data engineer's effort goes. The six undercurrents are the practices that make this possible, across every stage of the lifecycle.</p>
+
+  <div class="tbl-wrap"><table class="stack">
+    <tr><th>Undercurrent</th><th>What it means</th><th>At Dhanvanshi</th></tr>
+    <tr><td><b>Security</b></td><td>Give people only the access they need, protect personal data, encrypt data and keep passwords and keys out of code.</td><td>Analysts see phone numbers masked as 98XXXXXX21. Only the Reverse ETL job can read full numbers.</td></tr>
+    <tr><td><b>Data management</b></td><td>Governance, data ownership, a catalogue so people can find data, lineage showing where each number came from, quality rules, privacy and retention.</td><td>The catalogue says who owns <code>fact_sales</code>, and lineage shows that the dashboard's "net sales" comes from the billing counters through three steps.</td></tr>
+    <tr><td><b>DataOps</b></td><td>Automated tests, monitoring and alerts, and a clear process when something breaks, so that problems are caught before users notice.</td><td>If today's bill count from Nashik is 40% below normal, the data team gets an alert at 3 AM, not a call from the regional manager at 11 AM.</td></tr>
+    <tr><td><b>Data architecture</b></td><td>Designing systems that meet today's needs and can change later, while keeping cost under control.</td><td>Choosing a lakehouse so that dashboards and forecasting models use the same copy of the data.</td></tr>
+    <tr><td><b>Orchestration</b></td><td>Running many jobs in the right order, retrying failed ones, and showing what ran, what failed and why.</td><td>The nightly pipeline in Apache Airflow; Dagster and Prefect are other popular tools.</td></tr>
+    <tr><td><b>Software engineering</b></td><td>Writing pipeline code the way good software is written: version control, code review, testing, automated deployment, and infrastructure defined as code.</td><td>Every SQL change is kept in Git, reviewed by a colleague and tested on sample data before it goes live.</td></tr>
+  </table></div>
+
+  <h2>Orchestration: the pipeline as a DAG</h2>
+  <p>A nightly pipeline is not one job but many, and some must wait for others. This is drawn as a <b>DAG</b> (directed acyclic graph): each box is a task, each arrow means "this must finish first", and no path loops back on itself. When a task fails, the orchestrator stops only the tasks that depend on it. Everything else still runs.</p>
+  <div class="lab dag" id="dag">
+    <h3>Try it: break the nightly pipeline</h3>
+    <p class="small">Tap any task to make it fail tonight (tap again to fix it). Then run the pipeline and see what the team finds at 7 AM.</p>
+    <div id="dag-svg"></div>
+    <div class="lg" style="justify-content:center"><span><b class="sq" style="background:var(--pos-bg);border:1.5px solid var(--pos)"></b>Succeeded</span><span><b class="sq" style="background:var(--neg-bg);border:1.5px solid var(--neg)"></b>Failed</span><span><b class="sq" style="background:var(--surface-2);border:1.5px dashed var(--frame)"></b>Held back</span></div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="dag-run">Run tonight's pipeline</button><button class="btn" id="dag-reset">Reset</button></div>
+    <div id="dag-out" aria-live="polite"></div>
+  </div>
+
+  <div class="callout">
+    <b class="t">The data engineer as the owner of trust</b>
+    <p>Users rarely praise a pipeline that works. They notice only when a number is wrong or late. Each undercurrent protects that trust from a different side: security protects customers, data management keeps meaning clear, DataOps catches failures early, architecture keeps the system able to change, orchestration keeps the order right, and software engineering keeps the code dependable.</p>
+  </div>
+
+  <h2>Quick Check</h2>
+  <div class="mcq" data-set="c8"></div>
+</section>
+
+<!-- ============ FINAL QUIZ ============ -->
+<section class="mod" id="quiz" data-nav="Final quiz" data-group="Check yourself">
+  <h1>Final quiz</h1>
+  <p class="lede">Twelve questions from all eight chapters. Your answers are saved on this device, so you can come back later.</p>
+  <div class="score"><span id="qz-score"></span><button class="btn" id="qz-reset">Start again</button></div>
+  <div class="mcq" data-set="final"></div>
+  <div id="qz-end" aria-live="polite"></div>
+</section>
+
+  </main>
+</div>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const IN=(n,d=0)=>Number(n).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+const R=n=>"\u20B9"+IN(Math.round(n));
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const kpi=(l,v,cls)=>`<div class="kpi ${cls||""}"><div class="kl">${l}</div><div class="kv">${v}</div></div>`;
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function segButtons(box,items,cur,key){box.innerHTML=items.map(it=>`<button class="btn" data-${key}="${it.v}" aria-pressed="${it.v===cur}">${it.l}</button>`).join("");}
+function wireSeg(box,key,fn){box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!box.contains(b))return;$$("button",box).forEach(x=>x.setAttribute("aria-pressed",x===b));fn(b.dataset[key]);});}
+const fmtIndian=n=>{const f=v=>Number(v.toFixed(2)).toLocaleString("en-IN");return n>=1e7?f(n/1e7)+" crore":n>=1e5?f(n/1e5)+" lakh":IN(n);};
+
+/* ---------- chart helpers ---------- */
+function niceTicks(lo,hi,n){
+  const span=hi-lo||1,step0=span/(n||5),mag=Math.pow(10,Math.floor(Math.log10(step0))),err=step0/mag;
+  const step=(err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;const out=[];
+  for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(Math.round(v*1e6)/1e6);return out;
+}
+function frame(el,h,x0,x1,y0,y1,m){
+  const W=Math.max(300,Math.min(860,(el.clientWidth||600)));
+  m=Object.assign({l:40,r:16,t:12,b:28},m||{});
+  const sx=v=>m.l+(v-x0)/(x1-x0||1)*(W-m.l-m.r), sy=v=>m.t+(1-(v-y0)/(y1-y0||1))*(h-m.t-m.b);
+  return {W,h,m,sx,sy};
+}
+const RENDER=[];
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>RENDER.forEach(fn=>fn()),150);});
+const clock=m=>{let h=Math.floor(m/60)%24,mm=Math.round(m%60);if(mm===60){h++;mm=0;}const ap=h>=12?"PM":"AM";const hh=h%12||12;return `${hh}:${String(mm).padStart(2,"0")} ${ap}`;};
+const clock24=m=>{const h=Math.floor(m/60),mm=Math.floor(m%60);return `${h}:${String(mm).padStart(2,"0")}`;};
+
+/* ---------- navigation ---------- */
+const mods=$$(".mod");
+const nav=$("#nav");
+let visited=new Set(store.get("de-module-visited")||[]);
+function buildNav(){
+  let html="";
+  mods.forEach(m=>{
+    if(m.dataset.group)html+=`<li class="navgroup">${m.dataset.group}</li>`;
+    html+=`<li><a href="#${m.id}" data-id="${m.id}"><span class="n">${m.dataset.n||""}</span><span>${m.dataset.nav}</span><span class="seen">${visited.has(m.id)?"\u2713":""}</span></a></li>`;
+  });
+  nav.innerHTML=html;
+}
+function addPagers(){
+  mods.forEach((m,i)=>{
+    const p=mods[i-1],n=mods[i+1];
+    const d=document.createElement("div");d.className="pager";
+    const lab=x=>x.dataset.n?`Chapter ${x.dataset.n}: ${x.dataset.nav}`:x.dataset.nav;
+    d.innerHTML=(p?`<a href="#${p.id}"><small>Previous</small>${lab(p)}</a>`:"")+(n?`<a class="nx" href="#${n.id}"><small>Next</small>${lab(n)}</a>`:"");
+    m.appendChild(d);
+  });
+}
+function show(){
+  const id=(location.hash||"#start").slice(1);
+  const el=document.getElementById(id);
+  const target=el&&el.classList.contains("mod")?id:"start";
+  mods.forEach(m=>m.classList.toggle("on",m.id===target));
+  visited.add(target);store.set("de-module-visited",[...visited]);
+  buildNav();
+  $$("#nav a").forEach(a=>{if(a.dataset.id===target)a.setAttribute("aria-current","page");});
+  $("#side").classList.remove("open");$("#navtoggle").setAttribute("aria-expanded","false");
+  window.scrollTo(0,0);
+  RENDER.forEach(fn=>fn());
+}
+$("#navtoggle").addEventListener("click",()=>{const s=$("#side");s.classList.toggle("open");$("#navtoggle").setAttribute("aria-expanded",s.classList.contains("open"));});
+
+/* ---------- multiple-choice questions ---------- */
+/* correct positions are balanced, never repeat back to back and never form A-B-C or C-B-A runs */
+function positions(n,k){
+  let best=null;
+  for(let t=0;t<3000;t++){
+    const s=[];for(let i=0;i<n;i++)s.push(i%k);shuffle(s);
+    let ok=true;
+    for(let i=1;i<n&&ok;i++)if(s[i]===s[i-1])ok=false;
+    for(let i=2;i<n&&ok;i++){const a=s[i-2],b=s[i-1],c=s[i];if((b-a===1&&c-b===1)||(a-b===1&&b-c===1))ok=false;}
+    if(ok)return s;best=s;
+  }
+  return best;
+}
+const MCQ={},QALL=[];
+function addQ(set,q){(MCQ[set]=MCQ[set]||[]).push(q);q.set=set;QALL.push(q);}
+let mcqAns=store.get("de-module-mcq")||{};
+function mcqHTML(q,num){
+  const chosen=mcqAns[q.id];const done=chosen!==undefined;
+  const opts=q.order.map(o=>{let cls="";if(done){if(o===q.correct)cls="right";else if(o===chosen)cls="wrong";}
+    return `<button class="opt ${cls}" data-qid="${q.id}" data-o="${encodeURIComponent(o)}" ${done?"disabled":""}>${o}</button>`;}).join("");
+  const ok=chosen===q.correct;
+  return `<div class="qz" id="q-${q.id}"><div class="qp">${num}. ${q.p}</div><div class="opts">${opts}</div>${done?`<p class="why"><b style="color:${ok?"var(--pos)":"var(--neg)"}">${ok?"Correct.":"Not correct."}</b> ${q.why}${ok?"":` <button class="again" data-again="${q.id}">Try again</button>`}</p>`:""}</div>`;
+}
+function renderSet(box){const qs=MCQ[box.dataset.set]||[];box.innerHTML=qs.map((q,i)=>mcqHTML(q,i+1)).join("");}
+function rerenderQ(id){const q=QALL.find(x=>x.id===id);const el=document.getElementById("q-"+id);if(!q||!el)return;el.outerHTML=mcqHTML(q,MCQ[q.set].indexOf(q)+1);if(q.set==="final")quizScore();}
+document.addEventListener("click",ev=>{
+  const b=ev.target.closest("button.opt[data-qid]");
+  if(b){mcqAns[b.dataset.qid]=decodeURIComponent(b.dataset.o);store.set("de-module-mcq",mcqAns);rerenderQ(b.dataset.qid);return;}
+  const a=ev.target.closest("button.again");
+  if(a){delete mcqAns[a.dataset.again];store.set("de-module-mcq",mcqAns);rerenderQ(a.dataset.again);}
+});
+
+addQ("c1",{id:"c1a",p:"Aman Mart wants an AI model that predicts which customers will stop coming. Its bills are spread across three billing software and many bills have no phone number. What should Aman Mart do first?",
+  correct:"Bring the bills from all systems into one place and fix how customers are identified",
+  wrong:["Hire a deep learning expert to build the model straight away","Run A/B tests on discount coupons","Buy a powerful GPU server for training"],
+  why:"In the hierarchy of needs, collection and reliable movement and storage of data come first. A model built on scattered, incomplete data cannot be trusted."});
+addQ("c1",{id:"c1b",p:"Which of these pieces of work is <i>downstream</i> of data engineering?",
+  correct:"A data scientist building a demand forecast from the cleaned sales table",
+  wrong:["Designing how bills move from the counters to the warehouse","Removing duplicate bills created when a counter goes offline and resyncs","Deciding how often to pull truck locations from Niharika Logistics"],
+  why:"The forecast uses data that data engineering has already prepared, so it sits downstream. The other three are data engineering work."});
+addQ("c2",{id:"c2a",p:"Why does Storage run under Ingestion, Transformation and Serving in the lifecycle diagram?",
+  correct:"Data is stored at every step: raw after ingestion, clean after transformation and ready-to-use for serving",
+  wrong:["Data is stored only once, at the end of the pipeline","Storage is not needed when data is streamed","Storage is handled only by the source systems"],
+  why:"Every stage reads from and writes to storage. That is why it is drawn as a base under the other three."});
+addQ("c2",{id:"c2b",p:"At FoodJoe, which lifecycle stage is the data engineer usually <i>not</i> in control of?",
+  correct:"Generation: the order app and its database are run by the app development team",
+  wrong:["Ingestion: pulling orders from the app database into the lake","Transformation: joining orders with restaurant details","Serving: publishing daily order tables for analysts"],
+  why:"Source systems belong to application teams or outside partners. The data engineer must understand them and work with their owners, but does not run them."});
+addQ("c3",{id:"c3a",p:"Dhanvanshi copies only rows whose <code>updated_at</code> is later than the last run. An order was cancelled and its row deleted from the app database. What happens in the warehouse?",
+  correct:"The deleted order stays in the warehouse, so sales are shown higher than they are",
+  wrong:["The pipeline removes the order automatically","The pipeline stops with an error","The order's amount becomes zero"],
+  why:"A deleted row has no timestamp left to find. Timestamp-based loads cannot see deletes. Change data capture reads the database's change log, which records deletes too."});
+addQ("c3",{id:"c3b",p:"Why should heavy reports not run directly on the billing counters' database?",
+  correct:"It is an OLTP system built for fast small writes, and long analytical queries can slow down billing",
+  wrong:["OLTP databases cannot store decimal amounts","The billing database deletes all data every night","SQL does not allow analytical queries on OLTP systems"],
+  why:"OLTP systems are tuned for many small transactions. Large scans compete for the same resources, so analysis is done on a copy in an OLAP system."});
+addQ("c4",{id:"c4a",p:"For the question \u201ctotal sales of Toor Dal 1 kg in 2025\u201d, why is a column format such as Parquet faster than a row format?",
+  correct:"It reads only the product and amount columns instead of every column of every row",
+  wrong:["It stores fewer rows than a row format","It keeps all the data in memory all the time","It does not need any schema"],
+  why:"Column storage keeps each column together, so a query reads only the columns it needs. Columns of similar values also compress well."});
+addQ("c4",{id:"c4b",p:"In a star schema for Dhanvanshi's sales, which of these is the fact table?",
+  correct:"One row per item on each bill, with quantity and amount",
+  wrong:["One row per product, with name, brand and category","One row per branch, with city and manager","One row per date, with week, month and festival flag"],
+  why:"The fact table holds the measurements of each event. The other three are dimension tables that describe those events."});
+addQ("c5",{id:"c5a",p:"It is November. Finance finds that GST was calculated wrongly for March and wants March sales recomputed. The counters keep bills for only 90 days. Which setup makes this easy?",
+  correct:"ELT, because raw bills were loaded and kept in the warehouse",
+  wrong:["ETL, because only corrected totals were loaded","Either one, because the counters still have the March bills","Neither, because transformed data can never be recomputed"],
+  why:"The counters no longer have March bills. Only a setup that kept the raw data can rerun the transformation with the correct GST rule."});
+addQ("c5",{id:"c5b",p:"Which statement about ETL and data engineering is correct?",
+  correct:"ETL is one pattern within data engineering, which also covers streaming, storage design, serving, Reverse ETL and the undercurrents",
+  wrong:["Data engineering is simply a new name for ETL","ETL is used only for streaming data","Data engineering does not include moving data between systems"],
+  why:"ETL covers parts of ingestion and transformation in batch. Data engineering covers the full lifecycle and the practices underneath it."});
+addQ("c6",{id:"c6a",p:"Which Dhanvanshi use case most needs streaming data?",
+  correct:"Stopping the app from accepting orders for an item that has just sold out at the store",
+  wrong:["Filing the monthly GST return","Comparing this year's branch sales with last year's","Reviewing Kavya Distributors' delivery performance every quarter"],
+  why:"Only the stock case loses value within minutes. The others work perfectly well with batch data."});
+addQ("c6",{id:"c6b",p:"A FoodJoe order placed at 12:58 reaches the server at 13:03. Counting by <i>event time</i> in 5-minute tumbling windows, which window does it belong to?",
+  correct:"12:55 to 13:00",
+  wrong:["13:00 to 13:05","13:05 to 13:10","Both 12:55 to 13:00 and 13:00 to 13:05"],
+  why:"Event time uses when the order was actually placed. A watermark decides how long the 12:55 window waits for such late arrivals."});
+addQ("c7",{id:"c7a",p:"Which of these is an example of Reverse ETL?",
+  correct:"Sending the list of \u201cat risk\u201d customers from the warehouse into the WhatsApp campaign tool every morning",
+  wrong:["Copying bills from branch counters into the warehouse every night","Building a branch sales dashboard on the warehouse","Training a forecasting model on the sales table"],
+  why:"Reverse ETL moves data from the warehouse back into operational tools. The first wrong option is normal ETL, and the other two are serving for analytics and ML."});
+addQ("c7",{id:"c7b",p:"Farhan was in last week's \u201cat risk\u201d audience, but he visited the store 3 days ago. This week's sync runs in <i>upsert</i> mode. What happens to Farhan?",
+  correct:"He stays in the at-risk audience and may still get a \u201cwe miss you\u201d message",
+  wrong:["He is removed from the audience","The sync stops because his segment changed","He is moved to the Loyal audience automatically"],
+  why:"Upsert only adds and updates the records it sends. Farhan is not in this week's list, so nothing touches his old record. Mirror mode would remove him."});
+addQ("c8",{id:"c8a",p:"The Kavya invoices extract fails one night. The pipeline runs as a DAG. What happens?",
+  correct:"Only tasks that depend on it, directly or indirectly, are held back; the sales dashboard still refreshes",
+  wrong:["Every task in the pipeline stops","The dependent tasks run on empty data","Only the very last task is affected"],
+  why:"The orchestrator follows the arrows. Clean purchases, stock position, the demand forecast and reorder suggestions wait. Tasks with no path from the failed task run as usual."});
+addQ("c8",{id:"c8b",p:"Which of these practices belongs to the <i>DataOps</i> undercurrent?",
+  correct:"An automatic check that alerts the team when today's bill count is 40% below normal",
+  wrong:["Showing masked phone numbers to analysts","Choosing between a data lake and a data warehouse","Keeping all SQL code in Git with code review"],
+  why:"DataOps is about testing, monitoring and responding to problems. The others are security, data architecture and software engineering."});
+
+addQ("final",{id:"f1",p:"Which five stages make up the data engineering lifecycle described by Reis and Housley?",
+  correct:"Generation, storage, ingestion, transformation, serving",
+  wrong:["Collect, clean, model, deploy, monitor","Extract, transform, load, report, archive","Plan, build, test, release, maintain"],
+  why:"Generation happens in the source systems; ingestion, transformation and serving follow, with storage under all of them."});
+addQ("final",{id:"f2",p:"In the data science hierarchy of needs, which layer includes cleaning and anomaly detection?",
+  correct:"Explore / Transform",wrong:["Move / Store","Aggregate / Label","Learn / Optimize"],
+  why:"Explore and transform sits just above move and store. Cleaning and preparation happen here, before aggregation and modelling."});
+addQ("final",{id:"f3",p:"Kavya Distributors renames the column \u201cQty\u201d to \u201cQuantity\u201d in its invoice file, and the load fails. What is this called?",
+  correct:"Schema drift",wrong:["Data skew","A late-arriving event","A watermark"],
+  why:"Schema drift is an unannounced change in the structure of source data. Data contracts and schema checks help catch it."});
+addQ("final",{id:"f4",p:"What is the main advantage of change data capture over a nightly full load?",
+  correct:"It moves only the inserts, updates and deletes, including deletes that timestamp methods miss",
+  wrong:["It does not need any access to the source database","It removes the need for a data warehouse","It cleans the data automatically"],
+  why:"CDC reads the database's change log, so it is light and it also captures deletes."});
+addQ("final",{id:"f5",p:"\u201cSchema on read\u201d is most closely linked with which of these?",
+  correct:"A data lake",wrong:["A traditional data warehouse","The billing counters' OLTP database","A star schema"],
+  why:"A lake stores files as they are and applies structure when they are read. Warehouses and OLTP databases check the schema when data is written."});
+addQ("final",{id:"f6",p:"Why did ELT become popular?",
+  correct:"Cloud warehouses made storage cheap and computing power easy to scale, so raw data could be loaded first and transformed inside",
+  wrong:["ETL tools stopped supporting SQL","Rules made it illegal to transform data before loading it","ELT needs no transformation at all"],
+  why:"Once storage and compute in the warehouse became cheap and elastic, keeping raw data and transforming it inside became the practical choice."});
+addQ("final",{id:"f7",p:"When is transforming data <i>before</i> loading it still the better choice?",
+  correct:"When phone numbers must be masked before any data leaves Dhanvanshi's own servers",
+  wrong:["When analysts want raw data kept for future questions","When the warehouse has plenty of cheap computing power","When business questions change very often"],
+  why:"If sensitive data must never reach the cloud unmasked, it has to be changed before the load. The other three situations favour ELT."});
+addQ("final",{id:"f8",p:"UPI handled 24.51 billion transactions in August 2026. Roughly how many is that per second, on average?",
+  correct:"About 9,000",wrong:["About 900","About 90,000","About 9 lakh"],
+  why:"24.51 billion \u00F7 (31 days \u00D7 86,400 seconds) \u2248 9,150 transactions a second, all day and night."});
+addQ("final",{id:"f9",p:"What does a 10-minute <i>tumbling</i> window mean?",
+  correct:"Fixed 10-minute blocks that do not overlap, such as 12:00 to 12:10 and 12:10 to 12:20",
+  wrong:["A 10-minute window that moves forward every minute, so windows overlap","A window that closes after 10 minutes with no activity","The last 10 events, whatever their time"],
+  why:"Tumbling windows are fixed and non-overlapping. The overlapping one is a sliding window, and the gap-based one is a session window."});
+addQ("final",{id:"f10",p:"Which of these is a typical destination for Reverse ETL?",
+  correct:"A CRM or marketing tool used by frontline teams",
+  wrong:["The raw layer of the data lake","A backup copy of the billing database","An archive of Parquet files"],
+  why:"Reverse ETL delivers warehouse data into operational tools where people act on it."});
+addQ("final",{id:"f11",p:"Which risk is specific to Reverse ETL?",
+  correct:"Overwriting fields that staff have typed by hand into the operational tool",
+  wrong:["Losing raw data before it reaches the warehouse","Missing deleted rows in a timestamp-based load","Slow queries on columnar files"],
+  why:"Reverse ETL writes into live business tools. If a sync overwrites a field that sales staff maintain by hand, their work is lost."});
+addQ("final",{id:"f12",p:"What does an orchestration tool such as Apache Airflow mainly do?",
+  correct:"Runs tasks in the right order, retries failures and shows which step failed",
+  wrong:["Stores data in a columnar format","Replaces the need to write SQL","Encrypts data at rest"],
+  why:"Orchestration coordinates a DAG of tasks: dependencies, schedules, retries and visibility into each run."});
+
+function finaliseMCQ(){
+  const pos=positions(QALL.length,4);
+  QALL.forEach((q,i)=>{const w=shuffle(q.wrong.slice());w.splice(pos[i],0,q.correct);q.order=w;});
+  $$(".mcq[data-set]").forEach(renderSet);
+  quizScore();
+}
+function quizScore(){
+  const qs=MCQ.final||[];const done=qs.filter(q=>mcqAns[q.id]!==undefined);const right=done.filter(q=>mcqAns[q.id]===q.correct).length;
+  $("#qz-score").textContent=`Score: ${right} out of ${qs.length}  (${done.length} answered)`;
+  let msg="";
+  if(done.length===qs.length){
+    const p=right/qs.length;
+    msg=p>=.9?"Very well done. You have a strong base in data engineering.":p>=.7?"Good work. Look again at the questions you missed; the explanations point to the right chapter.":p>=.5?"A fair start. Revisit the chapters behind the questions you missed and try again.":"Worth another pass through the chapters before trying again.";
+    msg=`<div class="callout ${p>=.7?"good":""}"><b class="t">You scored ${right} out of ${qs.length}</b><p>${msg}</p></div>`;
+  }
+  $("#qz-end").innerHTML=msg;
+}
+$("#qz-reset").addEventListener("click",()=>{(MCQ.final||[]).forEach(q=>delete mcqAns[q.id]);store.set("de-module-mcq",mcqAns);renderSet($('.mcq[data-set="final"]'));quizScore();});
+
+/* ---------- Chapter 1: hierarchy of needs ---------- */
+const PYR=[
+  {k:"ai",n:"AI, deep learning",c:"ds",ex:"Image recognition, language models",
+   d:"Advanced models that learn complex patterns from large amounts of data.",
+   at:"A camera-based system that spots empty shelf space from store CCTV, or a chatbot that answers \u201cwhere is my order?\u201d.",
+   who:"Data scientists and ML engineers",
+   weak:"Most businesses get large value from the lower layers long before they need this one. Starting here without the base usually fails."},
+  {k:"learn",n:"Learn / Optimize",c:"ds",ex:"A/B testing, experiments, simple ML",
+   d:"Testing ideas properly and using simple models to predict or optimise.",
+   at:"Testing a \u20B9100 coupon against a \u20B9150 coupon on WhatsApp; a simple regression that forecasts weekly atta demand.",
+   who:"Data scientists",
+   weak:"Decisions go back to gut feeling, and nobody can tell which offer actually worked."},
+  {k:"agg",n:"Aggregate / Label",c:"sh",ex:"Metrics, segments, features, training data",
+   d:"Summarising data into metrics, segments and features that people and models can use.",
+   at:"Daily sales per branch, the \u201cat risk\u201d customer segment, and a feature table for the demand forecast.",
+   who:"Shared: data engineers, analytics engineers and analysts",
+   weak:"Finance and the store team report two different numbers for \u201cnet sales\u201d, and every meeting starts with an argument."},
+  {k:"exp",n:"Explore / Transform",c:"de",ex:"Cleaning, anomaly detection, prep",
+   d:"Cleaning and preparing data, and spotting values that look wrong.",
+   at:"Removing duplicate bills, standardising branch names, and flagging a \u20B999,999 test bill made by a trainee cashier.",
+   who:"Mostly data engineers, with analysts",
+   weak:"Totals are wrong. A single test bill can make one branch look like the best performer of the month."},
+  {k:"move",n:"Move / Store",c:"de",ex:"Pipelines, ETL, reliable data flow, storage",
+   d:"Reliable pipelines and infrastructure that move data and store it safely, both structured and unstructured.",
+   at:"Bills from every branch reach the warehouse every night; truck locations from Niharika Logistics land in the data lake.",
+   who:"Data engineers",
+   weak:"If the Nashik upload fails silently for three days, every report shows Nashik sales falling, and people act on it."},
+  {k:"col",n:"Collect",c:"de",ex:"Logging, sensors, external data, user content",
+   d:"Recording the data in the first place: logging, sensors, external data and content created by users.",
+   at:"Counters record every bill, the app logs every search, sensors log the cold room temperature at Madavi Warehouse, and the festival calendar is brought in from outside.",
+   who:"Data engineers, together with the app and IT teams",
+   weak:"If the app never logs searches that found nothing, no one can ever learn which products customers wanted but could not find."}
+];
+function pyrInit(){
+  const box=$("#pyr");
+  box.innerHTML=PYR.map((l,i)=>`<button class="${l.c}" data-k="${l.k}" aria-pressed="false" style="width:${34+i*13.2}%">${l.n}<small>${l.ex}</small></button>`).join("");
+  box.addEventListener("click",e=>{const b=e.target.closest("button");if(b)pyrShow(b.dataset.k);});
+  pyrShow("col");
+}
+function pyrShow(k){
+  const l=PYR.find(x=>x.k===k);
+  $$("#pyr button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
+  $("#pyr-detail").innerHTML=`<h3>${l.n}</h3><p class="who">${l.d}</p><dl><dt>At Dhanvanshi</dt><dd>${l.at}</dd><dt>Mostly done by</dt><dd>${l.who}</dd><dt>If this layer is weak</dt><dd>${l.weak}</dd></dl>`;
+}
+
+/* ---------- Chapter 2: lifecycle ---------- */
+const LC={
+  gen:{t:"Generation",tag:"gen",d:"Data is created in source systems: billing software, the app, supplier files, GPS devices, sensors. These systems are usually run by application teams or outside partners, not by the data engineer.",
+    at:"A bill with bill number, branch, counter, items, quantities, amounts, payment mode and time.",
+    q:"How is the data stored at the source? How often is it created? Can the structure change without notice? Can I read from it without slowing it down?",
+    tools:"Application databases such as MySQL, PostgreSQL and SQL Server; APIs; IoT devices; SaaS tools"},
+  ing:{t:"Ingestion",tag:"ing",d:"Moving data from the sources into the data platform, in batches or as a stream, by push or by pull.",
+    at:"A nightly copy of all bills; a live stream of app orders; a job that picks up Kavya Distributors' invoice file every morning.",
+    q:"How fresh do users need this data? What happens if the source is down? Full load or incremental? How do we catch deletes?",
+    tools:"Airbyte, Fivetran, Apache Kafka, Debezium for CDC, custom Python jobs"},
+  sto:{t:"Storage",tag:"sto",d:"Where data rests, at every stage of the lifecycle. The choice depends on how often data is read, how fast it must be read, how much there is and what it costs.",
+    at:"Raw bills in low-cost object storage for seven years; clean and business-ready tables in the warehouse.",
+    q:"Is this fast enough for the way it will be read? Is it cheap enough to keep for years? Which data is \u201chot\u201d (read often) and which is \u201ccold\u201d?",
+    tools:"Amazon S3, Azure Data Lake Storage, Google Cloud Storage, BigQuery, Snowflake, PostgreSQL"},
+  trf:{t:"Transformation",tag:"trf",d:"Turning raw data into useful data: fixing types, removing duplicates, standardising, joining and applying business rules.",
+    at:"Net sales = gross sales \u2212 returns \u2212 discounts; bills joined with the product master to add category and brand.",
+    q:"What exactly is the business rule, and who owns it? Where should this logic run? Is the cost of running it justified by its use?",
+    tools:"SQL, dbt, Apache Spark, Python (pandas), Apache Flink for streams"},
+  srv:{t:"Serving",tag:"srv",d:"Making data available to the people and systems that use it, in a form they can trust.",
+    at:"Sales tables for dashboards, a feature table for the forecast model, and a customer segment list for Reverse ETL.",
+    q:"Who will use this, and how? Do they trust the numbers? Is there one agreed definition of each metric?",
+    tools:"Power BI, Tableau, Looker, feature stores, APIs, Reverse ETL tools"},
+  ana:{t:"Analytics",tag:"use",d:"Business intelligence, dashboards and analysis, plus operational analytics (live monitoring) and embedded analytics (inside a product).",
+    at:"The morning branch sales dashboard; FoodJoe's sales view inside each restaurant's partner app.",q:"Covered in Chapter 7.",tools:"Power BI, Tableau, Looker, SQL"},
+  ml:{t:"Machine learning",tag:"use",d:"Training data and features for models, and delivering predictions.",
+    at:"The weekly demand forecast for each product at each branch.",q:"Covered in Chapter 7.",tools:"Feature stores, notebooks, ML platforms"},
+  retl:{t:"Reverse ETL",tag:"use",d:"Sending processed data from the warehouse back into operational tools where people act on it.",
+    at:"The \u201cat risk\u201d customer list goes into the WhatsApp campaign tool every morning.",q:"Covered in Chapter 7.",tools:"Hightouch, Census, custom API jobs"},
+  "u-sec":{t:"Security",d:"Least access, protecting personal data, encryption, keeping keys and passwords out of code.",at:"Phone numbers are masked for analysts."},
+  "u-dm":{t:"Data management",d:"Governance, ownership, catalogue, lineage, quality rules, privacy and retention.",at:"Every table in the warehouse has a named owner and a description."},
+  "u-ops":{t:"DataOps",d:"Automated tests, monitoring, alerts and a clear process when things break.",at:"An alert fires if a branch sends far fewer bills than usual."},
+  "u-arch":{t:"Data architecture",d:"Designing systems that meet today's needs, can change tomorrow and stay within budget.",at:"Choosing one lakehouse for both dashboards and models."},
+  "u-orch":{t:"Orchestration",d:"Running many jobs in the right order, with retries and a clear view of each run.",at:"The nightly pipeline runs as a DAG in Apache Airflow."},
+  "u-se":{t:"Software engineering",d:"Version control, code review, testing, automated deployment and infrastructure as code.",at:"Every SQL change is reviewed in Git before it goes live."}
+};
+function lcShow(k){
+  const s=LC[k];
+  $$("#lc button, #ucg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
+  if(k.startsWith("u-")){
+    $("#lc-detail").innerHTML=`<h3>${s.t} <span class="small">(undercurrent)</span></h3><p class="who">${s.d}</p><dl><dt>At Dhanvanshi</dt><dd>${s.at}</dd><dt>More on this</dt><dd>Chapter 8 covers all six undercurrents.</dd></dl>`;
+  } else {
+    $("#lc-detail").innerHTML=`<h3 style="color:var(--${s.tag})">${s.t}</h3><p class="who">${s.d}</p><dl><dt>At Dhanvanshi</dt><dd>${s.at}</dd><dt>Questions a data engineer asks</dt><dd>${s.q}</dd><dt>Common tools</dt><dd>${s.tools}</dd></dl>`;
+  }
+}
+function lcInit(){
+  $$("#lc button, #ucg button").forEach(b=>{b.setAttribute("aria-pressed","false");b.addEventListener("click",()=>lcShow(b.dataset.k));});
+  lcShow("gen");
+}
+
+/* place-the-task exercise */
+const STAGES=["Generation","Ingestion","Storage","Transformation","Serving"];
+const TASKS=[
+  {t:"The billing software at the Pune branch saves each bill into its own database.",a:"Generation"},
+  {t:"Every night, a job copies the day's bills from all branch counters to the cloud.",a:"Ingestion"},
+  {t:"Raw bill files are kept for seven years in low-cost object storage.",a:"Storage"},
+  {t:"Product codes on each bill are matched with the product master to add category and brand.",a:"Transformation"},
+  {t:"A daily sales table is published so that the regional manager's dashboard can read it.",a:"Serving"},
+  {t:"Duplicate bills, created when a counter went offline and then resynced, are removed.",a:"Transformation"},
+  {t:"Truck locations from Niharika Logistics are pulled through an API every 30 seconds.",a:"Ingestion"},
+  {t:"The forecasting team gets a clean table with one row per product, per branch, per day.",a:"Serving"}
+];
+function placeInit(){
+  let prev=-1;
+  const rows=TASKS.map((t,i)=>{
+    let opts;for(let k=0;k<50;k++){opts=shuffle(STAGES.slice());const p=opts.indexOf(t.a);if(p!==prev)break;}
+    prev=opts.indexOf(t.a);
+    return `<div class="match"><span class="mt">${i+1}. ${t.t}</span><select data-i="${i}" aria-label="Stage for task ${i+1}"><option value="">Choose a stage</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select><span class="mk" aria-hidden="true"></span></div>`;
+  });
+  $("#place-rows").innerHTML=rows.join("");
+  $$("#place-rows select").forEach(s=>s.addEventListener("change",()=>{s.classList.remove("right","wrong");s.nextElementSibling.textContent="";$("#place-score").textContent="";}));
+  $("#place-check").addEventListener("click",()=>{
+    let r=0,blank=0;
+    $$("#place-rows select").forEach(s=>{const ok=s.value===TASKS[s.dataset.i].a;if(!s.value)blank++;if(ok)r++;
+      s.classList.toggle("right",ok);s.classList.toggle("wrong",!!s.value&&!ok);
+      s.nextElementSibling.textContent=s.value?(ok?"\u2713":"\u2717"):"";s.nextElementSibling.style.color=ok?"var(--pos)":"var(--neg)";});
+    const sc=$("#place-score");sc.className="fb "+(r===TASKS.length?"ok":"no");
+    sc.textContent=`${r} of ${TASKS.length} correct`+(blank?`, ${blank} not answered`:"")+(r===TASKS.length?". Well done.":". Change the red ones and check again.");
+  });
+  $("#place-reset").addEventListener("click",()=>{$$("#place-rows select").forEach(s=>{s.value="";s.classList.remove("right","wrong");s.nextElementSibling.textContent="";});$("#place-score").textContent="";});
+}
+
+/* ---------- Chapter 3: load simulator ---------- */
+const WH0=[["O1001","Dharampeth",450,"23 Sep, 6:10 PM"],["O1002","Pune",1280,"23 Sep, 7:02 PM"],["O1003","Nashik",890,"23 Sep, 8:15 PM"],["O1004","Sitabuldi",315,"23 Sep, 9:40 PM"],["O1005","Pune",560,"23 Sep, 10:05 PM"],["O1006","Aurangabad",2050,"23 Sep, 11:30 PM"]];
+const SRC=[["O1001","Dharampeth",450,"23 Sep, 6:10 PM"],["O1002","Pune",1280,"23 Sep, 7:02 PM"],["O1003","Nashik",790,"24 Sep, 4:05 AM"],["O1004","Sitabuldi",315,"23 Sep, 9:40 PM"],["O1006","Aurangabad",2050,"23 Sep, 11:30 PM"],["O1007","Nagpur",640,"24 Sep, 2:10 AM"],["O1008","Pune",1120,"24 Sep, 3:25 AM"]];
+let loadM="full";
+function loadRender(){
+  const srcTotal=SRC.reduce((a,r)=>a+r[2],0);
+  let rows=[],moved=0,note="";
+  const whMap=new Map(WH0.map(r=>[r[0],r]));
+  if(loadM==="full"){
+    moved=SRC.length;
+    rows=SRC.map(r=>{const o=whMap.get(r[0]);const st=!o?"new":o[2]!==r[2]?"upd":"";return {r,st};});
+    rows.push({r:["O1005","Pune",560,"deleted at source"],st:"gone"});
+    note="The warehouse matches the source exactly. But every run copies the whole table, even rows that have not changed for years. As the table grows, so do the load time and the cost.";
+  } else if(loadM==="ts"){
+    const changed=new Set(["O1003","O1007","O1008"]);moved=3;
+    const all=new Map(WH0.map(r=>[r[0],r]));SRC.forEach(r=>{if(changed.has(r[0]))all.set(r[0],r);});
+    rows=[...all.values()].sort((a,b)=>a[0]<b[0]?-1:1).map(r=>{const o=whMap.get(r[0]);const st=r[0]==="O1005"?"bad":!o?"new":o[2]!==r[2]?"upd":"";return {r,st};});
+    note="Only three rows moved, which is efficient. But O1005 was deleted in the app, so it has no <code>updated_at</code> to find. It stays in the warehouse as a \u201cghost\u201d order and sales are overstated by \u20B9560.";
+  } else {
+    moved=4;
+    rows=SRC.map(r=>{const o=whMap.get(r[0]);const st=!o?"new":o[2]!==r[2]?"upd":"";return {r,st};});
+    rows.push({r:["O1005","Pune",560,"delete read from change log"],st:"gone"});
+    note="The change log recorded two inserts, one update and one delete, so exactly four changes were applied. The warehouse is correct and the load is small. The cost is that CDC needs access to the database's log and a bit more setup.";
+  }
+  const whTotal=rows.filter(x=>x.st!=="gone").reduce((a,x)=>a+x.r[2],0);
+  const ok=whTotal===srcTotal;
+  $("#load-k").innerHTML=kpi("Rows moved",IN(moved))+kpi("Source total",R(srcTotal))+kpi("Warehouse total",R(whTotal),ok?"good":"bad")+kpi("Result",ok?"Correct":"Wrong by "+R(whTotal-srcTotal),ok?"good":"bad");
+  const lab={new:'<span class="pill pos">inserted</span>',upd:'<span class="pill inf">updated</span>',bad:'<span class="pill neg">ghost row</span>',gone:'<span class="pill mut">removed</span>',"":""};
+  $("#load-t").innerHTML=`<tr><th>Order</th><th>Branch</th><th class="num">Amount</th><th>updated_at</th><th>In the warehouse after the load</th></tr>`+
+    rows.map(x=>`<tr class="${x.st==="new"?"t-new":x.st==="upd"?"t-upd":x.st==="bad"?"t-bad":x.st==="gone"?"t-gone":""}"><td>${x.r[0]}</td><td>${x.r[1]}</td><td class="num">${R(x.r[2])}</td><td class="st">${x.r[3]}</td><td>${lab[x.st]||'<span class="small">unchanged</span>'}</td></tr>`).join("");
+  $("#load-note").innerHTML=note;
+}
+const SIZES=[1e5,1e6,1e7,5e7,2e8];
+function loadScale(){
+  const n=SIZES[+$("#load-n").value];$("#load-no").textContent=fmtIndian(n)+" rows";
+  const ch=2e5,del=5000;
+  $("#load-scale").innerHTML=kpi("Full load moves",fmtIndian(n)+" rows")+kpi("Timestamp moves",fmtIndian(ch-del)+" rows")+kpi("Deletes missed by timestamp",IN(del)+" a day","bad")+kpi("CDC moves",fmtIndian(ch)+" changes","good");
+}
+function loadInit(){
+  wireSeg($("#load-m"),"m",m=>{loadM=m;loadRender();});
+  $("#load-n").addEventListener("input",loadScale);
+  loadRender();loadScale();
+}
+
+/* ---------- Chapter 4: column storage ---------- */
+const CS_H=["bill_id","date","branch","product","qty","amount"];
+const CS_R=[["B4471","24 Sep","Dharampeth","Toor Dal 1 kg","2","290"],["B4471","24 Sep","Dharampeth","Atta 10 kg","1","480"],["B4472","24 Sep","Sitabuldi","Tea 250 g","3","435"],["B4473","24 Sep","Pune","Toor Dal 1 kg","1","145"],["B4474","24 Sep","Nashik","Butter 500 g","1","285"],["B4475","24 Sep","Pune","Toor Dal 1 kg","4","580"]];
+function csRender(mode){
+  let html=CS_H.map(h=>`<div class="h">${h}</div>`).join("");
+  CS_R.forEach(r=>r.forEach((c,j)=>{const rd=mode==="row"||j===3||j===5;html+=`<div class="${rd?"rd":""}">${c}</div>`;}));
+  $("#cs-grid").innerHTML=html;
+  const n=mode==="row"?36:12;
+  $("#cs-note").textContent=mode==="row"
+    ?`Cells read: ${n} of 36. Row storage has to read each whole row to get at the product and amount. With crores of rows and 40 columns, most of what it reads is wasted.`
+    :`Cells read: ${n} of 36. Column storage reads only the product and amount columns. With 40 columns in a real table, it reads about one-twentieth of the data. The answer is \u20B91,015 either way.`;
+}
+function csInit(){wireSeg($("#colstore .seg"),"s",csRender);csRender("row");}
+
+/* ---------- Chapter 4: cleaning lab ---------- */
+const MASTER={"Toor Dal 1 kg":145,"Atta 10 kg":480,"Tea 250 g":145,"Butter 500 g":285,"Sugar 1 kg":44};
+const RAW=[
+  {id:"B101",br:"Dharampeth",it:"Toor Dal 1 kg",q:2,amt:290,u:"Rs"},
+  {id:"B102",br:"DHARAMPETH ",it:"Atta 10 kg",q:1,amt:480,u:"Rs"},
+  {id:"B102",br:"DHARAMPETH ",it:"Atta 10 kg",q:1,amt:480,u:"Rs"},
+  {id:"B103",br:"Sitabuldi",it:"Tea 250 g",q:3,amt:435,u:"Rs"},
+  {id:"B104",br:"sitabuldi",it:"Butter 500 g",q:1,amt:28500,u:"paise"},
+  {id:"B105",br:"Sitabuldi Br.",it:"Toor Dal 1 kg",q:1,amt:null,u:"Rs"},
+  {id:"B106",br:"Dharampeth",it:"TEST BILL",q:1,amt:99999,u:"Rs"},
+  {id:"B107",br:"Dhrampeth",it:"Sugar 1 kg",q:4,amt:176,u:"Rs"},
+  {id:"B107",br:"Dhrampeth",it:"Sugar 1 kg",q:4,amt:176,u:"Rs"},
+  {id:"B108",br:"Sitabuldi",it:"Atta 10 kg",q:2,amt:960,u:"Rs"}
+];
+const stdBranch=b=>{const s=b.trim().toLowerCase().replace(/\s*br\.?$/,"");return s.startsWith("dh")?"Dharampeth":s.startsWith("sit")?"Sitabuldi":b;};
+function cleanRender(){
+  const on={};$$("#cl-t input").forEach(i=>on[i.dataset.s]=i.checked);
+  const seen=new Set();
+  const rows=RAW.map(r=>{
+    const o={...r,drop:"",fix:[]};
+    const key=r.id+"|"+r.it;
+    if(on.dup&&seen.has(key))o.drop="duplicate";seen.add(key);
+    if(!o.drop&&on.test&&r.it==="TEST BILL")o.drop="test bill";
+    let a=r.amt;
+    if(on.unit&&r.u==="paise"){a=a/100;o.fix.push("amt");}
+    if(on.fill&&a===null){a=r.q*MASTER[r.it];o.fix.push("amt");}
+    o.a=a;
+    o.b=on.name?stdBranch(r.br):r.br;if(on.name&&o.b!==r.br)o.fix.push("br");
+    return o;
+  });
+  $("#cl-raw").innerHTML=`<tr><th>Bill</th><th>Branch</th><th>Item</th><th class="num">Qty</th><th class="num">Amount</th><th>Status</th></tr>`+rows.map(o=>{
+    const cls=o.drop?"t-gone":o.fix.length?"t-upd":"";
+    const amt=o.a===null?'<span class="err">missing</span>':(o.u==="paise"&&!o.fix.includes("amt")?IN(o.a)+" <span class='small'>paise</span>":IN(o.a));
+    return `<tr class="${cls}"><td>${o.id}</td><td class="${o.fix.includes("br")?"chg":""}" style="white-space:pre">${esc(o.b)}</td><td>${o.it}</td><td class="num">${o.q}</td><td class="num ${o.fix.includes("amt")?"chg":""}">${amt}</td><td>${o.drop?`<span class="pill mut">removed: ${o.drop}</span>`:o.fix.length?'<span class="pill inf">fixed</span>':""}</td></tr>`;}).join("");
+  const kept=rows.filter(o=>!o.drop);
+  const by=new Map();kept.forEach(o=>{by.set(o.b,(by.get(o.b)||0)+(o.a||0));});
+  const total=[...by.values()].reduce((a,b)=>a+b,0);
+  const TRUE=2771;
+  const dups=kept.length-new Set(kept.map(o=>o.id+"|"+o.it)).size;
+  const miss=kept.filter(o=>o.a===null).length;
+  const odd=kept.filter(o=>o.a>10000).length;
+  $("#cl-k").innerHTML=kpi("Total sales shown",R(total),total===TRUE?"good":"bad")+kpi("Branch groups",by.size,by.size===2?"good":"bad")+kpi("Duplicate lines left",dups,dups?"bad":"good")+kpi("Missing amounts",miss,miss?"bad":"good")+kpi("Amounts above \u20B910,000",odd,odd?"bad":"good");
+  $("#cl-out").innerHTML=`<tr><th>Branch (as grouped)</th><th class="num">Sales</th></tr>`+[...by.entries()].map(([b,v])=>`<tr><td style="white-space:pre">${esc(b)}</td><td class="num">${R(v)}</td></tr>`).join("");
+  const n=Object.values(on).filter(Boolean).length;
+  $("#cl-note").innerHTML=total===TRUE&&by.size===2
+    ?`<b style="color:var(--pos)">Clean.</b> Dharampeth sold \u20B9946 and Sitabuldi \u20B91,825, a total of \u20B92,771. The raw total was \u20B91,31,496, almost 50 times too high, mostly because of one test bill and one amount sent in paise. This is why transformation is not optional.`
+    :n===0?"With no cleaning, the total is \u20B91,31,496 and the report shows six different \u201cbranches\u201d for what are really two stores. Turn on the steps one at a time."
+    :"Better, but not clean yet. Check the red numbers above to see what is still wrong.";
+}
+function cleanInit(){$$("#cl-t input").forEach(i=>i.addEventListener("change",cleanRender));cleanRender();}
+
+/* ---------- Chapter 5: ETL vs ELT scenarios ---------- */
+const ETL_S=[
+  {k:"hour",l:"Sales by hour",q:"Aman Mart's owner visits Dhanvanshi and says his team looks at sales by hour to plan staff shifts. Dhanvanshi's head office wants the same report, starting from January.",
+   etl:["lose","The ETL job loaded only daily totals, so the hour of each bill never reached the warehouse. The job must be changed and the data extracted again, but the counters hold only the last 90 days. Hourly sales from January to July are lost."],
+   elt:["win","Raw bills, with their time, are already in the warehouse. An analyst writes one new SQL model, and hourly sales from January onwards are ready the same day."],
+   v:"ELT wins. Keeping raw data means new questions can be answered for the past as well."},
+  {k:"gst",l:"GST fix for March",q:"Finance finds that the GST rate on one product group was applied wrongly in March. March sales must be recomputed.",
+   etl:["lose","The warehouse has only March totals, calculated with the wrong rate. The March bills are no longer on the counters. Finance has to adjust the totals by hand with an estimate."],
+   elt:["win","The raw March bills are still in the raw layer. The transformation is corrected and rerun for March, and every report using it is fixed."],
+   v:"ELT wins. Transformations can be corrected and rerun because the input still exists."},
+  {k:"mask",l:"Mask phone numbers",q:"Dhanvanshi's policy says customer phone numbers must be masked before any data leaves its own servers for the cloud.",
+   etl:["win","Masking is done on Dhanvanshi's own ETL server during the transform step. Full phone numbers never reach the cloud."],
+   elt:["lose","Raw data, with full phone numbers, is loaded into the cloud warehouse first and masked only later. That breaks the policy, even if only for a few hours."],
+   v:"ETL wins here. Many teams use EtLT: a small masking step before the load, and the main transformation after it."},
+  {k:"live",l:"Live sales every few seconds",q:"The CEO wants the sales screen at head office to update within seconds of every bill during the Diwali sale.",
+   etl:["lose","A nightly batch updates the screen once a day. Even an hourly ETL run is far too slow."],
+   elt:["lose","Loading raw data in batches does not help either. Data arrives only as often as the batch runs."],
+   v:"Neither pattern fits as a batch job. This needs streaming ingestion, which Chapter 6 covers."}
+];
+function etlShow(k){
+  const s=ETL_S.find(x=>x.k===k);
+  const box=(n,x)=>`<div class="${x[0]}"><h4>${n}<span class="pill ${x[0]==="win"?"pos":"neg"}">${x[0]==="win"?"Works well":"Struggles"}</span></h4><p>${x[1]}</p></div>`;
+  $("#etl-out").innerHTML=`<p style="margin-top:12px"><b>Request:</b> ${s.q}</p><div class="cmp2">${box("With ETL",s.etl)}${box("With ELT",s.elt)}</div><div class="verdict">${s.v}</div>`;
+}
+function etlInit(){segButtons($("#etl-s"),ETL_S.map(s=>({v:s.k,l:s.l})),"hour","k");wireSeg($("#etl-s"),"k",etlShow);etlShow("hour");}
+
+/* ---------- Chapter 6: freshness simulation ---------- */
+const FR_OPEN=480,FR_CLOSE=1320,FR_STOCK=40;
+const FR_PROF=[1,2,3,4,3,3,2,3,4,5,5,4,3,2];
+const FR_EV=(()=>{const ev=[];FR_PROF.forEach((c,i)=>{for(let k=0;k<c;k++)ev.push({t:FR_OPEN+60*i+(k+0.5)*60/c,app:false});});
+  for(let t=560;t<1020;t+=40)ev.push({t:t+3,app:true});for(let t=1020;t<1320;t+=15)ev.push({t:t+7,app:true});return ev.sort((a,b)=>a.t-b.t);})();
+function frRefresh(mode,t){
+  if(mode==="day")return null;               /* last load was 2 AM, before opening */
+  if(mode==="hour")return Math.floor(t/60)*60;
+  if(mode==="q")return Math.floor(t/15)*15;
+  return t-5/60;
+}
+function frSim(mode){
+  /* real stock after each event; shown stock looks up real stock at last refresh */
+  let real=FR_STOCK;const hist=[{t:FR_OPEN,s:real}];const out=[];
+  const realAt=t=>{let s=FR_STOCK;for(const h of hist){if(h.t<=t)s=h.s;else break;}return s;};
+  FR_EV.forEach(e=>{
+    const r=frRefresh(mode,e.t);const shown=r===null||r<FR_OPEN?FR_STOCK:realAt(r);
+    let res;
+    if(real>0){real--;res="sold";}
+    else res=e.app?(shown>0?"oversold":"blocked"):"empty";
+    hist.push({t:e.t,s:real});out.push({...e,res,shown});
+  });
+  return {hist,out,realAt};
+}
+let frMode="day";
+function frRender(){
+  const T=+$("#fr-t").value;$("#fr-to").textContent=clock(T);
+  const S=frSim(frMode);
+  const r=frRefresh(frMode,T);
+  const realNow=S.realAt(T),shownNow=r===null||r<FR_OPEN?FR_STOCK:S.realAt(r);
+  const age=frMode==="day"?T-120:T-r;
+  const ageTxt=frMode==="day"?`${Math.floor((T-120)/60)} h ${Math.round((T-120)%60)} min`:frMode==="live"?"about 5 seconds":`${Math.round(age)} min`;
+  const overs=S.out.filter(e=>e.t<=T&&e.res==="oversold").length;
+  $("#fr-k").innerHTML=kpi("Real stock on shelf",realNow)+kpi("Stock shown on app",shownNow,shownNow!==realNow?"bad":"good")+kpi("Age of app data",ageTxt)+kpi("Orders accepted with no stock",overs,overs?"bad":"good");
+  /* chart */
+  const el=$("#fr-c");const F=frame(el,230,FR_OPEN,FR_CLOSE,0,FR_STOCK+4,{l:34});
+  let g="";
+  niceTicks(0,FR_STOCK,4).forEach(v=>{g+=`<line class="g-grid" x1="${F.m.l}" x2="${F.W-F.m.r}" y1="${F.sy(v)}" y2="${F.sy(v)}"/><text class="g-t" x="${F.m.l-6}" y="${F.sy(v)+4}" text-anchor="end">${v}</text>`;});
+  const hs=F.W<520?4:2;for(let h=8;h<=22;h+=hs)g+=`<text class="g-t" x="${F.sx(h*60)}" y="${F.h-8}" text-anchor="middle">${h<12?h+" AM":h===12?"12 PM":(h-12)+" PM"}</text>`;
+  const step=(pts)=>pts.map((p,i)=>(i?`H${F.sx(p[0]).toFixed(1)}V${F.sy(p[1]).toFixed(1)}`:`M${F.sx(p[0]).toFixed(1)},${F.sy(p[1]).toFixed(1)}`)).join("");
+  const realPts=S.hist.map(h=>[h.t,h.s]);realPts.push([FR_CLOSE,S.hist[S.hist.length-1].s]);
+  const shownPts=[];for(let t=FR_OPEN;t<=FR_CLOSE;t+=1){const rr=frRefresh(frMode,t);shownPts.push([t,rr===null||rr<FR_OPEN?FR_STOCK:S.realAt(rr)]);}
+  g+=`<path d="${step(realPts)}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`;
+  g+=`<path d="${step(shownPts)}" fill="none" stroke="var(--info)" stroke-width="2" stroke-dasharray="6 4"/>`;
+  S.out.filter(e=>e.res==="oversold").forEach(e=>{g+=`<rect x="${F.sx(e.t)-4}" y="${F.sy(0)-12}" width="8" height="8" rx="1.5" fill="var(--neg)" opacity="${e.t<=T?1:.3}"/>`;});
+  g+=`<line x1="${F.sx(T)}" x2="${F.sx(T)}" y1="${F.m.t}" y2="${F.sy(0)}" stroke="var(--frame)" stroke-width="1.5"/>`;
+  el.innerHTML=`<svg viewBox="0 0 ${F.W} ${F.h}" role="img" aria-label="Real and app-shown stock of Atta 10 kg through the day">${g}</svg>`;
+  /* summary across modes */
+  const lab={day:"Daily at 2 AM",hour:"Every hour",q:"Every 15 minutes",live:"Streaming"};
+  $("#fr-sum").innerHTML=`<tr><th>How often stock reaches the app</th><th style="text-align:right">Orders accepted with no stock, full day</th></tr>`+Object.keys(lab).map(m=>{const n=frSim(m).out.filter(e=>e.res==="oversold").length;return `<tr${m===frMode?' class="t-upd"':""}><td>${lab[m]}</td><td class="num">${n}</td></tr>`;}).join("");
+}
+function frInit(){wireSeg($("#fr-m"),"m",m=>{frMode=m;frRender();});$("#fr-t").addEventListener("input",frRender);RENDER.push(()=>{if($("#c6").classList.contains("on"))frRender();});frRender();}
+
+/* ---------- Chapter 6: windows ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const WIN_EV=(()=>{const r=mulberry32(11);const ev=[];while(ev.length<40){const x=r()*58;const w=.35+.65*Math.exp(-Math.pow((x-30)/16,2));if(r()<w)ev.push({e:x,p:x+.1+r()*.3,late:false});}
+  ev.push({e:58,p:63,late:true});return ev.sort((a,b)=>a.e-b.e);})();
+let winW=10,winM="ev";
+function winRender(){
+  const el=$("#win-c");const X1=70;const F=frame(el,250,0,X1,0,1,{l:30,r:14,t:10,b:28});
+  const key=winM==="ev"?"e":"p";
+  const n=Math.ceil(X1/winW);const counts=new Array(n).fill(0);
+  WIN_EV.forEach(v=>{counts[Math.floor(v[key]/winW)]++;});
+  const maxC=Math.max(...counts,1);const top=Math.max(4,Math.ceil(maxC/2)*2);
+  const barTop=76,barBot=F.h-F.m.b;const by=v=>barBot-(v/top)*(barBot-barTop);
+  let g="";
+  /* dot strip */
+  g+=`<text class="g-t" x="${F.m.l}" y="14">Orders placed by ${winM==="ev"?"event time":"processing time"}</text>`;
+  WIN_EV.forEach((v,i)=>{const x=F.sx(v[key]);const y=34+((i*7)%22);g+=`<circle cx="${x.toFixed(1)}" cy="${y}" r="${v.late?5:3.6}" fill="${v.late?"var(--neg)":"var(--info)"}"/>`;
+    if(v.late){const x2=F.sx(winM==="ev"?v.p:v.e);g+=`<line x1="${x2}" x2="${x}" y1="${y}" y2="${y}" stroke="var(--neg)" stroke-dasharray="3 3"/><circle cx="${x2}" cy="${y}" r="4" fill="none" stroke="var(--neg)"/>`;}});
+  /* window boundaries and bars */
+  for(let i=0;i<n;i++){
+    const a=i*winW,b=Math.min(X1,a+winW);const x0=F.sx(a),x1=F.sx(b);
+    g+=`<rect x="${(x0+2).toFixed(1)}" y="${by(counts[i]).toFixed(1)}" width="${Math.max(1,x1-x0-4).toFixed(1)}" height="${(barBot-by(counts[i])).toFixed(1)}" rx="3" fill="${a>=60?"var(--frame)":"var(--srv-bg)"}" stroke="var(--srv)"/>`;
+    if(counts[i])g+=`<text class="g-tl" x="${((x0+x1)/2).toFixed(1)}" y="${(by(counts[i])-4).toFixed(1)}" text-anchor="middle">${counts[i]}</text>`;
+    g+=`<line x1="${x0}" x2="${x0}" y1="24" y2="${barBot}" stroke="var(--line)"/>`;
+  }
+  const ms=F.W<520?20:10;for(let m=0;m<=60;m+=ms)g+=`<text class="g-t" x="${F.sx(m)}" y="${F.h-8}" text-anchor="middle">${clock24(720+m)}</text>`;
+  g+=`<line x1="${F.m.l}" x2="${F.W-F.m.r}" y1="${barBot}" y2="${barBot}" stroke="var(--frame)"/>`;
+  el.innerHTML=`<svg viewBox="0 0 ${F.W} ${F.h}" role="img" aria-label="FoodJoe orders counted in ${winW}-minute tumbling windows">${g}</svg>`;
+  const lateW=Math.floor((winM==="ev"?58:63)/winW);
+  const lab=i=>`${clock24(720+i*winW)} to ${clock24(720+Math.min(X1,(i+1)*winW))}`;
+  $("#win-note").innerHTML=winM==="ev"
+    ?`By event time, the late order is counted in the <b>${lab(lateW)}</b> window, when it was really placed. The system has to keep that window open for a while, which is what the watermark decides.`
+    :`By processing time, the late order is counted in the <b>${lab(lateW)}</b> window, when the server received it. That window now shows an order that happened in the lunch hour. For live monitoring this may be fine; for accurate reports, event time is the right choice.`;
+}
+function winInit(){
+  segButtons($("#win-w"),[5,10,15,30].map(v=>({v,l:v+" min"})),10,"w");
+  wireSeg($("#win-w"),"w",v=>{winW=+v;winRender();});
+  wireSeg($("#win-m"),"m",m=>{winM=m;winRender();});
+  RENDER.push(()=>{if($("#c6").classList.contains("on"))winRender();});
+  winRender();
+}
+
+/* ---------- Chapter 7: Reverse ETL ---------- */
+const CUST=[
+  {id:"C101",n:"Priya Deshmukh",br:"Dharampeth",ltv:48200,last:62,first:700,ok:true},
+  {id:"C102",n:"Rohan Kulkarni",br:"Pune",ltv:31500,last:51,first:540,ok:false},
+  {id:"C103",n:"Farhan Shaikh",br:"Nashik",ltv:26900,last:3,first:410,ok:true},
+  {id:"C104",n:"Sneha Wankhede",br:"Sitabuldi",ltv:52000,last:6,first:820,ok:true},
+  {id:"C105",n:"Aditya Joshi",br:"Aurangabad",ltv:22300,last:70,first:380,ok:true},
+  {id:"C106",n:"Meera Iyer",br:"Pune",ltv:4100,last:12,first:35,ok:true},
+  {id:"C107",n:"Tanvi Gawande",br:"Dharampeth",ltv:38700,last:1,first:620,ok:true},
+  {id:"C108",n:"Kunal Bhoyar",br:"Nashik",ltv:2300,last:20,first:48,ok:false}
+];
+const segOf=c=>c.first<=60?"New":c.last>45?"At risk":"Loyal";
+const PRIOR={"At risk":[{id:"C101",n:"Priya Deshmukh",seg:"At risk",last:55,ltv:47600},{id:"C103",n:"Farhan Shaikh",seg:"At risk",last:48,ltv:26400}]};
+const MSG={"At risk":n=>`Namaste ${n} ji! We have missed you at Dhanvanshi. Here is \u20B9150 off on your next buy above \u20B91,500, valid till Sunday.`,
+  "Loyal":n=>`Thank you, ${n} ji, for shopping with Dhanvanshi. As a loyal customer you get early access to our Diwali sale from Friday.`,
+  "New":n=>`Welcome to the Dhanvanshi family, ${n}! Enjoy \u20B975 off on your second visit this month.`};
+const MODES={upsert:"Upsert adds new records and updates existing ones. It never removes anyone.",insert:"Insert only adds new records. Existing records are not touched, even if their values have changed.",mirror:"Mirror makes the audience exactly match the warehouse list: it adds, updates and also removes records that are no longer in the list."};
+let rtSeg="At risk",rtMode="upsert";
+function rtSrc(){
+  $("#rt-src").innerHTML=`<tr><th>Customer</th><th style="text-align:right">Spent so far</th><th style="text-align:right">Last visit, days ago</th><th style="text-align:right">First visit, days ago</th><th>Consent</th><th>Segment</th></tr>`+
+    CUST.map(c=>`<tr><td><span class="small">${c.id}</span> ${c.n}</td><td class="num">${R(c.ltv)}</td><td class="num">${c.last}</td><td class="num">${c.first}</td><td>${c.ok?"Yes":"No"}</td><td><span class="pill ${segOf(c)==="At risk"?"neg":segOf(c)==="Loyal"?"pos":"inf"}">${segOf(c)}</span></td></tr>`).join("");
+}
+function rtRun(){
+  const consent=$("#rt-consent").checked;
+  const list=CUST.filter(c=>segOf(c)===rtSeg);
+  const sent=list.filter(c=>!consent||c.ok);
+  const skipped=list.filter(c=>consent&&!c.ok);
+  const prior=(PRIOR[rtSeg]||[]).map(x=>({...x}));
+  const dest=new Map(prior.map(p=>[p.id,{...p,st:"same"}]));
+  let add=0,upd=0,rem=0;
+  sent.forEach(c=>{
+    const ex=dest.get(c.id);
+    if(!ex){dest.set(c.id,{id:c.id,n:c.n,seg:rtSeg,last:c.last,ltv:c.ltv,st:"new"});add++;}
+    else if(rtMode!=="insert"){if(ex.last!==c.last||ex.ltv!==c.ltv){Object.assign(ex,{last:c.last,ltv:c.ltv,st:"upd"});upd++;}}
+    else ex.st="stale-val";
+  });
+  const sentIds=new Set(sent.map(c=>c.id));
+  dest.forEach(d=>{if(!sentIds.has(d.id)&&(d.st==="same")){if(rtMode==="mirror"){d.st="rem";rem++;}else d.st="stale";}});
+  const rows=[...dest.values()].sort((a,b)=>a.id<b.id?-1:1);
+  const lab={new:'<span class="pill pos">added</span>',upd:'<span class="pill inf">updated</span>',rem:'<span class="pill mut">removed</span>',stale:'<span class="pill neg">stale: no longer in segment</span>',"stale-val":'<span class="pill neg">not updated</span>',same:""};
+  let warn="";
+  const hasStale=rows.some(r=>r.st==="stale"),hasSV=rows.some(r=>r.st==="stale-val");
+  if(hasStale){const s=rows.filter(r=>r.st==="stale").map(r=>r.n).join(", ");warn+=`<div class="warnbox"><b>${s}</b> ${s.includes(",")?"are":"is"} still in the ${rtSeg} audience from last week, but no longer belong${s.includes(",")?"":"s"} to this segment. ${CUST.find(c=>c.n===s)&&CUST.find(c=>c.n===s).last<10?`Farhan visited just 3 days ago, yet tomorrow he may get a \u201cwe miss you\u201d message.`:""} Mirror mode would remove such records.</div>`;}
+  if(hasSV)warn+=`<div class="warnbox">Insert only added new customers but left Priya's old values in place (last visit 55 days, spent \u20B947,600). Any message using these fields will show outdated information.</div>`;
+  if(!consent){const nc=list.filter(c=>!c.ok);if(nc.length)warn+=`<div class="warnbox"><b>${nc.map(c=>c.n).join(", ")}</b> ${nc.length>1?"have":"has"} not agreed to receive WhatsApp messages. Sending them marketing messages goes against Dhanvanshi's consent rules and the Digital Personal Data Protection Act, 2023. Turn the consent filter back on.</div>`;}
+  if(!warn&&rows.length)warn=`<div class="callout good"><b class="t">Clean sync</b><p>The WhatsApp audience now matches the warehouse for this segment, and only customers who agreed to receive messages are included.</p></div>`;
+  const first=rows.find(r=>r.st==="new"||r.st==="upd")||rows.find(r=>r.st!=="rem");
+  const fname=first?first.n.split(" ")[0]:"";
+  $("#rt-out").innerHTML=`<div class="kpis">${kpi("In warehouse segment",list.length)}${kpi("Skipped: no consent",skipped.length)}${kpi("Added",add)}${kpi("Updated",upd)}${kpi("Removed",rem)}</div>
+    <h4 style="margin:14px 0 4px;font-family:var(--display)">WhatsApp tool: \u201c${rtSeg}\u201d audience after the sync</h4>
+    <div class="tbl-wrap"><table><tr><th>Customer</th><th>Tag</th><th style="text-align:right">Last visit, days ago</th><th style="text-align:right">Spent so far</th><th>Change</th></tr>${rows.length?rows.map(r=>`<tr class="${r.st==="rem"?"t-gone":r.st==="new"?"t-new":r.st==="upd"?"t-upd":r.st.startsWith("stale")?"t-bad":""}"><td><span class="small">${r.id}</span> ${r.n}</td><td>${r.seg}</td><td class="num">${r.last}</td><td class="num">${R(r.ltv)}</td><td>${lab[r.st]}</td></tr>`).join(""):`<tr><td colspan="5" class="small">No customers in this audience.</td></tr>`}</table></div>
+    ${first?`<p class="small" style="margin:10px 0 0">Message the campaign tool will send:</p><div class="msg">${MSG[rtSeg](fname)}<small>Dhanvanshi Super Store</small></div>`:""}${warn}`;
+}
+function rtInit(){
+  rtSrc();
+  segButtons($("#rt-seg"),["At risk","Loyal","New"].map(v=>({v,l:v})),"At risk","s");
+  segButtons($("#rt-mode"),[{v:"upsert",l:"Upsert"},{v:"insert",l:"Insert only"},{v:"mirror",l:"Mirror"}],"upsert","m");
+  const help=()=>{$("#rt-modehelp").textContent=MODES[rtMode];};
+  wireSeg($("#rt-seg"),"s",v=>{rtSeg=v;$("#rt-out").innerHTML="";});
+  wireSeg($("#rt-mode"),"m",v=>{rtMode=v;help();$("#rt-out").innerHTML="";});
+  $("#rt-consent").addEventListener("change",()=>{$("#rt-out").innerHTML="";});
+  $("#rt-run").addEventListener("click",rtRun);
+  help();
+}
+
+/* ---------- Chapter 8: DAG ---------- */
+const DAG=[
+  {k:"A",l:"POS bills",s:"Extract",x:10,y:0,d:[]},
+  {k:"B",l:"App orders",s:"Extract",x:170,y:0,d:[]},
+  {k:"C",l:"Kavya invoices",s:"Extract",x:330,y:0,d:[]},
+  {k:"D",l:"Clean sales",s:"Transform",x:90,y:1,d:["A","B"]},
+  {k:"E",l:"Clean purchases",s:"Transform",x:330,y:1,d:["C"]},
+  {k:"F",l:"fact_sales",s:"Model",x:10,y:2,d:["D"]},
+  {k:"G",l:"Stock position",s:"Model",x:250,y:2,d:["D","E"]},
+  {k:"H",l:"Sales dashboard",s:"Serve",x:10,y:3,d:["F"]},
+  {k:"J",l:"WhatsApp segments",s:"Reverse ETL",x:170,y:3,d:["F"]},
+  {k:"I",l:"Demand forecast",s:"Serve (ML)",x:330,y:3,d:["F","G"]},
+  {k:"K",l:"Reorder to Kavya",s:"Reverse ETL",x:250,y:4,d:["G","I"]}
+];
+const DAG_OUT={H:"Branch managers have no fresh sales dashboard for the morning meeting.",J:"No win-back WhatsApp messages go out today.",I:"The demand forecast still shows yesterday's numbers.",K:"Kavya Distributors gets no reorder suggestion, so today's order is placed by hand or late."};
+const NW=140,NH=46,RH=86;
+let dagFail=new Set(),dagState={},dagBusy=false;
+const DAG_SHORT={A:["POS bills"],B:["App orders"],C:["Kavya","invoices"],D:["Clean sales"],E:["Clean","purchases"],F:["fact_sales"],G:["Stock","position"],H:["Sales","dashboard"],J:["WhatsApp","segments"],I:["Demand","forecast"],K:["Reorder to","Kavya"]};
+function dagDraw(){
+  const cw=$("#dag-svg").clientWidth||520;const compact=cw<460;
+  const W=compact?330:480,nw=compact?100:NW,nh=compact?48:NH;
+  const X=n=>compact?5+(n.x-10)*0.6875:n.x;
+  const H=4*RH+nh+12;const pos=k=>DAG.find(n=>n.k===k);
+  let g="";
+  DAG.forEach(n=>n.d.forEach(p=>{const a=pos(p);const x1=X(a)+nw/2,y1=a.y*RH+nh+6,x2=X(n)+nw/2,y2=n.y*RH+6;const my=(y1+y2)/2;
+    const held=dagState[n.k]==="held"||dagState[n.k]==="fail";
+    g+=`<path class="ed ${held?"held":""}" d="M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2-4}" marker-end="url(#ah)"/>`;}));
+  DAG.forEach(n=>{const st=dagState[n.k]||(dagFail.has(n.k)?"fail":"idle");const x=X(n),y=n.y*RH+6,cx=x+nw/2;
+    let txt;
+    if(compact){const L=DAG_SHORT[n.k];txt=L.length===1?`<text class="l1" x="${cx}" y="${y+29}" text-anchor="middle">${L[0]}</text>`:`<text class="l1" x="${cx}" y="${y+21}" text-anchor="middle">${L[0]}</text><text class="l1" x="${cx}" y="${y+37}" text-anchor="middle">${L[1]}</text>`;}
+    else txt=`<text class="l1" x="${cx}" y="${y+19}" text-anchor="middle">${n.l}</text><text class="l2" x="${cx}" y="${y+36}" text-anchor="middle">${dagFail.has(n.k)?"will fail":n.s}</text>`;
+    g+=`<g class="nd ${st}" data-k="${n.k}" tabindex="0" role="button" aria-label="${n.l}: ${dagFail.has(n.k)?"set to fail, press to fix":"press to make it fail"}"><rect x="${x}" y="${y}" width="${nw}" height="${nh}" rx="9"/>${txt}</g>`;});
+  $("#dag-svg").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Nightly pipeline as a directed acyclic graph"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--frame)"/></marker></defs>${g}</svg>`;
+}
+function dagToggle(k){if(dagBusy)return;dagState={};dagFail.has(k)?dagFail.delete(k):dagFail.add(k);$("#dag-out").innerHTML="";dagDraw();}
+function dagRun(){
+  if(dagBusy)return;dagBusy=true;dagState={};dagDraw();$("#dag-out").innerHTML="";
+  const levels=[0,1,2,3,4];let i=0;
+  const step=()=>{
+    if(i>=levels.length){dagBusy=false;dagSummary();return;}
+    const lv=DAG.filter(n=>n.y===levels[i]);
+    lv.forEach(n=>{const blocked=n.d.some(p=>dagState[p]==="fail"||dagState[p]==="held");dagState[n.k]=blocked?"held":"run";});
+    dagDraw();
+    const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(()=>{lv.forEach(n=>{if(dagState[n.k]==="run")dagState[n.k]=dagFail.has(n.k)?"fail":"ok";});dagDraw();i++;setTimeout(step,reduce?0:150);},reduce?0:450);
+  };
+  step();
+}
+function dagSummary(){
+  const c={ok:0,fail:0,held:0};Object.values(dagState).forEach(s=>c[s]++);
+  const hurt=Object.keys(DAG_OUT).filter(k=>dagState[k]!=="ok");
+  const fine=["H","J","I","K"].filter(k=>dagState[k]==="ok").map(k=>DAG.find(n=>n.k===k).l);
+  let html=`<div class="kpis">${kpi("Succeeded",c.ok,"good")}${kpi("Failed",c.fail,c.fail?"bad":"")}${kpi("Held back",c.held,c.held?"bad":"")}</div>`;
+  if(!c.fail)html+=`<div class="callout good"><b class="t">7 AM: all green</b><p>Every task ran in the right order. Nobody outside the data team will even think about the pipeline today, which is exactly how it should be.</p></div>`;
+  else html+=`<div class="callout trap"><b class="t">7 AM: what the business feels</b><ul class="clean">${hurt.map(k=>`<li>${DAG_OUT[k]}</li>`).join("")}</ul>${fine.length?`<p>Still fine today: ${fine.join(", ")}. The orchestrator ran every task that did not depend on the failure.</p>`:""}<p>A good DataOps setup sends an alert at the moment of failure, so the team can fix and rerun the failed task (and everything after it) before 7 AM.</p></div>`;
+  $("#dag-out").innerHTML=html;
+}
+function dagInit(){
+  dagDraw();RENDER.push(()=>{if($("#c8").classList.contains("on"))dagDraw();});
+  $("#dag-svg").addEventListener("click",e=>{const n=e.target.closest(".nd");if(n)dagToggle(n.dataset.k);});
+  $("#dag-svg").addEventListener("keydown",e=>{const n=e.target.closest(".nd");if(n&&(e.key==="Enter"||e.key===" ")){e.preventDefault();dagToggle(n.dataset.k);const el=$(`.nd[data-k="${n.dataset.k}"]`);if(el)el.focus();}});
+  $("#dag-run").addEventListener("click",dagRun);
+  $("#dag-reset").addEventListener("click",()=>{if(dagBusy)return;dagFail.clear();dagState={};$("#dag-out").innerHTML="";dagDraw();});
+}
+
+/* ---------- start ---------- */
+addPagers();
+pyrInit();lcInit();placeInit();loadInit();csInit();cleanInit();etlInit();winInit();frInit();rtInit();dagInit();
+finaliseMCQ();
+window.addEventListener("hashchange",show);
+show();
+})();
+</script>
+</body></html>
