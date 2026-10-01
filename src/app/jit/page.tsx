@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { requireJit } from "@/lib/jitAuth";
+import { jitLogout } from "./actions";
 
 export const metadata = { title: "JIT · Course materials" };
 
-// Hosted separately on logicology.in; open to everyone, no sign-in.
+// Hosted separately on logicology.in; this page needs the shared JIT login.
 const LINKS = [
   {
     href: "https://python-jit.logicology.in/",
@@ -19,9 +21,11 @@ const LINKS = [
   },
 ];
 
-export default function JitPage() {
+export default async function JitPage() {
+  await requireJit();
+
   return (
-    <>
+    <div className="theme-jit">
       <header className="topbar">
         <div className="topbar-inner">
           <Link href="/home" className="topbar-brand">
@@ -29,9 +33,11 @@ export default function JitPage() {
             <span className="topbar-divider" aria-hidden="true" />
             <span>JIT</span>
           </Link>
-          <Link href="/home" className="btn-ghost">
-            ← Back to home
-          </Link>
+          <form action={jitLogout}>
+            <button className="btn-ghost" type="submit">
+              Log out
+            </button>
+          </form>
         </div>
       </header>
       <main className="page">
@@ -53,6 +59,6 @@ export default function JitPage() {
           ))}
         </div>
       </main>
-    </>
+    </div>
   );
 }

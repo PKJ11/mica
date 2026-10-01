@@ -12,7 +12,7 @@ function cta(a: Activity) {
 // Open to everyone — VNIT students don't sign in.
 export default function VnitPage() {
   return (
-    <>
+    <div className="theme-vnit">
       <header className="topbar">
         <div className="topbar-inner">
           <Link href="/home" className="topbar-brand">
@@ -44,6 +44,6 @@ export default function VnitPage() {
           ))}
         </div>
       </main>
-    </>
+    </div>
   );
 }

@@ -36,7 +36,7 @@ export default async function Dashboard() {
             <h2>Generative AI &amp; LLMs</h2>
             <p>Gen AI &amp; LLMs for marketing, and the anatomy of applications and workflow design.</p>
             <div className="course-foot">
-              <span>2 sessions · 4 activities</span>
+              <span>6 sessions · 9 activities</span>
               <span className="arrow">Open →</span>
             </div>
           </Link>

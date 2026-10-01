@@ -1,14 +1,26 @@
 import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import { requireStudent } from "@/lib/auth";
-import { GENAI_SESSION_1, GENAI_SESSION_2, type Activity } from "@/lib/activities";
+import {
+  GENAI_SESSION_1,
+  GENAI_SESSION_2,
+  GENAI_SESSION_3,
+  GENAI_SESSION_4,
+  GENAI_SESSION_5,
+  GENAI_SESSION_6,
+  type Activity,
+} from "@/lib/activities";
 
 const SESSIONS: { no: string; title: string; blurb: string; items: Activity[] }[] = [
   { no: "01", title: "Session 1", blurb: "Gen AI & LLMs for Marketing", items: GENAI_SESSION_1 },
   { no: "02", title: "Session 2", blurb: "Anatomy of Applications & Workflow Design", items: GENAI_SESSION_2 },
+  { no: "03", title: "Session 3", blurb: "From Manual Process to Conceptual Architecture", items: GENAI_SESSION_3 },
+  { no: "04", title: "Session 4", blurb: "The First Build", items: GENAI_SESSION_4 },
+  { no: "05", title: "Session 5", blurb: "Agentic AI", items: GENAI_SESSION_5 },
+  { no: "06", title: "Session 6", blurb: "Building & Testing Skills", items: GENAI_SESSION_6 },
 ];
 
-const LOCKED_SESSIONS = [3, 4, 5, 6];
+const LOCKED_SESSIONS: number[] = [];
 
 function cta(a: Activity) {
   if (a.file.toLowerCase().endsWith(".pdf")) return "Read PDF →";

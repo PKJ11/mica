@@ -129,6 +129,48 @@ export const ACTIVITIES: Record<string, Activity> = {
     hidden: true,
   },
 
+  // ---------- GENAILLM sessions 3+ (files live in content/sessions) ----------
+  "genai-session3": {
+    slug: "genai-session3",
+    file: "sessions/Session 3_From Manual Process to Conceptual Architecture.html",
+    title: "From Manual Process to Conceptual Architecture",
+    subtitle: "Mapping a process end to end with the SIPOC framework",
+    tag: "Session 3 Deck",
+    course: "genaillm",
+  },
+  "genai-project-wheel": {
+    slug: "genai-project-wheel",
+    file: "sessions/Session_3_MICA Project Wheel.html",
+    title: "MICA Project Wheel",
+    subtitle: "Spin the wheel to allocate each group its project",
+    tag: "Session 3 Activity",
+    course: "genaillm",
+  },
+  "genai-session4": {
+    slug: "genai-session4",
+    file: "sessions/Session 4 The First Build.html",
+    title: "The First Build",
+    subtitle: "Prompt templates, .md files and references, all at work together",
+    tag: "Session 4 Deck",
+    course: "genaillm",
+  },
+  "genai-session5": {
+    slug: "genai-session5",
+    file: "sessions/Session 5 Agentic AI.html",
+    title: "Agentic AI",
+    subtitle: "From “what is an agent?” to how much freedom to give one",
+    tag: "Session 5 Deck",
+    course: "genaillm",
+  },
+  "genai-session6": {
+    slug: "genai-session6",
+    file: "sessions/Session 6 Building & Testing Skills.html",
+    title: "Building & Testing Skills",
+    subtitle: "Write a skill, test what it produces, and fix it when something breaks",
+    tag: "Session 6 Deck",
+    course: "genaillm",
+  },
+
   // ---------- VNIT (files live in content/vnit; open to everyone, no login) ----------
   "vnit-data-visualisation": {
     slug: "vnit-data-visualisation",
@@ -178,6 +220,10 @@ export const CRISP_DM_CASES = ["crisp-dm-1", "crisp-dm-2", "crisp-dm-3", "crisp-
 
 export const GENAI_SESSION_1 = ["genai-session1", "genai-software-design"].map((s) => ACTIVITIES[s]);
 export const GENAI_SESSION_2 = ["genai-session2", "genai-claude-build-kit"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_3 = ["genai-session3", "genai-project-wheel"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_4 = ["genai-session4"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_5 = ["genai-session5"].map((s) => ACTIVITIES[s]);
+export const GENAI_SESSION_6 = ["genai-session6"].map((s) => ACTIVITIES[s]);
 
 export const VNIT_MODULES = Object.values(ACTIVITIES).filter((a) => a.course === "vnit" && !a.hidden);
 

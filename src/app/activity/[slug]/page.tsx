@@ -16,7 +16,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ slug:
   const isPdf = activity.file.toLowerCase().endsWith(".pdf");
 
   return (
-    <div className="viewer">
+    <div className={course === "vnit" ? "viewer theme-vnit" : "viewer"}>
       <div className="viewer-bar">
         <Link href={backHref} className="btn-ghost">
           ← Back

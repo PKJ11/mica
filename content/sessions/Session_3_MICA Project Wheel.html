@@ -1,0 +1,354 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MICA Project Wheel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800;900&display=swap">
+<style>
+:root{
+  --bg:#F3F7FE; --surface:#FFFFFF; --soft:#EAF3FF; --ink:#17224C; --muted:#56607A;
+  --line:#D6E2F4; --accent:#047FFF; --accent-ink:#0B5FC4; --cyan:#19E9E3; --on-accent:#FFFFFF;
+  --shadow:0 18px 40px rgba(23,34,76,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B1230; --surface:#131C40; --soft:#1A2651; --ink:#E9EEFA; --muted:#A5B1CB;
+    --line:#26325C; --accent:#3A9BFF; --accent-ink:#8EC1FF; --shadow:0 18px 40px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1230; --surface:#131C40; --soft:#1A2651; --ink:#E9EEFA; --muted:#A5B1CB;
+  --line:#26325C; --accent:#3A9BFF; --accent-ink:#8EC1FF; --shadow:0 18px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Mulish,"Segoe UI",Arial,sans-serif;padding-inline:clamp(16px,4vw,48px);padding-block:28px 56px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--accent-ink);text-transform:uppercase;margin:0 0 6px}
+h1{font-size:clamp(30px,4.2vw,46px);font-weight:900;line-height:1.05;margin:0;text-wrap:balance}
+.bar{width:88px;height:8px;border-radius:4px;background:var(--accent);margin-top:14px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:inherit;cursor:pointer;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;font-weight:700;font-size:14px}
+button:hover{border-color:var(--accent)}
+button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.stage{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.wheel-card{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;overflow:hidden}
+.wheel-box{position:relative;width:100%;max-width:560px;aspect-ratio:1}
+#wheel{width:100%;height:100%;display:block}
+#fx{position:absolute;inset:0;pointer-events:none;width:100%;height:100%}
+.pointer{position:absolute;left:50%;top:-4px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid var(--ink);filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));transform-origin:50% 0;transition:transform .08s}
+.pointer.flick{transform:translateX(-50%) rotate(-14deg)}
+.hub{position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:var(--ink);color:#fff;border:6px solid var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:clamp(14px,2.2vw,20px);line-height:1.05;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.hub small{font-size:.55em;font-weight:800;letter-spacing:.14em;color:var(--cyan)}
+.controls{display:flex;flex-direction:column;align-items:center;gap:8px}
+.next{font-size:15px;color:var(--muted);font-weight:700;margin:0}
+.next b{color:var(--ink)}
+#spin{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-size:18px;padding:14px 36px;font-weight:900;letter-spacing:.04em;box-shadow:0 10px 24px rgba(4,127,255,.35)}
+#spin:hover:not(:disabled){filter:brightness(1.07)}
+.reveal{position:absolute;inset:0;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px}
+.reveal-card{max-width:440px;width:100%;background:var(--surface);border:2px solid var(--accent);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.reveal-card .who{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);margin:0}
+.reveal-card h2{margin:0;font-size:30px;font-weight:900;line-height:1.1;text-wrap:balance}
+.reveal-card p{margin:0;color:var(--muted);font-size:16px}
+.tag{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+.num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-weight:900;font-size:14px;flex:none;font-variant-numeric:tabular-nums}
+#continue{align-self:start;background:var(--ink);border-color:var(--ink);color:var(--bg);margin-top:6px}
+.panel{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;gap:14px}
+.panel h3{margin:0;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink)}
+.groups{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.group{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;padding:10px 14px;border-radius:16px;background:var(--soft);border:2px solid transparent}
+.group .g{font-weight:900;font-size:15px}
+.group .p{font-size:15px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}
+.group .p span.t{overflow-wrap:anywhere}
+.group.done .p{color:var(--ink)}
+.group.current{border-color:var(--accent);background:var(--surface)}
+.group.current .p{color:var(--accent-ink)}
+.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.projects{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.projects{grid-template-columns:1fr}}
+.proj{background:var(--surface);border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;border:2px solid var(--line)}
+.proj .head{display:flex;align-items:center;gap:10px}
+.proj .head b{font-size:16px;font-weight:900;line-height:1.2}
+.proj p{margin:0;font-size:14.5px;color:var(--muted)}
+.brief{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink)}
+.brief li::marker{color:var(--accent)}
+.brief li.marks{list-style:none;margin-left:-18px;margin-top:4px;font-weight:800;color:var(--accent-ink)}
+.brief-box{background:var(--soft);border-radius:16px;padding:14px 16px;max-height:min(46vh,340px);overflow:auto;display:flex;flex-direction:column;gap:8px}
+.brief-label{margin:0!important;font-size:12px!important;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)!important}
+.proj details{border-top:1px solid var(--line);padding-top:10px}
+.proj summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--accent-ink)}
+.proj summary:focus-visible{outline:3px solid var(--cyan);outline-offset:2px;border-radius:6px}
+.proj details[open] summary{margin-bottom:10px}
+.reveal{overflow:auto}
+.reveal-card{max-width:560px!important}
+.chip{align-self:start;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.proj.taken{border-color:var(--accent)}
+.proj.taken .chip{background:var(--accent);color:var(--on-accent)}
+.confirm{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700}
+.confirm[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.reveal-card{animation:none}.pointer{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">MICA · Group projects · Use AI to solve it</p>
+      <h1>Spin for your project</h1>
+      <div class="bar"></div>
+    </div>
+    <div class="tools">
+      <button id="sound" type="button" aria-pressed="true">Sound: on</button>
+      <button id="undo" type="button">Undo last</button>
+      <button id="reset" type="button">Start over</button>
+      <span class="confirm" id="confirm" hidden>Clear all 9 draws?
+        <button id="yes" type="button">Yes, clear</button>
+        <button id="no" type="button">Keep them</button>
+      </span>
+    </div>
+  </header>
+
+  <section class="stage">
+    <div class="wheel-card">
+      <div class="wheel-box">
+        <canvas id="wheel" aria-label="Wheel of the projects still open"></canvas>
+        <canvas id="fx" aria-hidden="true"></canvas>
+        <div class="pointer" id="pointer"></div>
+        <div class="hub" id="hub"><small>GROUP</small><span id="hubNum">1</span></div>
+      </div>
+      <div class="controls">
+        <p class="next" id="nextText">Next up: <b>Group 1</b> · 9 projects on the wheel</p>
+        <button id="spin" type="button">SPIN</button>
+      </div>
+      <div class="reveal" id="reveal" hidden>
+        <div class="reveal-card" role="dialog" aria-live="polite" aria-labelledby="rvTitle">
+          <p class="who" id="rvWho">Group 1 gets</p>
+          <div class="tag"><span class="num" id="rvNum">7</span><span id="rvShort">Project 7</span></div>
+          <h2 id="rvTitle">Title</h2>
+          <p id="rvText">Statement</p>
+          <div class="brief-box"><p class="brief-label">Project brief · 40 marks</p><div id="rvBrief"></div></div>
+          <button id="continue" type="button">Next group</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Allocations</h3>
+      <ol class="groups" id="groups"></ol>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>The nine projects</h3>
+    <div class="projects" id="projects"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+var PROJECTS=[
+ {short:"Logic Parents Community",text:"Build a community of parents who want their children to sharpen their logical thinking, so the children stay relevant in the age of AI."},
+ {short:"Reel App Explainer Video",text:"You run a video editing agency: use AI to create an explainer video for a fictitious Reel-editing app, making up the app's features."},
+ {short:"Live Music Insta Campaign",text:"You work for a restaurant brand with live music shows: create an Instagram campaign that attracts a young crowd in their twenties."},
+ {short:"AI Services Brochures",text:"You work for a B2B IT company: build brochures on your AI services, as a 1-pager, 2-pager, 4-pager and a comprehensive 16-pager."},
+ {short:"Cartoon Strip Website",text:"Create a website (only the website, not the app) for a cartoon-strip app that turns users' drawings into strips from your storyline."},
+ {short:"Brand Consistency App",text:"Build a brand consistency evaluator app: a user uploads a flyer image and the app judges if it is on brand. A real brand is fine."},
+ {short:"3M Board Game Tournament",text:"Create a campaign for a paid tournament of the fictitious board game “3M: Mastering Marketing at MICA” that gets 500 enrolments."},
+ {short:"Kids' Art vs Logic Report",text:"Write a fictitious 40-page report with references and quotes: how much more time 2026 kids spend on art and painting vs science and logic."},
+ {short:"The deClaude App",text:"Build an app and a SKILL.md that ‘deClaude’ AI-generated content so no one can tell it is AI: no em dashes, fewer adjectives, etc."}
+];
+var BRIEFS=[
+ ["Use AI to research what worries parents about their children's thinking skills in the age of AI, and build two detailed parent personas.",
+  "Name and position the community, and pick its home platform (for example WhatsApp, Instagram or Discord), with a clear reason for the choice.",
+  "Plan a four-week launch calendar with at least 12 posts, one weekly logic challenge for children and two live sessions with an expert.",
+  "Generate the launch assets with AI: a logo, a welcome message, community rules and the first five posts.",
+  "Write a growth plan to reach your first 500 parents, with the numbers you will track each week.",
+  "Deliver a launch kit deck of no more than 12 slides, the assets as files, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Invent the Reel-editing app: its name, its target user and five or six features that set it apart.",
+  "Write a 60 to 90 second explainer script and a storyboard of 8 to 12 frames that walks a new user through the app.",
+  "Use AI tools to generate the visuals, screens, voiceover and background music for every frame.",
+  "Edit everything into a finished video with captions, an opening hook in the first three seconds and a closing call to action.",
+  "Add a one-page feature sheet that a sales team could hand to a prospective customer.",
+  "Deliver the final MP4 (60 to 90 seconds), the script and storyboard as a PDF, the feature sheet, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Define the restaurant brand: its name, city, food, and the kind of live music nights it runs.",
+  "Use AI to build a persona of the 20-something guest you want to attract, including where they spend time online.",
+  "Create one big campaign idea with a hashtag, and a two-week posting calendar that builds up to a live music night.",
+  "Produce the creatives with AI: six feed posts or carousels, three Reel scripts (with at least one Reel fully produced) and five Stories, including polls or quizzes.",
+  "Add a collaboration plan with local creators, a budget split and the KPIs you will use to judge success.",
+  "Deliver a campaign deck, all creatives as files, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Define the fictitious IT company, its four or five AI services, and the buyer you are selling to (for example a CIO or head of operations).",
+  "Create one visual identity (colours, fonts and layout style) and use it across all four brochures.",
+  "Write a one-pager that introduces the company and its services, and a two-pager that summarises each service with its business benefit.",
+  "Build a four-pager that adds two case studies and your delivery process.",
+  "Build a comprehensive 16-pager covering services, case studies, methodology, team, engagement models, pricing approach and FAQs.",
+  "Deliver all four brochures as PDFs, a half-page note on how the message scales from one page to sixteen, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Name and position the cartoon-strip app, and decide who it is for.",
+  "Plan the site map: home, how it works, features, sample gallery, pricing, FAQ and sign-up.",
+  "Write all the website copy with AI, keeping one consistent tone of voice.",
+  "Use AI to create at least three sample cartoon strips from a storyline you write, to show in the gallery as if the app had made them.",
+  "Build a working, clickable, mobile-friendly multi-page website using AI tools; the app itself is not required.",
+  "Deliver the live website link, a one-page note on your design choices, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Choose a real brand and use its public material to build a brand rulebook: logo use, colours (with hex codes), fonts, imagery and tone of voice.",
+  "Turn the rulebook into a checklist of at least eight rules the app will test a flyer against.",
+  "Build an app with AI where a user uploads a flyer image and gets a score for each rule, a short reason, and a suggested fix.",
+  "Create six test flyers with AI (three on brand and three off brand) and run all six through your app.",
+  "Record whether the app's verdicts were right and explain any mistakes it made.",
+  "Deliver the working app link, the brand rulebook, a test report, a three-minute demo video, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Define the game “3M: Mastering Marketing at MICA”: how it is played, how many players, and which marketing ideas it teaches.",
+  "Design the tournament: format, dates, venue or online, entry fee and prizes.",
+  "Build a funnel that shows how you get to 500 paid enrolments, with your assumptions for reach, clicks, sign-ups and payment.",
+  "Choose your channels and create the assets with AI: a landing page (copy and mock-up), a poster, four social posts and a three-message email or WhatsApp sequence.",
+  "Add a campaign timeline and a budget.",
+  "Deliver a campaign deck, all assets as files, the funnel as a spreadsheet, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Design the fictitious study: who was surveyed, which age groups and cities, how many children, and what was measured.",
+  "Use AI to generate a made-up dataset and turn it into at least eight charts or tables.",
+  "Write a 40-page report with an executive summary, introduction, literature review, methodology, findings, discussion, recommendations for parents and schools, limitations, and references.",
+  "Include quotes from fictitious parents, teachers and experts.",
+  "Mark the report clearly as fictitious on the cover and in the references, so no invented source can be mistaken for a real one.",
+  "Deliver the report as a PDF, the dataset as a spreadsheet, a one-page summary, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."],
+ ["Research the patterns that make text read as AI-written (em dashes, stacked adjectives, lists of three, stock phrases and so on) and list at least 15 of them.",
+  "Write a SKILL.md that tells Claude how to rewrite text to remove these patterns, with before-and-after examples.",
+  "Build an app with AI where a user pastes text, gets a rewritten version, and sees what was changed.",
+  "Test it on five pieces of Claude-generated content of different types, such as an email, a blog post and a product description.",
+  "Run a blind test in which at least five classmates guess which versions were AI-written, and report the results.",
+  "Deliver the working app link, the SKILL.md file, a test report with before-and-after samples and blind-test results, and a one-page log of the AI tools and key prompts you used.",
+  "Graded out of 40 marks."]
+];
+function briefHTML(i){return '<ul class="brief">'+BRIEFS[i].map(function(s,k){var last=k===BRIEFS[i].length-1;return '<li'+(last?' class="marks"':'')+'>'+s.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</li>';}).join("")+'</ul>';}
+var COLORS=[["#047FFF","#FFFFFF"],["#17224C","#FFFFFF"],["#19E9E3","#17224C"],["#0B5FC4","#FFFFFF"],["#CFE3FF","#17224C"],["#2A3A7A","#FFFFFF"],["#5FB3FF","#17224C"],["#0E3B8C","#FFFFFF"],["#9FF3EF","#17224C"]];
+var N=9, KEY="mica-project-wheel-v1";
+var assign=[]; // assign[g] = project index for group g (in draw order)
+try{var s=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(s))assign=s.filter(function(x){return typeof x==="number"&&x>=0&&x<N;}).slice(0,N);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(assign));}catch(e){}}
+
+var wheel=document.getElementById("wheel"),ctx=wheel.getContext("2d"),fx=document.getElementById("fx"),fctx=fx.getContext("2d");
+var rot=0, spinning=false, soundOn=true, audio=null, size=0, dpr=1;
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function open(){var o=[];for(var i=0;i<N;i++)if(assign.indexOf(i)<0)o.push(i);return o;}
+function fit(){var b=wheel.parentNode.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);size=b.width;[wheel,fx].forEach(function(c){c.width=Math.round(size*dpr);c.height=Math.round(size*dpr);});draw();}
+
+function wrapLines(t,maxW){var w=t.split(" "),lines=[],cur="";for(var i=0;i<w.length;i++){var test=cur?cur+" "+w[i]:w[i];if(ctx.measureText(test).width>maxW&&cur){lines.push(cur);cur=w[i];}else cur=test;}if(cur)lines.push(cur);return lines;}
+
+function draw(){
+  var S=size*dpr,c=S/2,R=c-8*dpr,o=open();ctx.clearRect(0,0,S,S);
+  if(o.length===0){ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--soft");ctx.beginPath();ctx.arc(c,c,R,0,6.2832);ctx.fill();return;}
+  var seg=6.2832/o.length;
+  ctx.save();ctx.translate(c,c);ctx.rotate(rot);
+  for(var i=0;i<o.length;i++){
+    var p=o[i],col=COLORS[p];
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,i*seg,(i+1)*seg);ctx.closePath();ctx.fillStyle=col[0];ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.9)";ctx.lineWidth=3*dpr;ctx.stroke();
+    ctx.save();ctx.rotate(i*seg+seg/2);ctx.textAlign="right";ctx.textBaseline="middle";ctx.fillStyle=col[1];
+    var fs=Math.max(11,Math.min(17,size/34))*dpr;ctx.font="800 "+fs+"px Mulish, Arial, sans-serif";
+    var maxW=R*0.60, lines=wrapLines(PROJECTS[p].short,maxW);
+    if(o.length<=2){lines=wrapLines(PROJECTS[p].short,maxW);}
+    var lh=fs*1.15, y0=-(lines.length-1)*lh/2;
+    for(var k=0;k<lines.length;k++)ctx.fillText(lines[k],R-18*dpr,y0+k*lh);
+    ctx.font="900 "+(fs*1.1)+"px Mulish, Arial, sans-serif";ctx.globalAlpha=.55;ctx.fillText(String(p+1),R*0.34,0);ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  ctx.restore();
+  ctx.beginPath();ctx.arc(c,c,R,0,6.2832);ctx.lineWidth=8*dpr;ctx.strokeStyle="#17224C";ctx.stroke();
+  for(var d=0;d<36;d++){var a=d*6.2832/36;ctx.beginPath();ctx.arc(c+Math.cos(a)*(R-1*dpr),c+Math.sin(a)*(R-1*dpr),2.4*dpr,0,6.2832);ctx.fillStyle=d%2?"#19E9E3":"#FFFFFF";ctx.fill();}
+}
+
+function segAtPointer(n){var seg=6.2832/n;var a=(-Math.PI/2-rot)%6.2832;if(a<0)a+=6.2832;return Math.floor(a/seg)%n;}
+
+function tick(){
+  var p=document.getElementById("pointer");p.classList.add("flick");setTimeout(function(){p.classList.remove("flick");},70);
+  if(!soundOn||!audio)return;
+  try{var t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type="square";o.frequency.value=1400;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.0001,t+.04);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.05);}catch(e){}
+}
+function chime(){if(!soundOn||!audio)return;try{[523,659,784,1047].forEach(function(f,i){var t=audio.currentTime+i*.09,o=audio.createOscillator(),g=audio.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+.5);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.55);});}catch(e){}}
+
+function rnd(n){try{var a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n;}catch(e){return Math.floor(Math.random()*n);}}
+
+function spin(){
+  var o=open();if(spinning||o.length===0||assign.length>=N)return;
+  if(!audio){try{audio=new (window.AudioContext||window.webkitAudioContext)();}catch(e){audio=null;}}
+  if(audio&&audio.state==="suspended")audio.resume();
+  spinning=true;render();
+  var n=o.length,seg=6.2832/n,k=rnd(n),jit=(Math.random()-.5)*seg*0.7;
+  var target=-Math.PI/2-(k*seg+seg/2)+jit;
+  var turns=reduce?1:6+rnd(3);
+  var base=rot-(rot%6.2832);
+  var end=base+turns*6.2832+(((target-base)%6.2832)+6.2832)%6.2832;
+  var start=rot,dur=reduce?1200:5200+rnd(900),t0=performance.now(),last=segAtPointer(n);
+  function step(now){
+    var f=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-f,4);rot=start+(end-start)*e;draw();
+    var cur=segAtPointer(n);if(cur!==last){last=cur;tick();}
+    if(f<1)requestAnimationFrame(step);else{spinning=false;landed(o[segAtPointer(n)]);}
+  }
+  requestAnimationFrame(step);
+}
+
+function landed(p){
+  var g=assign.length;assign.push(p);save();chime();burst();
+  document.getElementById("rvWho").textContent="Group "+(g+1)+" gets";
+  var num=document.getElementById("rvNum");num.textContent=p+1;num.style.background=COLORS[p][0];num.style.color=COLORS[p][1];
+  document.getElementById("rvShort").textContent="Project "+(p+1);
+  document.getElementById("rvTitle").textContent=PROJECTS[p].short;
+  document.getElementById("rvText").textContent=PROJECTS[p].text;
+  document.getElementById("rvBrief").innerHTML=briefHTML(p);
+  document.getElementById("continue").textContent=assign.length>=N?"See all allocations":"Next group";
+  document.getElementById("reveal").hidden=false;render();
+  document.getElementById("continue").focus();
+}
+
+function burst(){
+  if(reduce)return;var S=size*dpr,parts=[],cols=["#047FFF","#19E9E3","#17224C","#CFE3FF","#5FB3FF"];
+  for(var i=0;i<120;i++){var a=Math.random()*6.2832,v=(4+Math.random()*9)*dpr;parts.push({x:S/2,y:S/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-4*dpr,r:(3+Math.random()*4)*dpr,c:cols[i%cols.length],life:1});}
+  var t0=performance.now();
+  (function f(now){fctx.clearRect(0,0,S,S);var alive=false;parts.forEach(function(p){p.vy+=.25*dpr;p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.life-=.012;if(p.life>0){alive=true;fctx.globalAlpha=Math.max(0,p.life);fctx.fillStyle=p.c;fctx.fillRect(p.x,p.y,p.r,p.r*1.6);}});fctx.globalAlpha=1;if(alive&&now-t0<3000)requestAnimationFrame(f);else fctx.clearRect(0,0,S,S);})(t0);
+}
+
+function render(){
+  var g=assign.length,o=open();
+  document.getElementById("hubNum").textContent=g>=N?"✓":String(g+1);
+  document.getElementById("nextText").innerHTML=g>=N?"All <b>9 groups</b> have a project":"Next up: <b>Group "+(g+1)+"</b> · "+o.length+(o.length===1?" project":" projects")+" on the wheel";
+  var sp=document.getElementById("spin");sp.disabled=spinning||g>=N||!document.getElementById("reveal").hidden;sp.textContent=spinning?"SPINNING…":"SPIN";
+  document.getElementById("undo").disabled=spinning||g===0;
+  var gl=document.getElementById("groups");gl.innerHTML="";
+  for(var i=0;i<N;i++){
+    var li=document.createElement("li"),p=assign[i];
+    li.className="group"+(p!==undefined?" done":"")+(i===g&&g<N?" current":"");
+    var right=p!==undefined?'<span class="num" style="background:'+COLORS[p][0]+';color:'+COLORS[p][1]+'">'+(p+1)+'</span><span class="t">'+PROJECTS[p].short+'</span>':'<span class="t">'+(i===g?(spinning?"Spinning…":"Up next"):"Waiting")+'</span>';
+    li.innerHTML='<span class="g">Group '+(i+1)+'</span><span class="p">'+right+'</span>';gl.appendChild(li);
+  }
+  var pl=document.getElementById("projects");pl.innerHTML="";
+  PROJECTS.forEach(function(pr,i){
+    var gi=assign.indexOf(i),taken=gi>=0&&!(spinning&&false);
+    var d=document.createElement("article");d.className="proj"+(taken?" taken":"");
+    d.innerHTML='<div class="head"><span class="num" style="background:'+COLORS[i][0]+';color:'+COLORS[i][1]+'">'+(i+1)+'</span><b></b></div><p></p><span class="chip">'+(taken?"Group "+(gi+1):"Open")+'</span><details><summary>Project brief · 40 marks</summary>'+briefHTML(i)+'</details>';
+    d.querySelector("b").textContent=pr.short;d.querySelector("p").textContent=pr.text;pl.appendChild(d);
+  });
+}
+
+document.getElementById("spin").addEventListener("click",spin);
+document.getElementById("continue").addEventListener("click",function(){document.getElementById("reveal").hidden=true;draw();render();document.getElementById("spin").focus();});
+document.getElementById("undo").addEventListener("click",function(){if(spinning||!assign.length)return;assign.pop();save();document.getElementById("reveal").hidden=true;draw();render();});
+document.getElementById("reset").addEventListener("click",function(){document.getElementById("confirm").hidden=false;});
+document.getElementById("no").addEventListener("click",function(){document.getElementById("confirm").hidden=true;});
+document.getElementById("yes").addEventListener("click",function(){assign=[];save();rot=0;document.getElementById("confirm").hidden=true;document.getElementById("reveal").hidden=true;draw();render();});
+document.getElementById("sound").addEventListener("click",function(){soundOn=!soundOn;this.textContent="Sound: "+(soundOn?"on":"off");this.setAttribute("aria-pressed",String(soundOn));});
+document.addEventListener("keydown",function(e){if(e.code==="Space"&&e.target===document.body){e.preventDefault();if(!document.getElementById("reveal").hidden)document.getElementById("continue").click();else spin();}});
+window.addEventListener("resize",fit);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+fit();render();
+})();
+</script>
+
+</body></html>

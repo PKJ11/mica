@@ -15,6 +15,25 @@
   --radius: 14px;
   --shadow: 0 1px 2px rgba(42, 31, 31, 0.06), 0 8px 24px rgba(42, 31, 31, 0.06);
   --shadow-hover: 0 2px 4px rgba(42, 31, 31, 0.08), 0 16px 40px rgba(182, 29, 34, 0.14);
+  --grid-tint: rgba(182, 29, 34, 0.05);
+}
+
+/* VNIT brand: swaps the MICA red for VNIT navy on VNIT pages. */
+body:has(.theme-vnit), .theme-vnit {
+  --red: #153044;
+  --red-dark: #0c1f2d;
+  --red-soft: #e2e9ef;
+  --shadow-hover: 0 2px 4px rgba(42, 31, 31, 0.08), 0 16px 40px rgba(21, 48, 68, 0.16);
+  --grid-tint: rgba(21, 48, 68, 0.05);
+}
+
+/* JIT brand: swaps the MICA red for JIT blue on JIT pages. */
+body:has(.theme-jit), .theme-jit {
+  --red: #1e4583;
+  --red-dark: #142f5c;
+  --red-soft: #e2e9f5;
+  --shadow-hover: 0 2px 4px rgba(42, 31, 31, 0.08), 0 16px 40px rgba(30, 69, 131, 0.16);
+  --grid-tint: rgba(30, 69, 131, 0.05);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,8 +43,8 @@ body {
   color: var(--ink);
   background-color: var(--paper);
   background-image:
-    linear-gradient(rgba(182, 29, 34, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(182, 29, 34, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--grid-tint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-tint) 1px, transparent 1px);
   background-size: 24px 24px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
