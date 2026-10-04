@@ -2,13 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PdfViewer from "@/components/PdfViewer";
 import { requireStudent } from "@/lib/auth";
-import { ACTIVITIES, isPublicActivity } from "@/lib/activities";
+import { requireVnitStudent } from "@/lib/vnitAuth";
+import { ACTIVITIES, isVnitActivity } from "@/lib/activities";
 
 export default async function ActivityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
   if (!activity || activity.hidden) notFound();
-  if (!isPublicActivity(activity)) await requireStudent();
+  if (isVnitActivity(activity)) await requireVnitStudent();
+  else await requireStudent();
 
   const src = `/api/activity/${activity.slug}`;
   const course = activity.course ?? "abamdl";

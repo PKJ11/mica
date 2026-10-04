@@ -2,20 +2,20 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
-import { ACTIVITIES, isPublicActivity } from "@/lib/activities";
+import { VNIT_COOKIE, verifyVnitToken } from "@/lib/vnitAuth";
+import { ACTIVITIES, isVnitActivity } from "@/lib/activities";
 
-// Activity HTML lives outside /public so only signed-in students can load it (VNIT materials are open).
+// Activity HTML lives outside /public so only signed-in students can load it (VNIT uses its own login).
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const activity = ACTIVITIES[slug];
   if (!activity || activity.hidden) return new Response("Not found", { status: 404 });
 
-  if (!isPublicActivity(activity)) {
-    const store = await cookies();
-    if (!verifySessionToken(store.get(SESSION_COOKIE)?.value)) {
-      return new Response("Unauthorized — please sign in.", { status: 401 });
-    }
-  }
+  const store = await cookies();
+  const signedIn = isVnitActivity(activity)
+    ? verifyVnitToken(store.get(VNIT_COOKIE)?.value)
+    : verifySessionToken(store.get(SESSION_COOKIE)?.value);
+  if (!signedIn) return new Response("Unauthorized — please sign in.", { status: 401 });
 
   const data = await readFile(path.join(process.cwd(), "content", activity.file));
   const isPdf = activity.file.toLowerCase().endsWith(".pdf");

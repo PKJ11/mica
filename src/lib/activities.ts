@@ -227,7 +227,7 @@ export const GENAI_SESSION_6 = ["genai-session6"].map((s) => ACTIVITIES[s]);
 
 export const VNIT_MODULES = Object.values(ACTIVITIES).filter((a) => a.course === "vnit" && !a.hidden);
 
-/** VNIT materials are open to everyone; everything else needs a signed-in student. */
-export function isPublicActivity(a: Activity): boolean {
+/** VNIT materials need a VNIT login; everything else needs a signed-in MICA student. */
+export function isVnitActivity(a: Activity): boolean {
   return a.course === "vnit";
 }

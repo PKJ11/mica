@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
-export type RollOption = { roll: string; name: string };
+/** `guest` options are shared logins: shown by name only, without a roll no. */
+export type RollOption = { roll: string; name: string; guest?: boolean };
 
 type Props = {
   options: RollOption[];
@@ -115,7 +116,7 @@ export default function RollSelect({ options, name, defaultValue }: Props) {
               role="option"
               data-index={i}
               aria-selected={selected?.roll === o.roll}
-              className={`combo-option${i === active ? " active" : ""}${o.roll === "others" ? " others" : ""}`}
+              className={`combo-option${i === active ? " active" : ""}${isGuest(o) ? " others" : ""}`}
               onMouseEnter={() => setActive(i)}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -123,7 +124,7 @@ export default function RollSelect({ options, name, defaultValue }: Props) {
               }}
             >
               <span className="combo-name">{o.name}</span>
-              {o.roll !== "others" && <span className="combo-roll mono">{o.roll}</span>}
+              {!isGuest(o) && <span className="combo-roll mono">{o.roll}</span>}
             </li>
           ))}
         </ul>
@@ -133,5 +134,9 @@ export default function RollSelect({ options, name, defaultValue }: Props) {
 }
 
 function label(o: RollOption) {
-  return o.roll === "others" ? "Others" : `${o.roll} · ${o.name}`;
+  return isGuest(o) ? o.name : `${o.roll} · ${o.name}`;
+}
+
+function isGuest(o: RollOption) {
+  return o.guest || o.roll === "others";
 }

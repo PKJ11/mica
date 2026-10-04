@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { VNIT_MODULES, type Activity } from "@/lib/activities";
+import { requireVnitStudent } from "@/lib/vnitAuth";
+import { vnitLogout } from "./actions";
 
 export const metadata = { title: "VNIT Nagpur · Course materials" };
 
@@ -9,8 +11,10 @@ function cta(a: Activity) {
   return a.tag === "Dashboard" ? "Open dashboard →" : "Start module →";
 }
 
-// Open to everyone — VNIT students don't sign in.
-export default function VnitPage() {
+// VNIT students sign in with their enrollment number (see /vnit/login).
+export default async function VnitPage() {
+  const student = await requireVnitStudent();
+
   return (
     <div className="theme-vnit">
       <header className="topbar">
@@ -20,9 +24,17 @@ export default function VnitPage() {
             <span className="topbar-divider" aria-hidden="true" />
             <span>VNIT Nagpur</span>
           </Link>
-          <Link href="/home" className="btn-ghost">
-            ← Back to home
-          </Link>
+          <div className="topbar-user">
+            <span className="user-meta">
+              <strong>{student.name}</strong>
+              {!student.guest && <span className="mono">{student.roll}</span>}
+            </span>
+            <form action={vnitLogout}>
+              <button className="btn-ghost" type="submit">
+                Log out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <main className="page">
