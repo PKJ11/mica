@@ -1,9 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const sans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans" });
-const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500"], variable: "--font-mono" });
+// Self-hosted so builds don't depend on fetching from Google Fonts.
+const sans = localFont({
+  src: [
+    { path: "./fonts/ibm-plex-sans-latin-400-normal.woff2", weight: "400" },
+    { path: "./fonts/ibm-plex-sans-latin-500-normal.woff2", weight: "500" },
+    { path: "./fonts/ibm-plex-sans-latin-600-normal.woff2", weight: "600" },
+    { path: "./fonts/ibm-plex-sans-latin-700-normal.woff2", weight: "700" },
+  ],
+  variable: "--font-sans",
+  display: "swap",
+});
+const mono = localFont({ src: "./fonts/ibm-plex-mono-latin-500-normal.woff2", weight: "500", variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "MICA Portal",

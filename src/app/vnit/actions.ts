@@ -11,13 +11,13 @@ export async function vnitLogin(_prev: VnitLoginState, formData: FormData): Prom
   const roll = String(formData.get("roll") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
 
-  if (!roll) return { error: "Please select your enrollment number." };
+  if (!roll) return { error: "Please select your name." };
   if (!password) return { error: "Please enter your password.", roll };
 
   const student = findVnitStudent(roll);
   // Case-insensitive, so "gaike062" and "GAIKE062" both work.
   if (!student || vnitPasswordFor(student).toLowerCase() !== password.toLowerCase()) {
-    return { error: "Invalid enrollment number or password.", roll };
+    return { error: "Invalid name or password.", roll };
   }
 
   const store = await cookies();

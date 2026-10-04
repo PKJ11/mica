@@ -31,7 +31,7 @@ export default async function VnitLoginPage() {
             ← Back to home
           </Link>
           <h2>Student sign in</h2>
-          <p className="muted">Select your enrollment number and enter your password.</p>
+          <p className="muted">Search for your name (or roll no.) and enter your password.</p>
           <VnitLoginForm options={options} />
           <p className="hint">
             Password: first 4 letters of your first name as it appears on the college record + last 4 characters of your

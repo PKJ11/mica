@@ -9,10 +9,13 @@ type Props = {
   options: RollOption[];
   name: string;
   defaultValue?: string;
+  /** Show names only; roll nos. stay searchable. */
+  hideRolls?: boolean;
 };
 
 /** Searchable dropdown: filter by name or roll no., submits the roll via a hidden input. */
-export default function RollSelect({ options, name, defaultValue }: Props) {
+export default function RollSelect({ options, name, defaultValue, hideRolls }: Props) {
+  const label = (o: RollOption) => (hideRolls || isGuest(o) ? o.name : `${o.roll} · ${o.name}`);
   const listId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -124,17 +127,13 @@ export default function RollSelect({ options, name, defaultValue }: Props) {
               }}
             >
               <span className="combo-name">{o.name}</span>
-              {!isGuest(o) && <span className="combo-roll mono">{o.roll}</span>}
+              {!hideRolls && !isGuest(o) && <span className="combo-roll mono">{o.roll}</span>}
             </li>
           ))}
         </ul>
       )}
     </div>
   );
-}
-
-function label(o: RollOption) {
-  return isGuest(o) ? o.name : `${o.roll} · ${o.name}`;
 }
 
 function isGuest(o: RollOption) {

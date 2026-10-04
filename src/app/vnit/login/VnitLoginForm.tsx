@@ -11,8 +11,8 @@ export default function VnitLoginForm({ options }: { options: RollOption[] }) {
   return (
     <form action={action} className="login-form">
       <div className="field">
-        <span>Enrollment number</span>
-        <RollSelect name="roll" options={options} defaultValue={state.roll} key={state.roll} />
+        <span>Your name</span>
+        <RollSelect name="roll" options={options} defaultValue={state.roll} key={state.roll} hideRolls />
       </div>
       <label>
         <span>Password</span>
