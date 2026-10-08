@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { VNIT_MODULES, type Activity } from "@/lib/activities";
-import { requireVnitStudent } from "@/lib/vnitAuth";
+import TrackerBoot from "@/components/TrackerBoot";
+import { SETTINGS } from "@/lib/settings";
+import { requireVnitSession } from "@/lib/vnitAuth";
 import { vnitLogout } from "./actions";
 
 export const metadata = { title: "VNIT Nagpur · Course materials" };
@@ -13,10 +15,12 @@ function cta(a: Activity) {
 
 // VNIT students sign in with their enrollment number (see /vnit/login).
 export default async function VnitPage() {
-  const student = await requireVnitStudent();
+  const session = await requireVnitSession("/vnit");
+  const student = session.user;
 
   return (
     <div className="theme-vnit">
+      <TrackerBoot config={{ sessionId: session.id, loginUrl: "/vnit/login", settings: SETTINGS, title: "Course materials" }} />
       <header className="topbar">
         <div className="topbar-inner">
           <Link href="/home" className="topbar-brand">
@@ -29,6 +33,11 @@ export default async function VnitPage() {
               <strong>{student.name}</strong>
               {!student.guest && <span className="mono">{student.roll}</span>}
             </span>
+            {student.role !== "student" && (
+              <Link href="/vnit/admin" className="btn-ghost">
+                Activity
+              </Link>
+            )}
             <form action={vnitLogout}>
               <button className="btn-ghost" type="submit">
                 Log out

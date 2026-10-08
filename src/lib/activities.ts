@@ -8,6 +8,8 @@ export type Activity = {
   course?: "abamdl" | "genaillm" | "vnit";
   /** Not shown to students yet; its URL returns 404. */
   hidden?: boolean;
+  /** Chapter a module shows when the address has no #hash; lets the tracker name it (VNIT modules). */
+  defaultChapter?: string;
 };
 
 export const ACTIVITIES: Record<string, Activity> = {
@@ -171,7 +173,7 @@ export const ACTIVITIES: Record<string, Activity> = {
     course: "genaillm",
   },
 
-  // ---------- VNIT (files live in content/vnit; open to everyone, no login) ----------
+  // ---------- VNIT (files live in content/vnit; VNIT login, tracked) ----------
   "vnit-data-visualisation": {
     slug: "vnit-data-visualisation",
     file: "vnit/Seeing Data Clearly_ Interactive Learning Module on Data Visualisation.html",
@@ -187,6 +189,7 @@ export const ACTIVITIES: Record<string, Activity> = {
     subtitle: "How raw data becomes analysis-ready",
     tag: "Interactive Module",
     course: "vnit",
+    defaultChapter: "start",
   },
   "vnit-market-basket": {
     slug: "vnit-market-basket",
@@ -195,6 +198,7 @@ export const ACTIVITIES: Record<string, Activity> = {
     subtitle: "Finding products that sell together",
     tag: "Interactive Module",
     course: "vnit",
+    defaultChapter: "start",
   },
   "vnit-inventory-forecasting": {
     slug: "vnit-inventory-forecasting",
@@ -203,6 +207,7 @@ export const ACTIVITIES: Record<string, Activity> = {
     subtitle: "Forecasting demand and deciding when to reorder",
     tag: "Interactive Module",
     course: "vnit",
+    defaultChapter: "start",
   },
   "vnit-eternal-dashboard": {
     slug: "vnit-eternal-dashboard",

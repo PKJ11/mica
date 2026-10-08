@@ -423,6 +423,56 @@ a.activity-card:hover {
 .viewer-title strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .viewer-frame { flex: 1; width: 100%; border: none; background: var(--paper); }
 
+/* ---------- Sign-in notices and consent ---------- */
+.small { font-size: 13px; }
+.notice {
+  background: var(--saffron-soft);
+  color: #6b4402;
+  border: 1px solid #efd29c;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.consent-shell { min-height: 100vh; display: flex; justify-content: center; padding: 40px 16px; background: var(--paper); }
+.consent-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 640px;
+  width: 100%;
+  padding: 32px 28px;
+  align-self: flex-start;
+}
+.consent-logo { width: 64px; height: auto; margin-bottom: 12px; }
+.consent-card section { margin-top: 20px; }
+.consent-card h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.consent-card ul { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.consent-card section p + p { margin-top: 8px; }
+.consent-form { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+.check { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--red); }
+.consent-actions .btn-primary { width: 100%; }
+.link-btn { background: none; border: 0; color: var(--red); font: inherit; font-size: 14px; margin-top: 14px; cursor: pointer; padding: 0; }
+.link-btn:hover { text-decoration: underline; }
+
+/* ---------- Staff tables ---------- */
+.section-title { font-size: 20px; font-weight: 600; margin: 36px 0 4px; }
+.table-wrap { overflow-x: auto; margin-top: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data-table th, .data-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.data-table th { font-weight: 600; font-size: 13px; color: var(--muted); background: var(--paper); }
+.data-table.compact th, .data-table.compact td { padding: 6px 10px; }
+.data-table td.small { white-space: normal; min-width: 200px; }
+.data-table a { color: var(--red); font-weight: 500; }
+.data-table a:hover { text-decoration: underline; }
+.data-table tr.selected td { background: var(--red-soft); }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.dot-live { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2e8b57; margin-left: 8px; vertical-align: middle; }
+.stats .stat { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.stats .stat span { font-size: 13px; color: var(--muted); }
+.stats .stat strong { font-size: 26px; font-weight: 600; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 960px) {
   .grid.three, .grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }

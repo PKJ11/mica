@@ -4,12 +4,13 @@ import { useActionState, useState } from "react";
 import { vnitLogin, type VnitLoginState } from "../actions";
 import RollSelect, { type RollOption } from "@/app/login/RollSelect";
 
-export default function VnitLoginForm({ options }: { options: RollOption[] }) {
+export default function VnitLoginForm({ options, next }: { options: RollOption[]; next: string }) {
   const [state, action, pending] = useActionState<VnitLoginState, FormData>(vnitLogin, {});
   const [show, setShow] = useState(false);
 
   return (
     <form action={action} className="login-form">
+      <input type="hidden" name="next" value={next} />
       <div className="field">
         <span>Your name</span>
         <RollSelect name="roll" options={options} defaultValue={state.roll} key={state.roll} hideRolls />
