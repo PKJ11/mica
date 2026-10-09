@@ -1,6 +1,7 @@
 /*
  * Shared activity tracker (EV-1). Loaded in the outer portal page and in every content file.
- * Content never implements its own tracking; it may call window.__trk.track(type, details).
+ * Content never implements its own tracking; it may call window.__trk.track(type, details), and for
+ * learning questions marks each question box with data-trk-q="<id>" and calls window.__trk.answer({id, chosen, correct}).
  *
  * Config comes from window.__TRK_CFG (set by the server just before this script):
  *   endpoint, progressEndpoint, endEndpoint, loginUrl, sessionId, module, defaultChapter, contentVersion,
@@ -464,6 +465,32 @@
     });
   }
 
+  // ---------------------------------------------------------------- learning questions
+  // Content marks each question's box with data-trk-q="<question id>" and calls __trk.answer() on an answer.
+  // "Shown" is the first moment at least half of the question is on screen; answers are timed from it.
+  var shownAt = {};
+  var qObserver = null;
+  function watchQuestions(root) {
+    if (!qObserver || !root || root.nodeType !== 1) return;
+    if (root.hasAttribute("data-trk-q")) qObserver.observe(root);
+    var list = root.querySelectorAll("[data-trk-q]");
+    for (var i = 0; i < list.length; i++) qObserver.observe(list[i]);
+  }
+  function answer(a) {
+    var id = a && a.id ? String(a.id).slice(0, 80) : "";
+    if (!id) return;
+    track("answer_submitted", {
+      question: id,
+      option: a.chosen == null ? null : String(a.chosen).slice(0, 200),
+      correct: !!a.correct,
+      seconds: shownAt[id] ? Math.round((Date.now() - shownAt[id]) / 1000) : null,
+    }, { element: id });
+  }
+  /** Retakes: the next time these questions appear they count as shown again. */
+  function resetQuestions(ids) {
+    (ids || Object.keys(shownAt)).forEach(function (id) { delete shownAt[id]; });
+  }
+
   // ---------------------------------------------------------------- server-backed module storage (LG-10)
   // Content keeps calling localStorage as before, but each student's module state lives on the server.
   var moduleStore = null;
@@ -512,8 +539,23 @@
   var isContent = CFG.kind === "content";
   if (isContent) {
     track("module_opened", { title: CFG.title || null, embedded: embedded });
+    if (window.IntersectionObserver && window.MutationObserver) {
+      qObserver = new IntersectionObserver(safe(function (entries) {
+        entries.forEach(function (en) {
+          var id = en.isIntersecting && en.target.getAttribute("data-trk-q");
+          if (!id || shownAt[id]) return;
+          shownAt[id] = Date.now();
+          track("question_shown", { question: id }, { element: id });
+        });
+      }), { threshold: 0.5 });
+      // Modules redraw questions as students answer them; watch new ones as they appear.
+      new MutationObserver(safe(function (muts) {
+        muts.forEach(function (m) { for (var i = 0; i < m.addedNodes.length; i++) watchQuestions(m.addedNodes[i]); });
+      })).observe(document.documentElement, { childList: true, subtree: true });
+    }
     var onReady = safe(function () {
       setChapter(chapterFromPage());
+      watchQuestions(document.body);
       onScroll();
     });
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(onReady, 0); });
@@ -532,6 +574,8 @@
     ctx: function () { return currentCtx(); },
     track: safe(function (type, details, element) { track(String(type), details || null, { element: element || null }); }),
     chapter: safe(function (id) { setChapter(id); }),
+    answer: safe(function (a) { answer(a); }),
+    resetQuestions: safe(function (ids) { resetQuestions(ids); }),
     setContext: safe(function (c) {
       var changed = c.page !== ctx.page || c.module !== ctx.module;
       if (c.sessionId) CFG.sessionId = c.sessionId;

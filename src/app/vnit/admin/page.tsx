@@ -1,90 +1,107 @@
 import Link from "next/link";
-import { randomUUID } from "crypto";
-import { query } from "@/lib/db";
-import { fmtDateTime, fmtDuration } from "@/lib/format";
-import { requireVnitStaff } from "@/lib/vnitAuth";
+import { BarList, Columns, Stat } from "@/components/charts";
+import { activeLastWeek, assignedContent, studentTotals, timeRows } from "@/lib/analytics/data";
+import { filterQuery } from "@/lib/analytics/filters";
+import { median, timeBins } from "@/lib/analytics/stats";
+import { fmtDay, fmtSpan, todayIst } from "@/lib/format";
+import { BANDS } from "@/lib/settings";
+import StaffHeader from "./StaffHeader";
+import { audit, staffPage, type SearchParams } from "./staff";
 
-export const metadata = { title: "VNIT Nagpur · Student activity" };
+export const metadata = { title: "VNIT Nagpur · Cohort overview" };
 
-type Row = {
-  id: string;
-  roll: string;
-  name: string;
-  guest: boolean;
-  consent_at: Date | null;
-  last_login: Date | null;
-  sessions: number;
-  active_seconds: number;
-  events: number;
-  open_now: boolean;
-};
+const INACTIVE_DAYS = 7;
 
-// Phase 1 staff view: who has signed in and how much they have used. The full analytics screens (I1–I4) come in phase 2.
-export default async function VnitAdminPage() {
-  const { user } = await requireVnitStaff("/vnit/admin");
-  await query(`INSERT INTO audit_log (id, actor_id, action, target) VALUES ($1, $2, 'view_student_list', $3)`, [
-    randomUUID(),
-    user.id,
-    user.cohortId,
-  ]);
+// I1: the cohort at a glance. CA-1, CA-2, CA-5, CA-7.
+export default async function OverviewPage({ searchParams }: { searchParams: SearchParams }) {
+  const { user, filters: f } = await staffPage("/vnit/admin", searchParams);
+  await audit(user.id, "view_cohort_overview", f.cohortId, { from: f.from, to: f.to });
 
-  const rows = await query<Row>(
-    `SELECT u.id, u.roll, u.name, u.guest,
-            (SELECT max(agreed_at) FROM consents c WHERE c.user_id = u.id) AS consent_at,
-            (SELECT max(started_at) FROM sessions s WHERE s.user_id = u.id) AS last_login,
-            (SELECT count(*)::int FROM sessions s WHERE s.user_id = u.id) AS sessions,
-            (SELECT coalesce(sum(active_seconds), 0)::int FROM sessions s WHERE s.user_id = u.id) AS active_seconds,
-            (SELECT count(*)::int FROM events e WHERE e.user_id = u.id) AS events,
-            EXISTS (SELECT 1 FROM sessions s WHERE s.user_id = u.id AND s.ended_at IS NULL) AS open_now
-     FROM users u WHERE u.institution_id = $1
-     ORDER BY last_login DESC NULLS LAST, u.name`,
-    [user.institutionId],
-  );
-  const signedIn = rows.filter((r) => r.sessions > 0).length;
+  const [students, active, rows, content] = await Promise.all([studentTotals(f), activeLastWeek(f), timeRows(f), assignedContent(f.cohortId)]);
+  const totals = students.map((s) => s.activeSeconds);
+  const medTime = median(totals);
+  const scored = students.filter((s) => s.band);
+  const medScore = median(scored.map((s) => s.score!));
+  const bins = timeBins(totals);
+
+  const byModule = new Map<string, number>();
+  for (const r of rows) byModule.set(r.module, (byModule.get(r.module) ?? 0) + r.seconds);
+  const classTotal = [...byModule.values()].reduce((a, b) => a + b, 0);
+
+  const cutoff = new Date(`${todayIst()}T00:00:00+05:30`).getTime() - (INACTIVE_DAYS - 1) * 86_400_000;
+  const inactive = students.filter((s) => !s.lastLogin || new Date(s.lastLogin).getTime() < cutoff).length;
+  const lowTime = students.filter((s) => s.activeSeconds < 3600).length;
+  const lowScore = students.filter((s) => s.band === "attention").length;
+  const list = (extra: Record<string, string | number>) => `/vnit/admin/students?${filterQuery(f, extra)}`;
 
   return (
-    <div className="theme-vnit">
-      <main className="page">
-        <nav className="crumbs">
-          <Link href="/vnit">VNIT Nagpur</Link> <span>/</span> Student activity
-        </nav>
-        <h1 className="page-title">Student activity</h1>
-        <p className="muted">
-          {rows.length} accounts · {signedIn} have signed in. Active time counts 15-second intervals with the tab visible and an
-          input in the last minute.
-        </p>
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Roll no.</th>
-                <th>Last sign-in</th>
-                <th className="num">Sessions</th>
-                <th className="num">Active time</th>
-                <th className="num">Events</th>
-                <th>Consent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    <Link href={`/vnit/admin/${encodeURIComponent(r.id)}`}>{r.name}</Link>
-                    {r.open_now && <span className="dot-live" title="Signed in now" />}
-                  </td>
-                  <td className="mono">{r.guest ? "guest" : r.roll}</td>
-                  <td>{fmtDateTime(r.last_login)}</td>
-                  <td className="num">{r.sessions}</td>
-                  <td className="num">{fmtDuration(r.active_seconds)}</td>
-                  <td className="num">{r.events}</td>
-                  <td>{r.consent_at ? fmtDateTime(r.consent_at) : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+    <>
+      <StaffHeader title="Cohort overview" filters={f} back={`/vnit/admin?${filterQuery(f)}`} />
+
+      <div className="grid four stats">
+        <Stat label="Students" value={String(students.length)} />
+        <Stat label="Active in the last 7 days" value={String(active)} note={f.to === todayIst() ? "up to today" : `up to ${fmtDay(f.to)}`} />
+        <Stat label="Median time" value={medTime == null ? "—" : fmtSpan(medTime)} note="per student, in the period" />
+        <Stat
+          label="Median learning score"
+          value={medScore == null ? "—" : `${Math.round(medScore)} %`}
+          note={`${scored.length} with ${BANDS.minQuestions}+ questions`}
+        />
+      </div>
+
+      <section className="panel">
+        <h2 className="section-title">Students by total time</h2>
+        <p className="muted small">Active time in the period. Select a bar to list the students in it.</p>
+        <Columns
+          caption="Number of students in each band of total active time"
+          unit="students"
+          data={bins.map((b) => ({ key: b.key, label: b.label, value: b.count, href: list({ band: b.key }) }))}
+        />
+      </section>
+
+      <div className="grid two">
+        <section className="panel">
+          <h2 className="section-title">Time by module</h2>
+          <p className="muted small">Share of the cohort&apos;s active time in the period.</p>
+          {classTotal ? (
+            <BarList
+              data={content.modules.map((m) => {
+                const s = byModule.get(m.id) ?? 0;
+                return {
+                  key: m.id,
+                  label: m.title,
+                  value: s,
+                  display: `${Math.round((s / classTotal) * 100)} %`,
+                  href: `/vnit/admin/time?${filterQuery(f, { group: "module", sel: m.id })}`,
+                };
+              })}
+            />
+          ) : (
+            <p className="muted">No activity in this period yet.</p>
+          )}
+        </section>
+
+        <section className="panel">
+          <h2 className="section-title">Needs attention</h2>
+          <ul className="chips">
+            <li>
+              <Link href={list({ inactive: INACTIVE_DAYS })}>
+                <strong>{inactive}</strong> not signed in for {INACTIVE_DAYS} days
+              </Link>
+            </li>
+            <li>
+              <Link href={list({ time_below: 3600 })}>
+                <strong>{lowTime}</strong> under 1 hour in the period
+              </Link>
+            </li>
+            <li>
+              <Link href={list({ score_below: BANDS.developingFrom })}>
+                <strong>{lowScore}</strong> below {BANDS.developingFrom} % on learning questions
+              </Link>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </>
   );
 }

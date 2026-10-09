@@ -1,0 +1,1919 @@
+{
+  "institution": "vnit",
+  "modules": [
+    {
+      "id": "vnit-data-visualisation",
+      "type": "module",
+      "position": 1,
+      "version": "e6a0036833",
+      "chapters": [
+        {
+          "id": "c1",
+          "title": "Same numbers, different stories",
+          "kind": "chapter",
+          "position": 1
+        },
+        {
+          "id": "c2",
+          "title": "Why visualise, and how our eyes read charts",
+          "kind": "chapter",
+          "position": 2
+        },
+        {
+          "id": "c3",
+          "title": "The visual vocabulary",
+          "kind": "chapter",
+          "position": 3
+        },
+        {
+          "id": "c4",
+          "title": "Choosing the right chart",
+          "kind": "chapter",
+          "position": 4
+        },
+        {
+          "id": "c5",
+          "title": "Best practices",
+          "kind": "chapter",
+          "position": 5
+        },
+        {
+          "id": "c6",
+          "title": "Pitfalls: how charts mislead",
+          "kind": "chapter",
+          "position": 6
+        },
+        {
+          "id": "c7",
+          "title": "Anatomy of a dashboard",
+          "kind": "chapter",
+          "position": 7
+        },
+        {
+          "id": "c8",
+          "title": "Drill down, roll up and drill across",
+          "kind": "chapter",
+          "position": 8
+        },
+        {
+          "id": "c9",
+          "title": "Let the data move",
+          "kind": "chapter",
+          "position": 9
+        },
+        {
+          "id": "c10",
+          "title": "World-class dashboards",
+          "kind": "chapter",
+          "position": 10
+        },
+        {
+          "id": "practice",
+          "title": "Practice studio",
+          "kind": "practice",
+          "position": 11
+        },
+        {
+          "id": "quiz",
+          "title": "Final quiz",
+          "kind": "quiz",
+          "position": 12
+        }
+      ],
+      "questions": [
+        {
+          "id": "c1-1",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Two regional managers report the same average bill (₹740) and the same standard deviation for their customers. What should you do before concluding that the customers behave alike?",
+          "options": [
+            "Plot the distribution of bill values for both regions",
+            "Compare the median bills and stop there",
+            "Conclude they are alike, since mean and SD both match",
+            "Check which region has more stores"
+          ],
+          "correct": [
+            "Plot the distribution of bill values for both regions"
+          ],
+          "explanation": "Matching summary numbers can hide very different shapes, just like Anscombe's quartet. A histogram or box plot of both regions will show whether the spread, skew and outliers really match."
+        },
+        {
+          "id": "c1-2",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "In Dataset IV, what produces the correlation of 0.82?",
+          "options": [
+            "A single extreme point",
+            "A gentle curve in the data",
+            "Most points lying close to a straight line",
+            "Very small variance in y"
+          ],
+          "correct": [
+            "A single extreme point"
+          ],
+          "explanation": "Ten points share x = 8, so on their own they have no linear trend. The one point at x = 19 creates the whole correlation."
+        },
+        {
+          "id": "c2-1",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Why was Snow's map more convincing than the table of deaths by street?",
+          "options": [
+            "It showed where deaths clustered in relation to the water pumps",
+            "It contained more data than the table",
+            "Maps are always better than tables",
+            "The table had missing deaths"
+          ],
+          "correct": [
+            "It showed where deaths clustered in relation to the water pumps"
+          ],
+          "explanation": "The table and the map held the same information. The map added position, the most powerful encoding we have, so the cluster around one pump became impossible to miss."
+        },
+        {
+          "id": "c2-2",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "You want managers to compare the sales of eight stores as precisely as possible. Which encoding should you choose?",
+          "options": [
+            "Position and length: bars on a common baseline",
+            "Angle: a pie chart with eight slices",
+            "Area: one circle per store",
+            "Colour intensity: a shaded table"
+          ],
+          "correct": [
+            "Position and length: bars on a common baseline"
+          ],
+          "explanation": "Position on a common scale is the most accurate encoding in the Cleveland and McGill ranking. Bars sharing one baseline let the eye compare lengths directly."
+        },
+        {
+          "id": "c3-1",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Aman Mart wants to explain how last year's ₹12 Cr revenue became this year's ₹14.5 Cr, showing each category's gain or loss along the way. Which chart fits best?",
+          "options": [
+            "Waterfall chart",
+            "Pie chart",
+            "Histogram",
+            "Scatter plot"
+          ],
+          "correct": [
+            "Waterfall chart"
+          ],
+          "explanation": "A waterfall starts at one total, walks through each positive and negative contribution, and lands on the new total. It is built for \"bridge\" questions like this."
+        },
+        {
+          "id": "c3-2",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "FoodJoe wants to see which hours on which weekdays are the busiest for orders. Which chart fits best?",
+          "options": [
+            "Heatmap of weekday by hour",
+            "Stacked bar of orders by city",
+            "Pie chart of orders by weekday",
+            "KPI card of total orders"
+          ],
+          "correct": [
+            "Heatmap of weekday by hour"
+          ],
+          "explanation": "Two categories (weekday and hour) and one measure (orders) is the classic heatmap setup. Busy slots show up as dark cells at a glance."
+        },
+        {
+          "id": "c4-1",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Aman Mart wants to show how the monthly sales of its 40 stores moved over two years. Which is the best choice?",
+          "options": [
+            "A heatmap (stores by month) or small multiples",
+            "A line chart with 40 coloured lines",
+            "A pie chart for each month",
+            "A 3D column chart"
+          ],
+          "correct": [
+            "A heatmap (stores by month) or small multiples"
+          ],
+          "explanation": "Forty series make a line chart unreadable. A heatmap packs all 40 stores into rows, and small multiples give each store its own panel on a shared scale."
+        },
+        {
+          "id": "c4-2",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which of these is a distribution question?",
+          "options": [
+            "How are FoodJoe delivery times spread, and how many orders take more than 40 minutes?",
+            "Which city had the most orders last month?",
+            "How did orders change month by month?",
+            "What share of orders came from Pune?"
+          ],
+          "correct": [
+            "How are FoodJoe delivery times spread, and how many orders take more than 40 minutes?"
+          ],
+          "explanation": "A distribution question asks how values are spread out. The other questions are comparison, trend and part-to-whole questions."
+        },
+        {
+          "id": "c5-1",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which change increases a chart's data-ink ratio?",
+          "options": [
+            "Removing heavy gridlines and background shading",
+            "Adding a 3D effect to the bars",
+            "Adding a legend when labels could sit on the bars",
+            "Using a different colour for every bar"
+          ],
+          "correct": [
+            "Removing heavy gridlines and background shading"
+          ],
+          "explanation": "Removing ink that carries no data raises the share of ink that does. The other options add non-data ink."
+        },
+        {
+          "id": "c5-2",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "When should you use a diverging colour palette?",
+          "options": [
+            "When values move above and below a meaningful midpoint, like growth versus last year",
+            "For categories with no natural order, such as regions",
+            "For a single measure that runs from low to high",
+            "Whenever there are more than six categories"
+          ],
+          "correct": [
+            "When values move above and below a meaningful midpoint, like growth versus last year"
+          ],
+          "explanation": "Diverging palettes use two hues around a midpoint (zero growth, 100% of target), so the reader instantly sees which side of the line each value falls on."
+        },
+        {
+          "id": "c6-1",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "A chart compares ₹98 L and ₹102 L, with the y-axis starting at ₹96 L. Roughly what is its Lie Factor?",
+          "options": [
+            "About 49",
+            "About 1",
+            "About 5",
+            "About 200"
+          ],
+          "correct": [
+            "About 49"
+          ],
+          "explanation": "The data difference is 4 ÷ 98, about 4%. On the chart, the bars are 6 and 2 units tall, so the bigger bar looks 200% larger. 200% ÷ 4% ≈ 49."
+        },
+        {
+          "id": "c6-2",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "What is the most honest way to compare two measures with different units, such as ad spend and sales?",
+          "options": [
+            "Index both to 100 at the start, or use two charts that share the time axis",
+            "One chart with two y-axes scaled so that the lines overlap",
+            "A pie chart for each measure",
+            "A 3D chart with one axis per measure"
+          ],
+          "correct": [
+            "Index both to 100 at the start, or use two charts that share the time axis"
+          ],
+          "explanation": "Indexing puts both on the same scale of relative change. Two aligned charts also work. Dual axes let the designer invent any relationship they like."
+        },
+        {
+          "id": "c7-1",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "A store manager checks stock-outs, billing queues and cash every hour. Which type of dashboard does she need?",
+          "options": [
+            "Operational",
+            "Strategic",
+            "Analytical",
+            "An annual report"
+          ],
+          "correct": [
+            "Operational"
+          ],
+          "explanation": "Operational dashboards support frequent, fast decisions on day-to-day activity. They favour live numbers, alerts and exceptions."
+        },
+        {
+          "id": "c7-2",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Where should the most important KPIs usually sit on a dashboard?",
+          "options": [
+            "Top-left, where the eye lands first",
+            "Bottom-right, so they are read last",
+            "In the centre, inside a pie chart",
+            "On a separate tab"
+          ],
+          "correct": [
+            "Top-left, where the eye lands first"
+          ],
+          "explanation": "Readers scan from the top-left in a Z or F pattern. Key numbers placed there get seen in the first second."
+        },
+        {
+          "id": "c8-1",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "You are looking at FY 2025-26 sales by quarter, and you click Q3 to see October, November and December. What is this?",
+          "options": [
+            "Drill down",
+            "Roll up",
+            "Drill across",
+            "Dice"
+          ],
+          "correct": [
+            "Drill down"
+          ],
+          "explanation": "You moved from a summary level (quarter) to a more detailed level (month) of the same Time hierarchy."
+        },
+        {
+          "id": "c8-2",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Aman Mart's analyst moves from \"Sales of Beverages in Pune, Nov 2025\" to \"Returns of Beverages in Pune, Nov 2025\", which lives in a separate returns dataset. What is this?",
+          "options": [
+            "Drill across",
+            "Drill down",
+            "Roll up",
+            "Slice"
+          ],
+          "correct": [
+            "Drill across"
+          ],
+          "explanation": "The coordinates stay the same while the dataset changes. That jump between fact tables is a drill across, made possible by shared dimensions."
+        },
+        {
+          "id": "c9-1",
+          "chapter": "c9",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Why does the Gapminder chart use a log scale for income?",
+          "options": [
+            "Income grows by multiplying, so equal steps on a log axis mean equal relative gains and poorer countries are not squeezed together",
+            "A log scale makes rich countries look richer",
+            "Log scales are required for bubble charts",
+            "It hides the gap between countries"
+          ],
+          "correct": [
+            "Income grows by multiplying, so equal steps on a log axis mean equal relative gains and poorer countries are not squeezed together"
+          ],
+          "explanation": "On a log axis, $1,000 to $2,000 and $20,000 to $40,000 are the same distance, both a doubling. That matches how income actually changes, and it spreads out the many countries at lower incomes."
+        },
+        {
+          "id": "c9-2",
+          "chapter": "c9",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "What is the \"gap instinct\"?",
+          "options": [
+            "Seeing the world as two separate groups with a gap between them, when most people are actually in the middle",
+            "Leaving white space between dashboard widgets",
+            "Ignoring missing data in a time series",
+            "Starting an axis above zero"
+          ],
+          "correct": [
+            "Seeing the world as two separate groups with a gap between them, when most people are actually in the middle"
+          ],
+          "explanation": "Rosling showed that most countries and most people sit in the middle of the income range. Charts that compare only two group averages can reinforce the false picture of a divided world."
+        },
+        {
+          "id": "c10-1",
+          "chapter": "c10",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "In Few's sales dashboard, why are bullet graphs used instead of speedometer gauges?",
+          "options": [
+            "They show actual, target and performance bands in a small space and are easy to compare",
+            "They look more modern than gauges",
+            "They show more colour",
+            "Gauges cannot show targets"
+          ],
+          "correct": [
+            "They show actual, target and performance bands in a small space and are easy to compare"
+          ],
+          "explanation": "A gauge uses a large circle to show one number. A bullet graph shows the same number plus target and bands in a thin strip, and several bullets stack neatly for comparison."
+        },
+        {
+          "id": "c10-2",
+          "chapter": "c10",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "covid19india.org used the same colour for \"Confirmed\" in every widget. Why does that help?",
+          "options": [
+            "Readers learn the colour once and connect related widgets instantly",
+            "It makes the page look brighter",
+            "It reduces the size of the page",
+            "It is required for maps"
+          ],
+          "correct": [
+            "Readers learn the colour once and connect related widgets instantly"
+          ],
+          "explanation": "Consistent colour is the Gestalt principle of similarity at work. The colour becomes a label, so readers link the counter, the map and the chart without reading."
+        },
+        {
+          "id": "final-1",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Four datasets share the same mean, variance, correlation and regression line. What can you conclude about them?",
+          "options": [
+            "Nothing about their shape until you plot them",
+            "They are the same dataset",
+            "They all have a linear relationship",
+            "They have no outliers"
+          ],
+          "correct": [
+            "Nothing about their shape until you plot them"
+          ],
+          "explanation": "This is Anscombe's lesson: identical summary statistics can hide completely different patterns."
+        },
+        {
+          "id": "final-2",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What was John Snow's key insight from mapping cholera deaths in 1854?",
+          "options": [
+            "Deaths clustered around one water pump, pointing to contaminated water",
+            "Cholera spread through bad air from sewers",
+            "Richer streets had fewer deaths",
+            "Deaths were evenly spread across Soho"
+          ],
+          "correct": [
+            "Deaths clustered around one water pump, pointing to contaminated water"
+          ],
+          "explanation": "The map showed deaths clustered around the Broad Street pump, supporting Snow's theory that cholera spread through water."
+        },
+        {
+          "id": "final-3",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which visual encoding do people judge most accurately?",
+          "options": [
+            "Position along a common scale",
+            "Area of circles",
+            "Angle of pie slices",
+            "Colour intensity"
+          ],
+          "correct": [
+            "Position along a common scale"
+          ],
+          "explanation": "Cleveland and McGill found position on a common scale to be the most accurate, which is why bar and dot charts are so effective."
+        },
+        {
+          "id": "final-4",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Aman Mart wants to show how last year's revenue became this year's revenue through each category's gain or loss. Which chart fits best?",
+          "options": [
+            "Waterfall chart",
+            "Scatter plot",
+            "Histogram",
+            "Heatmap"
+          ],
+          "correct": [
+            "Waterfall chart"
+          ],
+          "explanation": "A waterfall walks from a starting total through each positive and negative contribution to the ending total."
+        },
+        {
+          "id": "final-5",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "A manager wants to compare the shares of 11 product sub-categories. What is the better choice?",
+          "options": [
+            "A sorted bar chart",
+            "A pie chart with 11 slices",
+            "A 3D pie chart",
+            "A line chart"
+          ],
+          "correct": [
+            "A sorted bar chart"
+          ],
+          "explanation": "With many parts, pie slices become hard to rank and colours hard to match. A sorted bar chart stays readable."
+        },
+        {
+          "id": "final-6",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which title is most useful on a chart shown to the regional head?",
+          "options": [
+            "Dairy margin fell to 6% in Aug 2025, the lowest in two years",
+            "Dairy margin chart",
+            "Monthly margin analysis, FY 2025-26",
+            "Gross margin % by month (Dairy)"
+          ],
+          "correct": [
+            "Dairy margin fell to 6% in Aug 2025, the lowest in two years"
+          ],
+          "explanation": "An action title states the insight. The reader knows what to look for and why it matters."
+        },
+        {
+          "id": "final-7",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "You must show growth versus last year for 14 stores, some up and some down. Which colour palette fits best?",
+          "options": [
+            "Diverging, centred on zero growth",
+            "Sequential, light to dark",
+            "Rainbow",
+            "A different categorical colour per store"
+          ],
+          "correct": [
+            "Diverging, centred on zero growth"
+          ],
+          "explanation": "Growth has a meaningful midpoint (zero). A diverging palette shows at once which side each store falls on."
+        },
+        {
+          "id": "final-8",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What is wrong with this chart?",
+          "options": [
+            "The y-axis starts at ₹48 L, exaggerating a small difference",
+            "The bars should be the same colour",
+            "There are too few bars",
+            "The labels should be inside the bars"
+          ],
+          "correct": [
+            "The y-axis starts at ₹48 L, exaggerating a small difference"
+          ],
+          "explanation": "The real difference is about 4%, but because the axis starts at ₹48 L, one bar looks several times taller. Bar charts should start at zero."
+        },
+        {
+          "id": "final-9",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "A news channel says sales \"crashed 20%\" by comparing the Diwali month with January. What is the pitfall?",
+          "options": [
+            "A cherry-picked time window that ignores seasonality",
+            "A truncated y-axis",
+            "A dual axis",
+            "Too many KPIs"
+          ],
+          "correct": [
+            "A cherry-picked time window that ignores seasonality"
+          ],
+          "explanation": "Comparing a festive peak with an ordinary month creates a false decline. Compare with the same month last year, or show the full history."
+        },
+        {
+          "id": "final-10",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Why place four KPI cards along the top-left of a dashboard?",
+          "options": [
+            "The eye lands there first, so the most important numbers are seen in the first second",
+            "It leaves the centre free for decoration",
+            "KPI cards must always be the smallest widgets",
+            "It hides them from casual readers"
+          ],
+          "correct": [
+            "The eye lands there first, so the most important numbers are seen in the first second"
+          ],
+          "explanation": "Readers scan in a Z or F pattern starting at the top-left. That prime space belongs to the numbers that matter most."
+        },
+        {
+          "id": "final-11",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Aman Mart's dashboard shows yearly sales. The analyst clicks 2025 to see quarterly figures. What is this?",
+          "options": [
+            "Drill down",
+            "Roll up",
+            "Drill across",
+            "Dice"
+          ],
+          "correct": [
+            "Drill down"
+          ],
+          "explanation": "Moving from year to quarter goes one level deeper in the Time hierarchy."
+        },
+        {
+          "id": "final-12",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "From quarterly sales by city, the analyst goes back to yearly sales by region. What is this?",
+          "options": [
+            "Roll up",
+            "Drill down",
+            "Drill across",
+            "Slice"
+          ],
+          "correct": [
+            "Roll up"
+          ],
+          "explanation": "Rolling up re-aggregates detail into summary levels of the hierarchies."
+        },
+        {
+          "id": "final-13",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "The analyst jumps from \"Sales of Snacks in Latur, Dec 2025\" to \"Stock of Snacks for Latur at Madavi Warehouse, Dec 2025\". Why is this possible?",
+          "options": [
+            "Both datasets share the same product, location and time dimensions",
+            "Both datasets are stored in Excel",
+            "The warehouse data is a subset of sales data",
+            "Madavi Warehouse is in Latur"
+          ],
+          "correct": [
+            "Both datasets share the same product, location and time dimensions"
+          ],
+          "explanation": "Drill across works when two fact tables share conformed dimensions, so the same coordinates mean the same thing in both."
+        },
+        {
+          "id": "final-14",
+          "chapter": "c9",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "In Rosling's Gapminder bubble chart, what does the size of each bubble show?",
+          "options": [
+            "Population",
+            "Income per person",
+            "Life expectancy",
+            "Region"
+          ],
+          "correct": [
+            "Population"
+          ],
+          "explanation": "Bubble area shows population. Position shows income and life expectancy; colour shows region."
+        },
+        {
+          "id": "final-15",
+          "chapter": "c10",
+          "chapterSource": "module",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What makes the Our World in Data grapher especially good for exploration?",
+          "options": [
+            "Readers can switch between chart, map and table views and choose countries and years themselves",
+            "It uses 3D charts",
+            "It shows every indicator on one page",
+            "It hides sources to keep the page clean"
+          ],
+          "correct": [
+            "Readers can switch between chart, map and table views and choose countries and years themselves"
+          ],
+          "explanation": "Linked views plus reader control let people ask their own questions, while visible sources keep the work checkable."
+        }
+      ]
+    },
+    {
+      "id": "vnit-data-engineering",
+      "type": "module",
+      "position": 2,
+      "version": "593bf944c4",
+      "chapters": [
+        {
+          "id": "start",
+          "title": "Introduction",
+          "kind": "intro",
+          "position": 1
+        },
+        {
+          "id": "c1",
+          "title": "Where data engineering fits",
+          "kind": "chapter",
+          "position": 2
+        },
+        {
+          "id": "c2",
+          "title": "The data engineering lifecycle",
+          "kind": "chapter",
+          "position": 3
+        },
+        {
+          "id": "c3",
+          "title": "Source systems and ingestion",
+          "kind": "chapter",
+          "position": 4
+        },
+        {
+          "id": "c4",
+          "title": "Storage, modelling and transformation",
+          "kind": "chapter",
+          "position": 5
+        },
+        {
+          "id": "c5",
+          "title": "ETL, ELT and data engineering",
+          "kind": "chapter",
+          "position": 6
+        },
+        {
+          "id": "c6",
+          "title": "Data in motion",
+          "kind": "chapter",
+          "position": 7
+        },
+        {
+          "id": "c7",
+          "title": "Serving and Reverse ETL",
+          "kind": "chapter",
+          "position": 8
+        },
+        {
+          "id": "c8",
+          "title": "The undercurrents",
+          "kind": "chapter",
+          "position": 9
+        },
+        {
+          "id": "quiz",
+          "title": "Final quiz",
+          "kind": "quiz",
+          "position": 10
+        }
+      ],
+      "questions": [
+        {
+          "id": "c1a",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Aman Mart wants an AI model that predicts which customers will stop coming. Its bills are spread across three billing software and many bills have no phone number. What should Aman Mart do first?",
+          "options": [
+            "Bring the bills from all systems into one place and fix how customers are identified",
+            "Hire a deep learning expert to build the model straight away",
+            "Run A/B tests on discount coupons",
+            "Buy a powerful GPU server for training"
+          ],
+          "correct": [
+            "Bring the bills from all systems into one place and fix how customers are identified"
+          ],
+          "explanation": "In the hierarchy of needs, collection and reliable movement and storage of data come first. A model built on scattered, incomplete data cannot be trusted."
+        },
+        {
+          "id": "c1b",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which of these pieces of work is downstream of data engineering?",
+          "options": [
+            "A data scientist building a demand forecast from the cleaned sales table",
+            "Designing how bills move from the counters to the warehouse",
+            "Removing duplicate bills created when a counter goes offline and resyncs",
+            "Deciding how often to pull truck locations from Niharika Logistics"
+          ],
+          "correct": [
+            "A data scientist building a demand forecast from the cleaned sales table"
+          ],
+          "explanation": "The forecast uses data that data engineering has already prepared, so it sits downstream. The other three are data engineering work."
+        },
+        {
+          "id": "c2a",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Why does Storage run under Ingestion, Transformation and Serving in the lifecycle diagram?",
+          "options": [
+            "Data is stored at every step: raw after ingestion, clean after transformation and ready-to-use for serving",
+            "Data is stored only once, at the end of the pipeline",
+            "Storage is not needed when data is streamed",
+            "Storage is handled only by the source systems"
+          ],
+          "correct": [
+            "Data is stored at every step: raw after ingestion, clean after transformation and ready-to-use for serving"
+          ],
+          "explanation": "Every stage reads from and writes to storage. That is why it is drawn as a base under the other three."
+        },
+        {
+          "id": "c2b",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "At FoodJoe, which lifecycle stage is the data engineer usually not in control of?",
+          "options": [
+            "Generation: the order app and its database are run by the app development team",
+            "Ingestion: pulling orders from the app database into the lake",
+            "Transformation: joining orders with restaurant details",
+            "Serving: publishing daily order tables for analysts"
+          ],
+          "correct": [
+            "Generation: the order app and its database are run by the app development team"
+          ],
+          "explanation": "Source systems belong to application teams or outside partners. The data engineer must understand them and work with their owners, but does not run them."
+        },
+        {
+          "id": "c3a",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Dhanvanshi copies only rows whose updated_at is later than the last run. An order was cancelled and its row deleted from the app database. What happens in the warehouse?",
+          "options": [
+            "The deleted order stays in the warehouse, so sales are shown higher than they are",
+            "The pipeline removes the order automatically",
+            "The pipeline stops with an error",
+            "The order's amount becomes zero"
+          ],
+          "correct": [
+            "The deleted order stays in the warehouse, so sales are shown higher than they are"
+          ],
+          "explanation": "A deleted row has no timestamp left to find. Timestamp-based loads cannot see deletes. Change data capture reads the database's change log, which records deletes too."
+        },
+        {
+          "id": "c3b",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Why should heavy reports not run directly on the billing counters' database?",
+          "options": [
+            "It is an OLTP system built for fast small writes, and long analytical queries can slow down billing",
+            "OLTP databases cannot store decimal amounts",
+            "The billing database deletes all data every night",
+            "SQL does not allow analytical queries on OLTP systems"
+          ],
+          "correct": [
+            "It is an OLTP system built for fast small writes, and long analytical queries can slow down billing"
+          ],
+          "explanation": "OLTP systems are tuned for many small transactions. Large scans compete for the same resources, so analysis is done on a copy in an OLAP system."
+        },
+        {
+          "id": "c4a",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "For the question “total sales of Toor Dal 1 kg in 2025”, why is a column format such as Parquet faster than a row format?",
+          "options": [
+            "It reads only the product and amount columns instead of every column of every row",
+            "It stores fewer rows than a row format",
+            "It keeps all the data in memory all the time",
+            "It does not need any schema"
+          ],
+          "correct": [
+            "It reads only the product and amount columns instead of every column of every row"
+          ],
+          "explanation": "Column storage keeps each column together, so a query reads only the columns it needs. Columns of similar values also compress well."
+        },
+        {
+          "id": "c4b",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "In a star schema for Dhanvanshi's sales, which of these is the fact table?",
+          "options": [
+            "One row per item on each bill, with quantity and amount",
+            "One row per product, with name, brand and category",
+            "One row per branch, with city and manager",
+            "One row per date, with week, month and festival flag"
+          ],
+          "correct": [
+            "One row per item on each bill, with quantity and amount"
+          ],
+          "explanation": "The fact table holds the measurements of each event. The other three are dimension tables that describe those events."
+        },
+        {
+          "id": "c5a",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "It is November. Finance finds that GST was calculated wrongly for March and wants March sales recomputed. The counters keep bills for only 90 days. Which setup makes this easy?",
+          "options": [
+            "ELT, because raw bills were loaded and kept in the warehouse",
+            "ETL, because only corrected totals were loaded",
+            "Either one, because the counters still have the March bills",
+            "Neither, because transformed data can never be recomputed"
+          ],
+          "correct": [
+            "ELT, because raw bills were loaded and kept in the warehouse"
+          ],
+          "explanation": "The counters no longer have March bills. Only a setup that kept the raw data can rerun the transformation with the correct GST rule."
+        },
+        {
+          "id": "c5b",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which statement about ETL and data engineering is correct?",
+          "options": [
+            "ETL is one pattern within data engineering, which also covers streaming, storage design, serving, Reverse ETL and the undercurrents",
+            "Data engineering is simply a new name for ETL",
+            "ETL is used only for streaming data",
+            "Data engineering does not include moving data between systems"
+          ],
+          "correct": [
+            "ETL is one pattern within data engineering, which also covers streaming, storage design, serving, Reverse ETL and the undercurrents"
+          ],
+          "explanation": "ETL covers parts of ingestion and transformation in batch. Data engineering covers the full lifecycle and the practices underneath it."
+        },
+        {
+          "id": "c6a",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which Dhanvanshi use case most needs streaming data?",
+          "options": [
+            "Stopping the app from accepting orders for an item that has just sold out at the store",
+            "Filing the monthly GST return",
+            "Comparing this year's branch sales with last year's",
+            "Reviewing Kavya Distributors' delivery performance every quarter"
+          ],
+          "correct": [
+            "Stopping the app from accepting orders for an item that has just sold out at the store"
+          ],
+          "explanation": "Only the stock case loses value within minutes. The others work perfectly well with batch data."
+        },
+        {
+          "id": "c6b",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "A FoodJoe order placed at 12:58 reaches the server at 13:03. Counting by event time in 5-minute tumbling windows, which window does it belong to?",
+          "options": [
+            "12:55 to 13:00",
+            "13:00 to 13:05",
+            "13:05 to 13:10",
+            "Both 12:55 to 13:00 and 13:00 to 13:05"
+          ],
+          "correct": [
+            "12:55 to 13:00"
+          ],
+          "explanation": "Event time uses when the order was actually placed. A watermark decides how long the 12:55 window waits for such late arrivals."
+        },
+        {
+          "id": "c7a",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which of these is an example of Reverse ETL?",
+          "options": [
+            "Sending the list of “at risk” customers from the warehouse into the WhatsApp campaign tool every morning",
+            "Copying bills from branch counters into the warehouse every night",
+            "Building a branch sales dashboard on the warehouse",
+            "Training a forecasting model on the sales table"
+          ],
+          "correct": [
+            "Sending the list of “at risk” customers from the warehouse into the WhatsApp campaign tool every morning"
+          ],
+          "explanation": "Reverse ETL moves data from the warehouse back into operational tools. The first wrong option is normal ETL, and the other two are serving for analytics and ML."
+        },
+        {
+          "id": "c7b",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Farhan was in last week's “at risk” audience, but he visited the store 3 days ago. This week's sync runs in upsert mode. What happens to Farhan?",
+          "options": [
+            "He stays in the at-risk audience and may still get a “we miss you” message",
+            "He is removed from the audience",
+            "The sync stops because his segment changed",
+            "He is moved to the Loyal audience automatically"
+          ],
+          "correct": [
+            "He stays in the at-risk audience and may still get a “we miss you” message"
+          ],
+          "explanation": "Upsert only adds and updates the records it sends. Farhan is not in this week's list, so nothing touches his old record. Mirror mode would remove him."
+        },
+        {
+          "id": "c8a",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "The Kavya invoices extract fails one night. The pipeline runs as a DAG. What happens?",
+          "options": [
+            "Only tasks that depend on it, directly or indirectly, are held back; the sales dashboard still refreshes",
+            "Every task in the pipeline stops",
+            "The dependent tasks run on empty data",
+            "Only the very last task is affected"
+          ],
+          "correct": [
+            "Only tasks that depend on it, directly or indirectly, are held back; the sales dashboard still refreshes"
+          ],
+          "explanation": "The orchestrator follows the arrows. Clean purchases, stock position, the demand forecast and reorder suggestions wait. Tasks with no path from the failed task run as usual."
+        },
+        {
+          "id": "c8b",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which of these practices belongs to the DataOps undercurrent?",
+          "options": [
+            "An automatic check that alerts the team when today's bill count is 40% below normal",
+            "Showing masked phone numbers to analysts",
+            "Choosing between a data lake and a data warehouse",
+            "Keeping all SQL code in Git with code review"
+          ],
+          "correct": [
+            "An automatic check that alerts the team when today's bill count is 40% below normal"
+          ],
+          "explanation": "DataOps is about testing, monitoring and responding to problems. The others are security, data architecture and software engineering."
+        },
+        {
+          "id": "f1",
+          "chapter": "c2",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which five stages make up the data engineering lifecycle described by Reis and Housley?",
+          "options": [
+            "Generation, storage, ingestion, transformation, serving",
+            "Collect, clean, model, deploy, monitor",
+            "Extract, transform, load, report, archive",
+            "Plan, build, test, release, maintain"
+          ],
+          "correct": [
+            "Generation, storage, ingestion, transformation, serving"
+          ],
+          "explanation": "Generation happens in the source systems; ingestion, transformation and serving follow, with storage under all of them."
+        },
+        {
+          "id": "f2",
+          "chapter": "c1",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "In the data science hierarchy of needs, which layer includes cleaning and anomaly detection?",
+          "options": [
+            "Explore / Transform",
+            "Move / Store",
+            "Aggregate / Label",
+            "Learn / Optimize"
+          ],
+          "correct": [
+            "Explore / Transform"
+          ],
+          "explanation": "Explore and transform sits just above move and store. Cleaning and preparation happen here, before aggregation and modelling."
+        },
+        {
+          "id": "f3",
+          "chapter": "c3",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Kavya Distributors renames the column “Qty” to “Quantity” in its invoice file, and the load fails. What is this called?",
+          "options": [
+            "Schema drift",
+            "Data skew",
+            "A late-arriving event",
+            "A watermark"
+          ],
+          "correct": [
+            "Schema drift"
+          ],
+          "explanation": "Schema drift is an unannounced change in the structure of source data. Data contracts and schema checks help catch it."
+        },
+        {
+          "id": "f4",
+          "chapter": "c3",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What is the main advantage of change data capture over a nightly full load?",
+          "options": [
+            "It moves only the inserts, updates and deletes, including deletes that timestamp methods miss",
+            "It does not need any access to the source database",
+            "It removes the need for a data warehouse",
+            "It cleans the data automatically"
+          ],
+          "correct": [
+            "It moves only the inserts, updates and deletes, including deletes that timestamp methods miss"
+          ],
+          "explanation": "CDC reads the database's change log, so it is light and it also captures deletes."
+        },
+        {
+          "id": "f5",
+          "chapter": "c4",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "“Schema on read” is most closely linked with which of these?",
+          "options": [
+            "A data lake",
+            "A traditional data warehouse",
+            "The billing counters' OLTP database",
+            "A star schema"
+          ],
+          "correct": [
+            "A data lake"
+          ],
+          "explanation": "A lake stores files as they are and applies structure when they are read. Warehouses and OLTP databases check the schema when data is written."
+        },
+        {
+          "id": "f6",
+          "chapter": "c5",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Why did ELT become popular?",
+          "options": [
+            "Cloud warehouses made storage cheap and computing power easy to scale, so raw data could be loaded first and transformed inside",
+            "ETL tools stopped supporting SQL",
+            "Rules made it illegal to transform data before loading it",
+            "ELT needs no transformation at all"
+          ],
+          "correct": [
+            "Cloud warehouses made storage cheap and computing power easy to scale, so raw data could be loaded first and transformed inside"
+          ],
+          "explanation": "Once storage and compute in the warehouse became cheap and elastic, keeping raw data and transforming it inside became the practical choice."
+        },
+        {
+          "id": "f7",
+          "chapter": "c5",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "When is transforming data before loading it still the better choice?",
+          "options": [
+            "When phone numbers must be masked before any data leaves Dhanvanshi's own servers",
+            "When analysts want raw data kept for future questions",
+            "When the warehouse has plenty of cheap computing power",
+            "When business questions change very often"
+          ],
+          "correct": [
+            "When phone numbers must be masked before any data leaves Dhanvanshi's own servers"
+          ],
+          "explanation": "If sensitive data must never reach the cloud unmasked, it has to be changed before the load. The other three situations favour ELT."
+        },
+        {
+          "id": "f8",
+          "chapter": "c6",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "UPI handled 24.51 billion transactions in August 2026. Roughly how many is that per second, on average?",
+          "options": [
+            "About 9,000",
+            "About 900",
+            "About 90,000",
+            "About 9 lakh"
+          ],
+          "correct": [
+            "About 9,000"
+          ],
+          "explanation": "24.51 billion ÷ (31 days × 86,400 seconds) ≈ 9,150 transactions a second, all day and night."
+        },
+        {
+          "id": "f9",
+          "chapter": "c6",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What does a 10-minute tumbling window mean?",
+          "options": [
+            "Fixed 10-minute blocks that do not overlap, such as 12:00 to 12:10 and 12:10 to 12:20",
+            "A 10-minute window that moves forward every minute, so windows overlap",
+            "A window that closes after 10 minutes with no activity",
+            "The last 10 events, whatever their time"
+          ],
+          "correct": [
+            "Fixed 10-minute blocks that do not overlap, such as 12:00 to 12:10 and 12:10 to 12:20"
+          ],
+          "explanation": "Tumbling windows are fixed and non-overlapping. The overlapping one is a sliding window, and the gap-based one is a session window."
+        },
+        {
+          "id": "f10",
+          "chapter": "c7",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which of these is a typical destination for Reverse ETL?",
+          "options": [
+            "A CRM or marketing tool used by frontline teams",
+            "The raw layer of the data lake",
+            "A backup copy of the billing database",
+            "An archive of Parquet files"
+          ],
+          "correct": [
+            "A CRM or marketing tool used by frontline teams"
+          ],
+          "explanation": "Reverse ETL delivers warehouse data into operational tools where people act on it."
+        },
+        {
+          "id": "f11",
+          "chapter": "c7",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which risk is specific to Reverse ETL?",
+          "options": [
+            "Overwriting fields that staff have typed by hand into the operational tool",
+            "Losing raw data before it reaches the warehouse",
+            "Missing deleted rows in a timestamp-based load",
+            "Slow queries on columnar files"
+          ],
+          "correct": [
+            "Overwriting fields that staff have typed by hand into the operational tool"
+          ],
+          "explanation": "Reverse ETL writes into live business tools. If a sync overwrites a field that sales staff maintain by hand, their work is lost."
+        },
+        {
+          "id": "f12",
+          "chapter": "c8",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "What does an orchestration tool such as Apache Airflow mainly do?",
+          "options": [
+            "Runs tasks in the right order, retries failures and shows which step failed",
+            "Stores data in a columnar format",
+            "Replaces the need to write SQL",
+            "Encrypts data at rest"
+          ],
+          "correct": [
+            "Runs tasks in the right order, retries failures and shows which step failed"
+          ],
+          "explanation": "Orchestration coordinates a DAG of tasks: dependencies, schedules, retries and visibility into each run."
+        }
+      ]
+    },
+    {
+      "id": "vnit-market-basket",
+      "type": "module",
+      "position": 3,
+      "version": "b0fc731698",
+      "chapters": [
+        {
+          "id": "start",
+          "title": "Introduction",
+          "kind": "intro",
+          "position": 1
+        },
+        {
+          "id": "m1",
+          "title": "Transactions and itemsets",
+          "kind": "chapter",
+          "position": 2
+        },
+        {
+          "id": "m2",
+          "title": "Support",
+          "kind": "chapter",
+          "position": 3
+        },
+        {
+          "id": "m3",
+          "title": "Confidence",
+          "kind": "chapter",
+          "position": 4
+        },
+        {
+          "id": "m4",
+          "title": "Lift",
+          "kind": "chapter",
+          "position": 5
+        },
+        {
+          "id": "m6",
+          "title": "Association rules",
+          "kind": "chapter",
+          "position": 6
+        },
+        {
+          "id": "m7",
+          "title": "Apriori algorithm",
+          "kind": "chapter",
+          "position": 7
+        },
+        {
+          "id": "m8",
+          "title": "10 solved problems",
+          "kind": "practice",
+          "position": 8
+        },
+        {
+          "id": "m9",
+          "title": "Rule finder",
+          "kind": "practice",
+          "position": 9
+        },
+        {
+          "id": "m10",
+          "title": "Quiz",
+          "kind": "quiz",
+          "position": 10
+        },
+        {
+          "id": "m11",
+          "title": "Summary sheet",
+          "kind": "summary",
+          "position": 11
+        }
+      ],
+      "questions": [
+        {
+          "id": "final-1",
+          "chapter": "m2",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Store data: what is the support of {Bread, Butter}?",
+          "options": [
+            "0.30",
+            "0.50",
+            "0.71",
+            "1.00"
+          ],
+          "correct": [
+            "0.50"
+          ],
+          "explanation": "Five of the ten bills (01, 02, 04, 07, 08) contain both items, so Support = 5/10 = 0.50."
+        },
+        {
+          "id": "final-2",
+          "chapter": "m3",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Store data: what is Confidence(Butter → Bread)?",
+          "options": [
+            "0.50",
+            "0.71",
+            "1.00",
+            "1.43"
+          ],
+          "correct": [
+            "1.00"
+          ],
+          "explanation": "All five bills with butter also contain bread: 5/5 = 1.00. In the reverse direction, Confidence(Bread → Butter) is only 5/7 = 0.71."
+        },
+        {
+          "id": "final-3",
+          "chapter": "m4",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Store data: what is the lift of Tea → Bread?",
+          "options": [
+            "0.33",
+            "0.48",
+            "0.70",
+            "1.43"
+          ],
+          "correct": [
+            "0.48"
+          ],
+          "explanation": "Confidence = 1/3 = 0.33 and Support(Bread) = 0.70, so Lift = 0.33 / 0.70 = 0.48. Tea buyers are less likely than average to buy bread."
+        },
+        {
+          "id": "final-4",
+          "chapter": "m4",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "A rule has confidence 0.80, and its consequent appears in 80% of all bills. What is the lift, and what does it mean?",
+          "options": [
+            "1.6: strong positive association",
+            "1.0: the items are independent",
+            "0.8: negative association",
+            "It cannot be found without the support"
+          ],
+          "correct": [
+            "1.0: the items are independent"
+          ],
+          "explanation": "Lift = 0.80 / 0.80 = 1. The high confidence only shows that the consequent is a popular item."
+        },
+        {
+          "id": "final-5",
+          "chapter": "m4",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Which measure gives the same value for X → Y and Y → X?",
+          "options": [
+            "Confidence",
+            "Lift",
+            "Both confidence and lift",
+            "Neither"
+          ],
+          "correct": [
+            "Lift"
+          ],
+          "explanation": "Lift = Support(X ∪ Y) / (Support(X) × Support(Y)), which does not depend on the direction. Confidence changes because its denominator changes."
+        },
+        {
+          "id": "final-6",
+          "chapter": "m7",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "The Apriori property states that:",
+          "options": [
+            "If an itemset is frequent, all its supersets are frequent",
+            "If an itemset is infrequent, all its supersets are infrequent",
+            "Confidence always increases as itemsets grow",
+            "Lift is always above 1 for frequent itemsets"
+          ],
+          "correct": [
+            "If an itemset is infrequent, all its supersets are infrequent"
+          ],
+          "explanation": "Support can only decrease as items are added, so every superset of an infrequent itemset is also infrequent. This is what makes pruning possible."
+        },
+        {
+          "id": "final-7",
+          "chapter": "m7",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "Store data with minimum support = 3 bills: why is {Bread, Eggs, Milk} pruned without being counted?",
+          "options": [
+            "Eggs appears in fewer than 3 bills",
+            "{Bread, Eggs} appears in only 2 bills",
+            "{Eggs, Milk} is not frequent",
+            "Its confidence is below 70%"
+          ],
+          "correct": [
+            "{Bread, Eggs} appears in only 2 bills"
+          ],
+          "explanation": "{Bread, Eggs} has a count of 2, which is below the minimum, so no superset of it can be frequent. Eggs alone (count 4) and {Eggs, Milk} (count 3) are both frequent."
+        },
+        {
+          "id": "final-8",
+          "chapter": "m6",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "How many association rules are possible with 6 items?",
+          "options": [
+            "62",
+            "364",
+            "602",
+            "729"
+          ],
+          "correct": [
+            "602"
+          ],
+          "explanation": "R = 3⁶ − 2⁷ + 1 = 729 − 128 + 1 = 602."
+        },
+        {
+          "id": "final-9",
+          "chapter": "m6",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "For rules made from the same frequent itemset {A, B, C}, which statement is always true?",
+          "options": [
+            "Confidence(A → B, C) ≥ Confidence(A, B → C)",
+            "Confidence(A, B → C) ≥ Confidence(A → B, C)",
+            "Both confidences are always equal",
+            "Their supports are different"
+          ],
+          "correct": [
+            "Confidence(A, B → C) ≥ Confidence(A → B, C)"
+          ],
+          "explanation": "Both rules have the same numerator, Support(A, B, C). The denominator Support(A, B) is at most Support(A), so Confidence(A, B → C) is at least Confidence(A → B, C)."
+        },
+        {
+          "id": "final-10",
+          "chapter": "m4",
+          "chapterSource": "proposed",
+          "kind": "final_quiz",
+          "type": "single",
+          "text": "A rule has support 0.002 and lift 12. What should the analyst do?",
+          "options": [
+            "Act on it immediately because the lift is very high",
+            "Treat it with caution because very few bills support it",
+            "Increase minimum confidence to 100%",
+            "Reject every rule whose lift is above 10"
+          ],
+          "correct": [
+            "Treat it with caution because very few bills support it"
+          ],
+          "explanation": "A very high lift on a very small support usually comes from a handful of bills. The rule should be checked on more data before any action is taken."
+        }
+      ]
+    },
+    {
+      "id": "vnit-inventory-forecasting",
+      "type": "module",
+      "position": 4,
+      "version": "1dcf88cbfb",
+      "chapters": [
+        {
+          "id": "start",
+          "title": "Introduction",
+          "kind": "intro",
+          "position": 1
+        },
+        {
+          "id": "c1",
+          "title": "Nodes and flows",
+          "kind": "chapter",
+          "position": 2
+        },
+        {
+          "id": "c2",
+          "title": "Logistics and distribution",
+          "kind": "chapter",
+          "position": 3
+        },
+        {
+          "id": "c3",
+          "title": "Inventory types and costs",
+          "kind": "chapter",
+          "position": 4
+        },
+        {
+          "id": "c4",
+          "title": "Lead time and MoQ",
+          "kind": "chapter",
+          "position": 5
+        },
+        {
+          "id": "c5",
+          "title": "Service level and safety stock",
+          "kind": "chapter",
+          "position": 6
+        },
+        {
+          "id": "c6",
+          "title": "Reorder point and replenishment",
+          "kind": "chapter",
+          "position": 7
+        },
+        {
+          "id": "c7",
+          "title": "Demand forecasting",
+          "kind": "chapter",
+          "position": 8
+        },
+        {
+          "id": "c8",
+          "title": "DOI, turnover and ABC",
+          "kind": "chapter",
+          "position": 9
+        },
+        {
+          "id": "c9",
+          "title": "Capstone: monthly plan",
+          "kind": "practice",
+          "position": 10
+        },
+        {
+          "id": "c10",
+          "title": "Practice problems",
+          "kind": "practice",
+          "position": 11
+        }
+      ],
+      "questions": [
+        {
+          "id": "c1a",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "In which direction does money flow in the toor dal supply chain?",
+          "options": [
+            "From the customer towards Latur Dal Mill (upstream)",
+            "From Latur Dal Mill towards the customer (downstream)",
+            "Only between Dhanvanshi Super Store and its customers",
+            "It does not move along the chain; each node pays only the transporter"
+          ],
+          "correct": [
+            "From the customer towards Latur Dal Mill (upstream)"
+          ],
+          "explanation": "Each buyer pays its supplier: the customer pays Dhanvanshi, Dhanvanshi pays Kavya Distributors, and Kavya pays the mill. So money moves upstream, opposite to the material."
+        },
+        {
+          "id": "c1b",
+          "chapter": "c1",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which of the following is not a node in the toor dal supply chain?",
+          "options": [
+            "The Niharika Logistics truck route from Kavya Distributors to Madavi Warehouse",
+            "Madavi Warehouse",
+            "Arjun C&F Agent",
+            "Nithansh Stockists"
+          ],
+          "correct": [
+            "The Niharika Logistics truck route from Kavya Distributors to Madavi Warehouse"
+          ],
+          "explanation": "A node is a place where stock is made, stored or sold. The truck route is a link between two nodes. Stock on the truck is pipeline stock."
+        },
+        {
+          "id": "c2a",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Niharika Logistics charges ₹18,000 per full truck (FTL) and ₹3 per kg for part load (PTL). Kavya Distributors has to send 4,500 kg. Which option is cheaper?",
+          "options": [
+            "PTL, costing ₹13,500",
+            "FTL, costing ₹18,000",
+            "Both cost the same",
+            "FTL, because a full truck is always cheaper per kg"
+          ],
+          "correct": [
+            "PTL, costing ₹13,500"
+          ],
+          "explanation": "PTL costs 4,500 &times; 3 = ₹13,500. The load is below the break-even of 18,000 &divide; 3 = 6,000 kg, so PTL is cheaper, though it may take a day or two longer."
+        },
+        {
+          "id": "c2b",
+          "chapter": "c2",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Madavi Warehouse does not have enough toor dal to meet every branch's need until the next truck. What does fair share allocation try to do?",
+          "options": [
+            "Give every branch the same days of cover, so all branches run short at about the same time",
+            "Give every branch the same number of packs",
+            "Send all the stock to the branch with the highest sales",
+            "Supply the branches in the order in which their indents arrived"
+          ],
+          "correct": [
+            "Give every branch the same days of cover, so all branches run short at about the same time"
+          ],
+          "explanation": "Fair share brings all branches to equal days of cover. An equal number of packs ignores the difference in demand and stock between branches."
+        },
+        {
+          "id": "c3a",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Five tonnes of toor dal is on a Niharika Logistics truck between Kavya Distributors and Madavi Warehouse. What type of inventory is it?",
+          "options": [
+            "Pipeline (in-transit) stock",
+            "Safety stock",
+            "Anticipation stock",
+            "Dead stock"
+          ],
+          "correct": [
+            "Pipeline (in-transit) stock"
+          ],
+          "explanation": "Stock that has been dispatched but not yet received is pipeline stock. It is still inventory and still blocks money."
+        },
+        {
+          "id": "c3b",
+          "chapter": "c3",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Madavi Warehouse doubles its order quantity for toor dal from 1,000 to 2,000 packs. Safety stock does not change. What happens?",
+          "options": [
+            "Average cycle stock doubles and the number of orders per year halves",
+            "Average cycle stock halves and the number of orders per year doubles",
+            "Both average stock and the number of orders per year double",
+            "Only the safety stock goes up"
+          ],
+          "correct": [
+            "Average cycle stock doubles and the number of orders per year halves"
+          ],
+          "explanation": "Average cycle stock is Q &divide; 2, so it goes from 500 to 1,000 packs. Orders per year are D &divide; Q, so they fall from 43.8 to 21.9."
+        },
+        {
+          "id": "c4a",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which is the correct way to measure lead time for Madavi Warehouse?",
+          "options": [
+            "From raising the order to the stock being received, checked and ready to issue",
+            "From dispatch at Kavya Distributors to arrival at Madavi Warehouse",
+            "From raising the order to dispatch at Kavya Distributors",
+            "Only the travel time of the Niharika Logistics truck"
+          ],
+          "correct": [
+            "From raising the order to the stock being received, checked and ready to issue"
+          ],
+          "explanation": "Lead time covers everything between raising the order and being able to use the stock: processing, dispatch, transit, unloading, quality check and GRN."
+        },
+        {
+          "id": "c4b",
+          "chapter": "c4",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Madavi Warehouse needs 400 packs of an item, but the supplier's MoQ is 1,000 packs, so it orders 1,000. What happens to the extra 600 packs?",
+          "options": [
+            "They stay in stock and block working capital until they are sold",
+            "They become safety stock, so the reorder point can be set to zero",
+            "The supplier takes them back at the end of the month",
+            "They reduce the lead time of the next order"
+          ],
+          "correct": [
+            "They stay in stock and block working capital until they are sold"
+          ],
+          "explanation": "The extra quantity is additional cycle stock. It does not change demand or lead time, so the reorder point stays the same; the next order is simply delayed until the stock is used."
+        },
+        {
+          "id": "c5a",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "What does a 95% cycle service level mean?",
+          "options": [
+            "In 95 out of 100 order cycles, stock does not run out before the next delivery",
+            "95% of every customer's demand is met from stock",
+            "The shelf is full 95% of the time",
+            "95% of the supplier's deliveries arrive on time"
+          ],
+          "correct": [
+            "In 95 out of 100 order cycles, stock does not run out before the next delivery"
+          ],
+          "explanation": "Cycle service level counts order cycles without a stock-out. The share of demand met from stock is the fill rate, a different measure."
+        },
+        {
+          "id": "c5b",
+          "chapter": "c5",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "The lead time of an item increases from 4 days to 16 days, and daily demand variation stays the same. What happens to the safety stock?",
+          "options": [
+            "It doubles",
+            "It becomes four times as large",
+            "It stays the same",
+            "It increases by 12 days of demand"
+          ],
+          "correct": [
+            "It doubles"
+          ],
+          "explanation": "Safety stock depends on &radic;L. &radic;16 &divide; &radic;4 = 4 &divide; 2 = 2, so safety stock doubles."
+        },
+        {
+          "id": "c6a",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Daily demand is 50 units, lead time is 6 days and safety stock is 40 units. What is the reorder point?",
+          "options": [
+            "340 units",
+            "300 units",
+            "260 units",
+            "90 units"
+          ],
+          "correct": [
+            "340 units"
+          ],
+          "explanation": "ROP = d &times; L + SS = 50 &times; 6 + 40 = 340 units."
+        },
+        {
+          "id": "c6b",
+          "chapter": "c6",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Dhanvanshi's Civil Lines branch counts its stock every Monday and orders enough to bring it up to a fixed level. Which policy is this?",
+          "options": [
+            "Periodic review, order-up-to (R, S)",
+            "Continuous review, fixed quantity (s, Q)",
+            "Economic Order Quantity ordering",
+            "Ordering only when the shelf is empty"
+          ],
+          "correct": [
+            "Periodic review, order-up-to (R, S)"
+          ],
+          "explanation": "A fixed review day and a variable order quantity up to a target level is the periodic review (R, S) policy."
+        },
+        {
+          "id": "c7a",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "In simple exponential smoothing, what happens when &alpha; is increased from 0.2 to 0.8?",
+          "options": [
+            "The forecast reacts faster to recent sales, but also follows random ups and downs",
+            "The forecast becomes smoother and slower to react",
+            "The forecast ignores the latest month",
+            "The forecast error always goes down"
+          ],
+          "correct": [
+            "The forecast reacts faster to recent sales, but also follows random ups and downs"
+          ],
+          "explanation": "With &alpha; = 0.8, 80% of the new forecast comes from the latest month, so the forecast follows recent sales closely, including random noise."
+        },
+        {
+          "id": "c7b",
+          "chapter": "c7",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Over six months, the bias (average of Actual &minus; Forecast) is +250 packs. What is the risk?",
+          "options": [
+            "Forecasts are usually too low, so stock-outs are likely",
+            "Forecasts are usually too high, so extra stock will pile up",
+            "There is no risk, since a positive bias means the forecast is accurate",
+            "There is no risk as long as MAPE is below 10%"
+          ],
+          "correct": [
+            "Forecasts are usually too low, so stock-outs are likely"
+          ],
+          "explanation": "A positive bias means actual sales are, on average, higher than the forecast. Stock planned on this forecast will fall short."
+        },
+        {
+          "id": "c8a",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "A warehouse holds stock worth ₹30 lakh. Its annual cost of goods sold is ₹3.65 crore. What is its days of inventory?",
+          "options": [
+            "30 days",
+            "12 days",
+            "73 days",
+            "10 days"
+          ],
+          "correct": [
+            "30 days"
+          ],
+          "explanation": "Daily COGS = ₹3.65 crore &divide; 365 = ₹1 lakh. DOI = 30 &divide; 1 = 30 days. Turnover = 365 &divide; 30 = about 12 times a year."
+        },
+        {
+          "id": "c8b",
+          "chapter": "c8",
+          "chapterSource": "module",
+          "kind": "quick_check",
+          "type": "single",
+          "text": "Which statement about class A items in ABC analysis is correct?",
+          "options": [
+            "They are a small number of items that make up most of the consumption value, so they need the closest control",
+            "They are the items with the highest number of units sold",
+            "They are low-cost items that can be bought in bulk",
+            "They are slow-moving items that should be cleared"
+          ],
+          "correct": [
+            "They are a small number of items that make up most of the consumption value, so they need the closest control"
+          ],
+          "explanation": "ABC ranks items by annual consumption value, not units. A few items, such as basmati rice and sunflower oil at Madavi Warehouse, carry most of the value."
+        }
+      ]
+    },
+    {
+      "id": "vnit-eternal-dashboard",
+      "type": "dashboard",
+      "position": 5,
+      "version": "68d408d040",
+      "chapters": [],
+      "questions": []
+    }
+  ]
+}

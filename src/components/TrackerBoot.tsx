@@ -38,7 +38,7 @@ export default function TrackerBoot({ config }: { config: TrackerConfig }) {
       settings,
     };
     const s = document.createElement("script");
-    s.src = "/tracker.js?v=1";
+    s.src = "/tracker.js?v=2";
     s.async = true;
     document.head.appendChild(s);
   }, [sessionId, loginUrl, settings, module, title]);

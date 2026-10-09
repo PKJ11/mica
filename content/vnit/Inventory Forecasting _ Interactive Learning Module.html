@@ -994,16 +994,23 @@ function mcqHTML(q,num){
   const opts=q.order.map(o=>{let cls="";if(done){if(o===q.correct)cls="right";else if(o===chosen)cls="wrong";}
     return `<button class="opt ${cls}" data-qid="${q.id}" data-o="${encodeURIComponent(o)}" ${done?"disabled":""}>${o}</button>`;}).join("");
   const ok=chosen===q.correct;
-  return `<div class="qz" id="q-${q.id}"><div class="qp">${num?num+". ":""}${q.p}</div><div class="opts">${opts}</div>${done?`<p class="why"><b style="color:${ok?"var(--pos)":"var(--neg)"}">${ok?"Correct.":"Not correct."}</b> ${q.why}${ok?"":` <button class="again" data-again="${q.id}">Try again</button>`}</p>`:""}</div>`;
+  return `<div class="qz" id="q-${q.id}" data-trk-q="${q.id}"><div class="qp">${num?num+". ":""}${q.p}</div><div class="opts">${opts}</div>${done?`<p class="why"><b style="color:${ok?"var(--pos)":"var(--neg)"}">${ok?"Correct.":"Not correct."}</b> ${q.why}${ok?"":` <button class="again" data-again="${q.id}">Try again</button>`}</p>`:""}</div>`;
 }
 function renderSet(box){const qs=MCQ[box.dataset.set]||[];box.innerHTML=qs.map((q,i)=>mcqHTML(q,i+1)).join("");}
 function rerenderQ(id){const q=QALL.find(x=>x.id===id);const el=document.getElementById("q-"+id);if(!q||!el)return;
   const num=q.set.startsWith("p")?0:(MCQ[q.set].indexOf(q)+1);el.outerHTML=mcqHTML(q,num);}
+/* activity tracking: answers and completed question sets */
+function trkAnswer(id){
+  const q=QALL.find(x=>x.id===id);if(!window.__trk||!q)return;
+  __trk.answer({id,chosen:mcqAns[id],correct:mcqAns[id]===q.correct});
+  const qs=MCQ[q.set]||[];
+  if(qs.every(x=>mcqAns[x.id]!==undefined))__trk.track("quiz_submitted",{quiz:q.set,kind:q.set==="final"?"final_quiz":"quick_check",score:qs.filter(x=>mcqAns[x.id]===x.correct).length,total:qs.length});
+}
 document.addEventListener("click",ev=>{
   const b=ev.target.closest("button.opt[data-qid]");
-  if(b){mcqAns[b.dataset.qid]=decodeURIComponent(b.dataset.o);store.set("inv-module-mcq",mcqAns);rerenderQ(b.dataset.qid);return;}
+  if(b){mcqAns[b.dataset.qid]=decodeURIComponent(b.dataset.o);store.set("inv-module-mcq",mcqAns);trkAnswer(b.dataset.qid);rerenderQ(b.dataset.qid);return;}
   const a=ev.target.closest("button.again");
-  if(a){delete mcqAns[a.dataset.again];store.set("inv-module-mcq",mcqAns);rerenderQ(a.dataset.again);}
+  if(a){window.__trk&&(__trk.resetQuestions([a.dataset.again]),__trk.track("question_retry",{question:a.dataset.again}));delete mcqAns[a.dataset.again];store.set("inv-module-mcq",mcqAns);rerenderQ(a.dataset.again);}
 });
 function finaliseMCQ(){
   const pos=positions(QALL.length,4);

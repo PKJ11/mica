@@ -8,7 +8,12 @@ import { seed } from "./seed";
  * - USE_PGLITE=1 (local testing): an embedded PGlite database in `.data/pglite`, so test runs never touch Neon.
  */
 type Row = Record<string, unknown>;
-type Driver = { query<T extends Row>(text: string, params?: unknown[]): Promise<T[]> };
+type Querier = { query<T extends Row>(text: string, params?: unknown[]): Promise<T[]> };
+type Driver = Querier & {
+  /** Runs fn on one connection inside BEGIN … COMMIT; rolls back if it throws. */
+  transaction<R>(fn: (tx: Querier) => Promise<R>): Promise<R>;
+};
+export type { Querier };
 
 type DbGlobal = { __db?: Promise<Driver> };
 const g = globalThis as DbGlobal;
@@ -26,6 +31,25 @@ async function connect(): Promise<Driver> {
       async query<T extends Row>(text: string, params: unknown[] = []) {
         return (await pool.query(text, params)).rows as T[];
       },
+      async transaction(fn) {
+        const client = await pool.connect();
+        const tx: Querier = {
+          async query<T extends Row>(text: string, params: unknown[] = []) {
+            return (await client.query(text, params)).rows as T[];
+          },
+        };
+        try {
+          await client.query("BEGIN");
+          const result = await fn(tx);
+          await client.query("COMMIT");
+          return result;
+        } catch (err) {
+          await client.query("ROLLBACK").catch(() => {});
+          throw err;
+        } finally {
+          client.release();
+        }
+      },
     };
   } else {
     // Serverless disks are temporary: an embedded database there would silently lose every event.
@@ -38,6 +62,15 @@ async function connect(): Promise<Driver> {
     driver = {
       async query<T extends Row>(text: string, params: unknown[] = []) {
         return (await pg.query<T>(text, params)).rows;
+      },
+      async transaction(fn) {
+        return pg.transaction((t) =>
+          fn({
+            async query<T extends Row>(text: string, params: unknown[] = []) {
+              return (await t.query<T>(text, params)).rows;
+            },
+          }),
+        );
       },
     };
   }
@@ -67,6 +100,10 @@ function db(): Promise<Driver> {
 
 export async function query<T extends Row = Row>(text: string, params?: unknown[]): Promise<T[]> {
   return (await db()).query<T>(text, params);
+}
+
+export async function transaction<R>(fn: (tx: Querier) => Promise<R>): Promise<R> {
+  return (await db()).transaction(fn);
 }
 
 export async function queryOne<T extends Row = Row>(text: string, params?: unknown[]): Promise<T | null> {

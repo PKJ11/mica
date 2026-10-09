@@ -23,5 +23,12 @@ export const SETTINGS = {
   serverGraceMs: ms("SERVER_GRACE_MS", 60_000),
 };
 
+/** Score bands (section 8): strong from 80 %, developing from 50 %, no band on fewer than 3 questions. */
+export const BANDS = {
+  strongFrom: 80,
+  developingFrom: 50,
+  minQuestions: 3,
+};
+
 /** Bump when the "What we record" text changes; everyone is asked to agree again (S2). */
 export const NOTICE_VERSION = "2026-10-v1";

@@ -1035,13 +1035,19 @@ const EX=[];
   ];
   let ans=store.get("mba-module-quiz")||{};
   const box=$("#qz");
+  /* activity tracking: answers and the completed quiz */
+  function trk(i){
+    if(!window.__trk)return;
+    __trk.answer({id:"final-"+(i+1),chosen:Q[i].o[ans[i]],correct:ans[i]===Q[i].a});
+    if(Object.keys(ans).length===Q.length)__trk.track("quiz_submitted",{quiz:"final",kind:"final_quiz",score:Q.filter((q,k)=>ans[k]===q.a).length,total:Q.length});
+  }
   function score(){const n=Object.keys(ans).length,c=Object.keys(ans).filter(k=>ans[k]===Q[k].a).length;$("#qz-score").textContent=`Score: ${c} out of ${n} attempted (${Q.length} questions)`;}
   function render(){
-    box.innerHTML=Q.map((q,i)=>{const done=i in ans;return `<div class="qz"><div class="qp">${i+1}. ${q.p}</div><div class="opts">${q.o.map((o,j)=>{let cls="";if(done){if(j===q.a)cls="right";else if(j===ans[i])cls="wrong";}return `<button class="opt ${cls}" data-q="${i}" data-o="${j}" ${done?"disabled":""}>${o}</button>`;}).join("")}</div>${done?`<p class="why"><b style="color:${ans[i]===q.a?"var(--pos)":"var(--neg)"}">${ans[i]===q.a?"Correct.":"Incorrect."}</b> ${q.w}</p>`:""}</div>`;}).join("");
+    box.innerHTML=Q.map((q,i)=>{const done=i in ans;return `<div class="qz" data-trk-q="final-${i+1}"><div class="qp">${i+1}. ${q.p}</div><div class="opts">${q.o.map((o,j)=>{let cls="";if(done){if(j===q.a)cls="right";else if(j===ans[i])cls="wrong";}return `<button class="opt ${cls}" data-q="${i}" data-o="${j}" ${done?"disabled":""}>${o}</button>`;}).join("")}</div>${done?`<p class="why"><b style="color:${ans[i]===q.a?"var(--pos)":"var(--neg)"}">${ans[i]===q.a?"Correct.":"Incorrect."}</b> ${q.w}</p>`:""}</div>`;}).join("");
     score();
   }
-  box.addEventListener("click",e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;ans[b.dataset.q]=+b.dataset.o;store.set("mba-module-quiz",ans);render();});
-  $("#qz-reset").addEventListener("click",()=>{ans={};store.set("mba-module-quiz",ans);render();});
+  box.addEventListener("click",e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;ans[b.dataset.q]=+b.dataset.o;store.set("mba-module-quiz",ans);trk(+b.dataset.q);render();});
+  $("#qz-reset").addEventListener("click",()=>{window.__trk&&(__trk.resetQuestions(Q.map((_,k)=>"final-"+(k+1))),__trk.track("quiz_retaken",{quiz:"final"}));ans={};store.set("mba-module-quiz",ans);render();});
   render();
 })();
 })();

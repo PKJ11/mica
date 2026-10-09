@@ -14,7 +14,7 @@ const versions = new Map<string, string>();
 function injectTracker(html: string, cfg: Record<string, unknown>): string {
   // JSON inside <script>: escape "<" so "</script>" in data cannot end the tag.
   const json = JSON.stringify(cfg).replace(/</g, "\\u003c");
-  const tags = `<script>window.__TRK_CFG=${json};</script><script src="/tracker.js?v=1"></script>`;
+  const tags = `<script>window.__TRK_CFG=${json};</script><script src="/tracker.js?v=2"></script>`;
   const m = html.match(/<head[^>]*>/i);
   if (m && m.index !== undefined) {
     const at = m.index + m[0].length;

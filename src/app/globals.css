@@ -486,3 +486,130 @@ a.activity-card:hover {
   .viewer-title .tag { display: none; }
   .btn-download { padding: 7px 10px; }
 }
+
+/* ---------- Summary freshness ---------- */
+.summary-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.btn-small {
+  background: var(--white);
+  color: var(--red);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-small:hover { border-color: var(--red); }
+
+/* ---------- Staff screens (I1–I4) ---------- */
+/* Chart tokens: one validated blue for single-series marks, a darker step for the selected mark,
+   hairline grid, and the fixed status steps for score bands (always with an icon and a label). */
+.staff {
+  --chart-1: #2a78d6;
+  --chart-strong: #104281;
+  --chart-grid: #e8e6e3;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --critical: #d03b3b;
+  background: var(--paper);
+  min-height: 100vh;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.staff-shell { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 28px; padding: 28px 20px 72px; }
+.staff-nav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 88px; align-self: start; }
+.staff-nav a { padding: 9px 12px; border-radius: 8px; font-weight: 500; color: var(--ink); }
+.staff-nav a:hover { background: var(--white); }
+.staff-nav a.active { background: var(--white); color: var(--red); font-weight: 600; box-shadow: var(--shadow); }
+.staff-main { min-width: 0; }
+.staff-header .page-title { margin-top: 0; }
+.staff-main .grid { margin-top: 20px; }
+.staff-main .table-wrap { margin-top: 12px; }
+
+.filter-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 10px; }
+.filter-bar label, .inline-form label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--muted); }
+.filter-bar select, .filter-bar input, .inline-form select, .inline-form input {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--white);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-height: 36px;
+}
+.filter-bar select:focus, .inline-form select:focus, .inline-form input:focus, .filter-bar input:focus { outline: 2px solid var(--chart-1); outline-offset: 1px; }
+.filter-dates { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.filter-label { padding-bottom: 9px; }
+.inline-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 16px 0 6px; }
+
+.seg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 18px; }
+.seg a { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--white); font-size: 14px; color: var(--ink); }
+.seg a:hover { border-color: var(--red); }
+.seg a.on { background: var(--red); border-color: var(--red); color: var(--white); font-weight: 600; }
+
+.panel { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; margin-top: 20px; min-width: 0; }
+.grid > .panel { margin-top: 0; }
+.panel > .section-title:first-child { margin-top: 0; }
+.panel .table-wrap { box-shadow: none; border: 1px solid var(--line); }
+.stats .stat em { font-style: normal; }
+.stats .stat strong { font-variant-numeric: normal; }
+.data-table td.wrap { white-space: normal; min-width: 180px; }
+.rank { padding-left: 22px; display: flex; flex-direction: column; gap: 4px; margin: 6px 0 12px; font-size: 14px; }
+
+.chips { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.chips a { display: block; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); }
+.chips a:hover { border-color: var(--red); background: var(--red-soft); }
+.chips strong { font-size: 18px; margin-right: 6px; }
+
+/* Columns: histograms and per-week counts. Marks <= 24px wide, 4px rounded tops, square at the baseline. */
+.chart-columns { margin: 12px 0 0; }
+.chart-columns .cols { display: flex; align-items: stretch; gap: 2px; height: 190px; border-bottom: 1px solid var(--chart-grid); }
+.chart-columns .col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.chart-columns .col-hit { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; color: var(--ink); border-radius: 6px; outline-offset: 2px; }
+.chart-columns .col-hit:hover, .chart-columns .col-hit:focus-visible { background: rgba(42, 120, 214, 0.08); }
+.chart-columns .col-value { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-bottom: 3px; }
+.chart-columns .col-bar { width: min(24px, 70%); min-height: 0; background: var(--chart-1); border-radius: 4px 4px 0 0; }
+.chart-columns .col-bar.selected { background: var(--chart-strong); }
+.chart-columns .col-label { font-size: 11px; color: var(--muted); text-align: center; padding-top: 6px; line-height: 1.2; overflow-wrap: anywhere; position: relative; top: 0; }
+.chart-columns .cols { margin-bottom: 30px; }
+.chart-columns .col { position: relative; }
+.chart-columns .col-label { position: absolute; top: 100%; left: 0; right: 0; }
+.chart-columns figcaption { margin-top: 4px; }
+
+/* Bars: label · track · value. 14px marks with a 4px rounded end; a 2px ink marker for a reference value. */
+.chart-bars ul { list-style: none; display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+.chart-bars .bar-row {
+  display: grid; grid-template-columns: minmax(110px, 38%) minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 5px 6px; border-radius: 8px; color: var(--ink); font-size: 14px;
+}
+.chart-bars a.bar-row:hover, .chart-bars .bar-row:focus-visible { background: rgba(42, 120, 214, 0.08); }
+.chart-bars .bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Long labels (answer options) wrap instead of being cut. */
+.chart-bars.wide .bar-row { grid-template-columns: minmax(160px, 55%) minmax(0, 1fr) auto; }
+.chart-bars.wide .bar-label { white-space: normal; }
+.data-table td.wrap.wide { min-width: 320px; }
+.chart-bars .bar-track { position: relative; height: 14px; border-left: 1px solid var(--chart-grid); }
+.chart-bars .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--chart-1); border-radius: 0 4px 4px 0; min-width: 0; }
+.chart-bars .bar-fill.selected { background: var(--chart-strong); }
+.chart-bars .bar-marker { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 1px; }
+.chart-bars .bar-value { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.band { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.band-icon { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; color: var(--white); }
+.band-strong .band-icon { background: var(--good); }
+.band-developing .band-icon { background: var(--warning); color: var(--ink); }
+.band-attention .band-icon { background: var(--critical); }
+.band-row { margin-top: 10px; }
+.band-row p { margin-top: 4px; }
+.who { margin-top: 8px; font-size: 14px; }
+.who summary { cursor: pointer; color: var(--red); }
+.who p { margin-top: 4px; }
+
+@media (max-width: 1024px) {
+  .staff-shell { grid-template-columns: 1fr; gap: 12px; padding-top: 16px; }
+  .staff-nav { flex-direction: row; flex-wrap: wrap; position: static; }
+}
+@media (max-width: 600px) {
+  .staff-shell { padding: 12px 16px 56px; }
+  .staff .grid.four.stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .staff .stats .stat strong { font-size: 22px; }
+  .data-table td.wrap.wide { min-width: 240px; }
+  .chart-bars .bar-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .chart-bars .bar-track { grid-column: 1 / -1; grid-row: 2; }
+  .chart-columns .col-label { font-size: 10px; }
+}

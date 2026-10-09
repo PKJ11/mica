@@ -1,4 +1,5 @@
 import { VNIT_GUESTS, VNIT_STUDENTS } from "@/data/vnitStudents";
+import { seedCatalogue } from "./catalogue";
 
 type Driver = { query(text: string, params?: unknown[]): Promise<unknown[]> };
 
@@ -12,7 +13,8 @@ export function vnitUserId(roll: string): string {
 }
 
 /**
- * Keeps the database in step with the roster in src/data/vnitStudents.ts (until admin upload, AD-2, exists).
+ * Keeps the database in step with the roster in src/data/vnitStudents.ts (until admin upload, AD-2, exists)
+ * and with the content catalogue in src/data/catalogue/vnit.json.
  * Idempotent: runs on every cold start.
  */
 export async function seed(db: Driver) {
@@ -45,4 +47,5 @@ export async function seed(db: Driver) {
      ON CONFLICT DO NOTHING`,
     [VNIT_COHORT, VNIT_INSTITUTION],
   );
+  await seedCatalogue(db, VNIT_COHORT);
 }

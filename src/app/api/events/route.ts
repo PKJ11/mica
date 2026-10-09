@@ -1,11 +1,22 @@
+import { after } from "next/server";
 import { query, queryOne } from "@/lib/db";
 import { SETTINGS } from "@/lib/settings";
+import { refreshIfStale } from "@/lib/summaries";
 import { getVnitSession } from "@/lib/vnitAuth";
 
 const MAX_BODY = 256_000;
 const MAX_EVENTS = 100;
 const ID_RE = /^[0-9a-f-]{8,64}$/i;
 const TYPE_RE = /^[a-z][a-z0-9_]{0,47}$/;
+
+// Summaries stay fresh while students are active, with no scheduler needed: after a response, this
+// instance checks at most once a minute whether they are older than 15 minutes, and refreshes them.
+let lastSummaryCheck = 0;
+function keepSummariesFresh() {
+  if (Date.now() - lastSummaryCheck < 60_000) return;
+  lastSummaryCheck = Date.now();
+  after(() => refreshIfStale().catch((err) => console.error("summary refresh failed", err)));
+}
 
 type InEvent = {
   id?: unknown;
@@ -119,5 +130,6 @@ export async function POST(req: Request) {
     [s.id, Math.round(inputAgoMs), heartbeats, beatSeconds],
   );
 
+  keepSummariesFresh();
   return Response.json({ session: "open", accepted: rows.length });
 }

@@ -381,19 +381,20 @@ const BILLS=[];{const rb=rng(77);CITIES.forEach(c=>{const med=CITY_BILL[c]*0.82;
    ========================================================= */
 function mcq(el,q,onDone){
  const opts=shuffle(q.opts.map((t,i)=>({t,c:i===0})));
- const box=document.createElement('div');box.className='mcq';
+ const box=document.createElement('div');box.className='mcq';if(q.id)box.dataset.trkQ=q.id;
  box.innerHTML=(q.pre||'')+`<p class="q">${q.q}</p>`+opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span>${o.t}</span></button>`).join('')+`<div class="exp hidden"></div>`;
  el.appendChild(box);
  box.addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b||b.disabled)return;const o=opts[+b.dataset.i];
   $$('.opt',box).forEach((x,i)=>{x.disabled=true;if(opts[i].c)x.classList.add('correct')});if(!o.c)b.classList.add('wrong');
   const ex=$('.exp',box);ex.classList.remove('hidden');ex.classList.add(o.c?'ok':'no');ex.innerHTML=`<b>${o.c?(q.yes||'Correct.'):(q.no||'Not quite.')}</b> ${q.exp}`;
-  onDone&&onDone(o.c)});
+  window.__trk&&q.id&&__trk.answer({id:q.id,chosen:o.t,correct:o.c});onDone&&onDone(o.c)});
  return box}
 function quickCheck(el,chId,qs){
  const wrap=document.createElement('div');
  wrap.innerHTML=`<div class="qc-head"><h2>Quick check</h2><span class="small" id="qcs-${chId}"></span></div><p class="small">Two questions to lock in this chapter. Answer both to mark the chapter complete.</p>`;
  el.appendChild(wrap);let done=0,right=0;
- qs.forEach(q=>mcq(wrap,q,ok=>{done++;if(ok)right++;if(done===qs.length){$('#qcs-'+chId).textContent=`${right} of ${qs.length} correct`;markDone(chId)}}));
+ qs.forEach((q,k)=>{q.id=chId+'-'+(k+1)});
+ qs.forEach(q=>mcq(wrap,q,ok=>{done++;if(ok)right++;if(done===qs.length){$('#qcs-'+chId).textContent=`${right} of ${qs.length} correct`;markDone(chId);window.__trk&&__trk.track('quiz_submitted',{quiz:chId,kind:'quick_check',score:right,total:qs.length})}}));
 }
 </script>
 <script>
@@ -1765,23 +1766,24 @@ const QUIZ=[
  {ch:8,q:'The analyst jumps from "Sales of Snacks in Latur, Dec 2025" to "Stock of Snacks for Latur at Madavi Warehouse, Dec 2025". Why is this possible?',opts:['Both datasets share the same product, location and time dimensions','Both datasets are stored in Excel','The warehouse data is a subset of sales data','Madavi Warehouse is in Latur'],exp:'Drill across works when two fact tables share conformed dimensions, so the same coordinates mean the same thing in both.'},
  {ch:9,q:'In Rosling\'s Gapminder bubble chart, what does the size of each bubble show?',opts:['Population','Income per person','Life expectancy','Region'],exp:'Bubble area shows population. Position shows income and life expectancy; colour shows region.'},
  {ch:10,q:'What makes the Our World in Data grapher especially good for exploration?',opts:['Readers can switch between chart, map and table views and choose countries and years themselves','It uses 3D charts','It shows every indicator on one page','It hides sources to keep the page clean'],exp:'Linked views plus reader control let people ask their own questions, while visible sources keep the work checkable.'}];
+QUIZ.forEach((q,k)=>{q.id='final-'+(k+1)});
 const CH_TITLES={1:'Same numbers, different stories',2:'Why visualise, and how our eyes read charts',3:'The visual vocabulary',4:'Choosing the right chart',5:'Best practices',6:'Pitfalls',7:'Anatomy of a dashboard',8:'Drill down, roll up and drill across',9:'Let the data move',10:'World-class dashboards'};
 function chQ(){return `
 <p class="ch-num">Final quiz</p>
 <h1>Test yourself</h1>
 <p class="lede">Fifteen questions across all ten chapters. You will see the explanation after each answer, and a list of chapters to revisit at the end.</p>
 <div id="quizBox"></div>`}
-function chQInit(){let i=0,res=[];const box=$('#quizBox');
+function chQInit(){let i=0,res=[];const box=$('#quizBox');window.__trk&&(__trk.resetQuestions(QUIZ.map(x=>x.id)),__trk.track('quiz_started',{quiz:'final'}));
  function q(){if(i>=QUIZ.length)return end();const Q=QUIZ[i];box.innerHTML=`<div class="controls" style="justify-content:space-between;margin:0"><b>Question ${i+1} of ${QUIZ.length}</b><span class="small">From Chapter ${Q.ch}</span></div><div class="qprog"><span style="width:${i/QUIZ.length*100}%"></span></div><div id="qPre"></div><div id="qM"></div><div class="controls hidden" id="qNext"><button class="btn primary">${i<QUIZ.length-1?'Next question':'See my results'}</button></div>`;
   if(Q.pre){const d=document.createElement('div');d.style.maxWidth='320px';$('#qPre').appendChild(d);Q.pre(d)}
   mcq($('#qM'),Q,ok=>{res[i]=ok;$('#qNext').classList.remove('hidden')});$('#qNext button').onclick=()=>{i++;q();box.scrollIntoView({behavior:'smooth',block:'start'})}}
- function end(){const sc=res.filter(Boolean).length,miss=[...new Set(QUIZ.filter((x,k)=>!res[k]).map(x=>x.ch))].sort((a,b)=>a-b);store.set('quiz',sc);
+ function end(){const sc=res.filter(Boolean).length,miss=[...new Set(QUIZ.filter((x,k)=>!res[k]).map(x=>x.ch))].sort((a,b)=>a-b);store.set('quiz',sc);window.__trk&&__trk.track('quiz_submitted',{quiz:'final',kind:'final_quiz',score:sc,total:QUIZ.length});
   box.innerHTML=`<div class="fig reveal"><p class="small" style="margin:0">Your score</p><p class="score">${sc}<span class="small"> / ${QUIZ.length}</span></p>
   <p>${sc>=13?'Excellent. You are ready to design dashboards that people actually use.':sc>=10?'Good work. A quick revisit of the chapters below will close the gaps.':sc>=7?'A fair start. Go back through the chapters below, then try again.':'Worth another pass. Work through the chapters below carefully, then take the quiz again.'}</p>
   ${miss.length?`<h3>Chapters to revisit</h3><div class="controls">${miss.map(c=>`<button class="btn sm" data-go="c${c}">Chapter ${c}: ${CH_TITLES[c]}</button>`).join('')}</div>`:'<p>You answered every question correctly.</p>'}
   <h3>Your answers</h3><ol style="padding-left:20px">${QUIZ.map((x,k)=>`<li style="margin-bottom:6px"><span class="${res[k]?'up':'down'}" style="font-weight:700">${res[k]?'Correct':'Missed'}</span>: ${x.q}<br><span class="small">Answer: ${x.opts[0]}</span></li>`).join('')}</ol>
   <button class="btn primary" id="qAgain">Take the quiz again</button></div>`;
-  $('#qAgain').onclick=()=>{i=0;res=[];q()};box.onclick=e=>{const b=e.target.closest('[data-go]');if(b)location.hash=b.dataset.go};markSeen('quiz')}
+  $('#qAgain').onclick=()=>{i=0;res=[];window.__trk&&(__trk.resetQuestions(QUIZ.map(x=>x.id)),__trk.track('quiz_retaken',{quiz:'final'}));q()};box.onclick=e=>{const b=e.target.closest('[data-go]');if(b)location.hash=b.dataset.go};markSeen('quiz')}
  q()}
 
 /* =========================================================

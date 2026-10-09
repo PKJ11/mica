@@ -113,4 +113,117 @@ CREATE TABLE audit_log (
 );
 `,
   },
+  {
+    // Content catalogue (CT-1 to CT-3): institution → module → chapter → element, and which cohorts get which modules.
+    version: 2,
+    sql: `
+CREATE TABLE modules (
+  id text PRIMARY KEY,
+  institution_id text NOT NULL REFERENCES institutions(id),
+  title text NOT NULL,
+  type text NOT NULL CHECK (type IN ('module', 'dashboard', 'game_set')),
+  position integer NOT NULL,
+  version text,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- kind: intro, chapter, practice, quiz or summary. Reports use "chapter" as the topic.
+CREATE TABLE chapters (
+  module_id text NOT NULL REFERENCES modules(id),
+  id text NOT NULL,
+  title text NOT NULL,
+  kind text NOT NULL,
+  position integer NOT NULL,
+  retired boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (module_id, id)
+);
+
+-- Interactive elements. Learning questions (type quick_check or final_quiz) keep their text, options,
+-- correct answer and explanation in data. Retired elements stay so past events still resolve.
+CREATE TABLE elements (
+  module_id text NOT NULL REFERENCES modules(id),
+  id text NOT NULL,
+  chapter_id text,
+  type text NOT NULL,
+  title text,
+  position integer NOT NULL,
+  version text,
+  data jsonb,
+  retired boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (module_id, id)
+);
+
+-- "Not attempted" versus "not assigned" (CT-3).
+CREATE TABLE assignments (
+  cohort_id text NOT NULL REFERENCES cohorts(id),
+  module_id text NOT NULL REFERENCES modules(id),
+  assigned_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (cohort_id, module_id)
+);
+
+CREATE INDEX events_answers ON events (module, element, server_ts) WHERE type = 'answer_submitted';
+`,
+  },
+  {
+    // Summaries (section 5): rebuilt from events by src/lib/summaries.ts, never edited by hand.
+    // Each row keeps a pointer back to its events (session_id, event_id) so every figure is traceable (NF-8).
+    version: 3,
+    sql: `
+-- Active time: 15 s per heartbeat, one per session per 15-second window, so two visible tabs count once.
+-- module and chapter are '' for time outside a module (portal pages). day is the IST calendar day.
+CREATE TABLE activity_summary (
+  user_id text NOT NULL,
+  day date NOT NULL,
+  session_id text NOT NULL,
+  module text NOT NULL,
+  chapter text NOT NULL,
+  active_seconds integer NOT NULL,
+  first_at timestamptz NOT NULL,
+  last_at timestamptz NOT NULL,
+  PRIMARY KEY (user_id, day, session_id, module, chapter)
+);
+CREATE INDEX activity_summary_module ON activity_summary (module, day);
+CREATE INDEX activity_summary_session ON activity_summary (session_id);
+
+-- One row per learning answer. attempt 1 is the first answer to that question by that student.
+CREATE TABLE question_results (
+  event_id text PRIMARY KEY,
+  user_id text NOT NULL,
+  session_id text,
+  module text NOT NULL,
+  question_id text NOT NULL,
+  chapter text,
+  kind text,
+  option text,
+  correct boolean NOT NULL,
+  seconds integer,
+  attempt integer NOT NULL,
+  answered_at timestamptz NOT NULL
+);
+CREATE INDEX question_results_user ON question_results (user_id, module, question_id);
+CREATE INDEX question_results_first ON question_results (module, question_id) WHERE attempt = 1;
+
+-- Per student per chapter: opened, how far read, and when completed (IA-8).
+CREATE TABLE chapter_status (
+  user_id text NOT NULL,
+  module text NOT NULL,
+  chapter text NOT NULL,
+  opens integer NOT NULL,
+  first_opened_at timestamptz,
+  last_opened_at timestamptz,
+  max_scroll integer,
+  completed_at timestamptz,
+  PRIMARY KEY (user_id, module, chapter)
+);
+
+-- One row: how far the summaries have read the events.
+CREATE TABLE summary_state (
+  id text PRIMARY KEY,
+  watermark timestamptz,
+  refreshed_at timestamptz,
+  duration_ms integer,
+  students integer
+);
+`,
+  },
 ];
